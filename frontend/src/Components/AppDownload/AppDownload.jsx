@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import whytous from '../../assets/whyus.jpeg'
 import "./AppDownload.css";
 
 const WhyChooseUs = () => {
@@ -49,7 +50,7 @@ const WhyChooseUs = () => {
           </div>
 
           <div className="why-choose-image">
-            <img src="/src/assets/whyus.jpeg" alt="Why choose Chanvifarm" />
+            <img src={whytous} alt="Why choose Chanvifarm" />
           </div>
 
           <div className="steps-right">
