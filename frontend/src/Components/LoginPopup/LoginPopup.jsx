@@ -87,7 +87,7 @@ const LoginPopup = ({ setShowLogin }) => {
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
       setLoading(true);
-      const response = await axios.post(url + '/api/user/google-auth', {
+        const response = await axios.post('https://chanvifarms-site-backend.onrender.com/api/user/google-auth', {
         credential: credentialResponse.credential
       });
       
