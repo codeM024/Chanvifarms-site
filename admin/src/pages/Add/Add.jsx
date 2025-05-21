@@ -169,7 +169,7 @@ const Add = () => {
     formData.append('status', data.status);
 
     try {
-      const response = await axios.post('http://localhost:4000/api/food/add', formData, {
+      const response = await axios.post('http://https://chanvifarms-site-admin.onrender.com/api/food/add', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
