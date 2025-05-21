@@ -14,7 +14,7 @@ const List = () => {
     category: 'all',
     status: 'all'
   });
-  const url = "http://localhost:4000";
+  const url = "https://chanvifarms-site-admin.onrender.com";
 
   // Get unique categories from the list
   const categories = ['all', ...new Set(list.map(item => item.category))];
