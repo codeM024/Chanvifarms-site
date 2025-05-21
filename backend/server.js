@@ -196,6 +196,6 @@ app.get("/", (req, res) => {
 })
 
 app.listen(port, () => {
-    console.log(`server started on http://localhost:${port}`)
+    console.log(`server started on https://chanvifarms-site-backend.onrender.com`)
 })
 
