@@ -119,7 +119,6 @@ const Navbar = ({setShowLogin}) => {
           <Link to='/' onClick={()=>{setActiveNav('home'); setMobileMenuOpen(false)}} className={activeNav === "home" ? "active" : ""}>Home</Link>
           <Link to='/about' onClick={()=>{setActiveNav('about'); setMobileMenuOpen(false)}} className={activeNav === "about" ? "active" : ""}>About Us</Link>
           <Link to='/shop' onClick={()=>{setActiveNav('shop'); setMobileMenuOpen(false)}} className={activeNav === "shop" ? "active" : ""}>Shop</Link>
-          <Link to='/faq' onClick={()=>{setActiveNav('faq'); setMobileMenuOpen(false)}} className={activeNav === "faq" ? "active" : ""}>Ask Your Queries</Link>
           <Link to='/contact' onClick={()=>{setActiveNav('contact'); setMobileMenuOpen(false)}} className={activeNav === "contact" ? "active" : ""}>Contact Us</Link>
         </ul>
 
