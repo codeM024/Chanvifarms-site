@@ -10,6 +10,7 @@ import {
   FaChevronDown,
   FaSortAmountDown,
   FaSortAmountUp,
+  FaTrash,
 } from "react-icons/fa";
 
 const Orders = () => {
@@ -32,61 +33,190 @@ const Orders = () => {
     }
   };
 
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [cancelReason, setCancelReason] = useState('');
+  const [selectedOrderForCancel, setSelectedOrderForCancel] = useState(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [selectedOrderForDelete, setSelectedOrderForDelete] = useState(null);
+  
+  const handleCancelSubmit = async () => {
+    if (!cancelReason.trim()) {
+      toast.error("Please provide a cancellation reason");
+      return;
+    }
+
+    try {
+      const loadingToast = toast.loading("Cancelling order...");
+      
+      // Update order status
+      const response = await axios.post(url + "/api/order/status", {
+        orderId: selectedOrderForCancel.orderId,
+        status: 'cancelled',
+        cancelReason: cancelReason.trim()
+      });
+
+      if (response.data.success) {
+        toast.update(loadingToast, {
+          render: "Order cancelled successfully",
+          type: "success",
+          isLoading: false,
+          autoClose: 3000
+        });
+
+        // If we got a WhatsApp URL, open it after a short delay
+        if (response.data.whatsappUrl) {
+          setTimeout(() => {
+            window.open(response.data.whatsappUrl, '_blank');
+          }, 500);
+        }
+
+        await fetchAllOrders();
+        setShowCancelDialog(false);
+        setCancelReason('');
+        setSelectedOrderForCancel(null);
+      } else {
+        toast.update(loadingToast, {
+          render: response.data.message || "Failed to cancel order",
+          type: "error",
+          isLoading: false,
+          autoClose: 3000
+        });
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to cancel order");
+    }
+  };
+
+  const handleDeleteOrder = async () => {
+    try {
+      const loadingToast = toast.loading("Deleting order...");
+      
+      const response = await axios.delete(`${url}/api/order/delete/${selectedOrderForDelete._id}`);
+      
+      if (response.data.success) {
+        toast.update(loadingToast, {
+          render: "Order deleted successfully",
+          type: "success",
+          isLoading: false,
+          autoClose: 3000
+        });
+        await fetchAllOrders();
+        setShowDeleteDialog(false);
+        setSelectedOrderForDelete(null);
+      } else {
+        toast.update(loadingToast, {
+          render: response.data.message || "Failed to delete order",
+          type: "error",
+          isLoading: false,
+          autoClose: 3000
+        });
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to delete order");
+      setShowDeleteDialog(false);
+      setSelectedOrderForDelete(null);
+    }
+  };
+
   const statusHandler = async (event, orderId, currentOrder) => {
     const newStatus = event.target.value;
     const currentStatus = currentOrder.status;
     
     try {
-      let cancelReason = '';
-      
-      // If status is being changed to cancelled, prompt for reason
+      // Validate status transition from pending
+      if (currentStatus === 'pending' && !['confirmed', 'cancelled'].includes(newStatus)) {
+        toast.error("Pending orders can only be confirmed or cancelled");
+        event.target.value = currentStatus; // Reset select to original value
+        return;
+      }
+
+      // If status is cancelled, show the cancel dialog
       if (newStatus === 'cancelled') {
-        cancelReason = window.prompt('Please enter the reason for cancellation:');
-        if (!cancelReason) {
-          toast.error("Cancellation reason is required");
-          return;
-        }
-      }
-
-      // If it's a WhatsApp Pay order that's being confirmed
-      if (currentOrder.payment.method === 'WHATSAPP_PAY' && newStatus === 'confirmed') {
-        const confirmResponse = await axios.post(url + "/api/order/confirm-whatsapp-payment", {
+        setSelectedOrderForCancel({
           orderId,
-          transactionId: `WP_${Date.now()}`
+          order: currentOrder
         });
-        
-        if (confirmResponse.data.success) {
-          // Send WhatsApp confirmation if available
-          if (confirmResponse.data.whatsappConfirmationUrl) {
-            window.open(confirmResponse.data.whatsappConfirmationUrl, '_blank');
-          }
-        } else {
-          toast.error("Failed to confirm WhatsApp payment");
-          return;
-        }
+        setShowCancelDialog(true);
+        // Format items for cancellation message preview
+        const itemsList = currentOrder.items.map((item, index) => 
+          `${index + 1}. ${item.name} (${item.size}) × ${item.quantity}`
+        ).join('\n');
+        // Set initial cancel reason with order details
+        setCancelReason(`Order Details:\n${itemsList}\n\nReason for cancellation: `);
+        event.target.value = currentStatus; // Keep the current status until confirmed
+        return;
       }
 
-      // Update order status
-      const response = await axios.post(url + "/api/order/status", {
-        orderId,
-        status: newStatus,
-        cancelReason // Include cancel reason if status is cancelled
-      });
+      // Show loading toast for better UX
+      const loadingToast = toast.loading(`Updating order status to ${newStatus}...`);
 
-      if (response.data.success) {
-        // If we got a WhatsApp notification URL in the response, open it
-        if (response.data.whatsappUrl) {
-          window.open(response.data.whatsappUrl, '_blank');
+      try {
+        // Handle WhatsApp Pay confirmation first if needed
+        if (currentOrder.payment.method === 'WHATSAPP_PAY' && newStatus === 'confirmed') {
+          const confirmResponse = await axios.post(url + "/api/order/confirm-whatsapp-payment", {
+            orderId,
+            transactionId: `WP_${Date.now()}`
+          });
+          
+          if (!confirmResponse.data.success) {
+            toast.update(loadingToast, { 
+              render: "Failed to confirm WhatsApp payment", 
+              type: "error",
+              isLoading: false,
+              autoClose: 3000
+            });
+            event.target.value = currentStatus; // Reset select to original value
+            return;
+          }
         }
-        
-        toast.success(`Order status updated to ${newStatus}`);
-        await fetchAllOrders();
-      } else {
-        toast.error(response.data.message || "Failed to update status");
+
+        // Update order status
+        const response = await axios.post(url + "/api/order/status", {
+          orderId,
+          status: newStatus,
+          cancelReason
+        });
+
+        if (response.data.success) {
+          // Update loading toast to success
+          toast.update(loadingToast, {
+            render: `Order ${newStatus === 'confirmed' ? 'confirmed! 🎉' : `status updated to ${newStatus}`}`,
+            type: "success",
+            isLoading: false,
+            autoClose: 3000
+          });
+
+          // Open WhatsApp notification in new tab if URL is provided
+          if (response.data.whatsappUrl) {
+            // Small delay to ensure the toast is seen
+            setTimeout(() => {
+              window.open(response.data.whatsappUrl, '_blank');
+            }, 500);
+          }
+
+          await fetchAllOrders();
+        } else {
+          toast.update(loadingToast, {
+            render: response.data.message || "Failed to update status",
+            type: "error",
+            isLoading: false,
+            autoClose: 3000
+          });
+          event.target.value = currentStatus; // Reset select to original value
+        }
+      } catch (error) {
+        toast.update(loadingToast, {
+          render: error.response?.data?.message || "Failed to update status",
+          type: "error",
+          isLoading: false,
+          autoClose: 3000
+        });
+        event.target.value = currentStatus; // Reset select to original value
       }
     } catch (error) {
-      console.error("Error updating order status:", error);
-      toast.error(error.response?.data?.message || "Failed to update status");
+      console.error("Error in status handler:", error);
+      toast.error("An unexpected error occurred");
+      event.target.value = currentStatus; // Reset select to original value
     }
   };
 
@@ -344,27 +474,51 @@ ${mapLink}`;
               <div className="order-status-section">
                 <div className="order-id-section">
                   <div className="order-id">Order #{order._id.slice(-6)}</div>
-                  <button 
-                    className="whatsapp-button"
-                    onClick={() => handleWhatsAppClick(order)}
-                    title="Send to WhatsApp"
-                  >
-                    <FaWhatsapp />
-                  </button>
+                  <div className="order-actions">
+                    <button 
+                      className="whatsapp-button"
+                      onClick={() => handleWhatsAppClick(order)}
+                      title="Send to WhatsApp"
+                    >
+                      <FaWhatsapp />
+                    </button>
+                    {(order.status === 'delivered' || order.status === 'cancelled') && (
+                      <button 
+                        className="delete-button"
+                        onClick={() => {
+                          setSelectedOrderForDelete(order);
+                          setShowDeleteDialog(true);
+                        }}
+                        title="Delete Order"
+                      >
+                        <FaTrash />
+                      </button>
+                    )}
+                  </div>
                 </div>
                 <div className="status-select-wrapper">
                   <select
                     onChange={(event) => statusHandler(event, order._id, order)}
                     value={order.status}
                     className={`status-select status-${order.status.toLowerCase()}`}
+                    disabled={order.status === 'delivered' || order.status === 'cancelled'}
                   >
-                    <option value="pending">Pending</option>
-                    <option value="confirmed">Confirmed</option>
-                    <option value="processing">Processing</option>
-                    <option value="packing">Packing</option>
-                    <option value="out-for-delivery">Out for Delivery</option>
-                    <option value="delivered">Delivered</option>
-                    <option value="cancelled">Cancelled</option>
+                    {order.status === 'pending' ? (
+                      <>
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirm Order</option>
+                        <option value="cancelled">Cancel Order</option>
+                      </>
+                    ) : (
+                      <>
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="packing">Packing</option>
+                        <option value="out-for-delivery">Out for Delivery</option>
+                        <option value="delivered">Delivered</option>
+                        <option value="cancelled">Cancelled</option>
+                      </>
+                    )}
                   </select>
                   <FaChevronDown className="select-arrow" />
                 </div>
@@ -480,6 +634,145 @@ ${mapLink}`;
           ))}
         </div>
       </div>
+
+      {/* Cancel Order Dialog */}
+      {showCancelDialog && selectedOrderForCancel && (
+        <div className="cancel-dialog-overlay">
+          <div className="cancel-dialog">
+            <div className="cancel-dialog-header">
+              <h3>Cancel Order #{selectedOrderForCancel.order._id.slice(-6)}</h3>
+              <button 
+                className="close-button"
+                onClick={() => {
+                  setShowCancelDialog(false);
+                  setCancelReason('');
+                  setSelectedOrderForCancel(null);
+                }}
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="order-summary-section">
+              <div className="customer-details">
+                <p className="customer-name">
+                  {selectedOrderForCancel.order.address.firstName} {selectedOrderForCancel.order.address.lastName}
+                </p>
+                <p className="customer-phone">{selectedOrderForCancel.order.address.phone}</p>
+              </div>
+              
+              <div className="order-items">
+                <h4>Order Items:</h4>
+                <div className="items-list">
+                  {selectedOrderForCancel.order.items.map((item, idx) => (
+                    <div key={idx} className="item-row">
+                      <span className="item-name">{item.name}</span>
+                      <span className="item-size">({item.size})</span>
+                      <span className="item-quantity">×{item.quantity}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="total-amount">
+                  Total Amount: ₹{selectedOrderForCancel.order.amount.toFixed(2)}
+                </div>
+              </div>
+            </div>
+            
+            <div className="cancel-form">
+              <label>
+                <span className="required">*</span> 
+                Reason for Cancellation:
+              </label>
+              <textarea
+                value={cancelReason}
+                onChange={(e) => setCancelReason(e.target.value)}
+                placeholder="Please provide a detailed reason for cancellation..."
+                rows="4"
+                className={!cancelReason.trim() ? 'error' : ''}
+              />
+              {!cancelReason.trim() && (
+                <span className="error-message">Cancellation reason is required</span>
+              )}
+              
+              <div className="cancel-note">
+                <p>
+                  <FaWhatsapp className="whatsapp-icon" />
+                  A cancellation message will be sent to the customer via WhatsApp
+                </p>
+              </div>
+              
+              <div className="cancel-actions">
+                <button 
+                  className="btn-cancel"
+                  onClick={() => {
+                    setShowCancelDialog(false);
+                    setCancelReason('');
+                    setSelectedOrderForCancel(null);
+                  }}
+                >
+                  Back
+                </button>
+                <button 
+                  className="btn-confirm"
+                  onClick={handleCancelSubmit}
+                  disabled={!cancelReason.trim()}
+                >
+                  Confirm & Send WhatsApp
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Order Confirmation Dialog */}
+      {showDeleteDialog && selectedOrderForDelete && (
+        <div className="delete-dialog-overlay">
+          <div className="delete-dialog">
+            <div className="delete-dialog-header">
+              <h3>Delete Order</h3>
+              <button 
+                className="close-button"
+                onClick={() => {
+                  setShowDeleteDialog(false);
+                  setSelectedOrderForDelete(null);
+                }}
+              >
+                ×
+              </button>
+            </div>
+            
+            <div className="delete-dialog-content">
+              <div className="warning-icon">⚠️</div>
+              <p>Are you sure you want to delete this order?</p>
+              <div className="order-info">
+                <p><strong>Order ID:</strong> #{selectedOrderForDelete._id.slice(-6)}</p>
+                <p><strong>Status:</strong> {selectedOrderForDelete.status}</p>
+                <p><strong>Customer:</strong> {selectedOrderForDelete.address.firstName} {selectedOrderForDelete.address.lastName}</p>
+              </div>
+              <p className="warning-text">This action cannot be undone.</p>
+            </div>
+
+            <div className="delete-dialog-actions">
+              <button 
+                className="btn-cancel"
+                onClick={() => {
+                  setShowDeleteDialog(false);
+                  setSelectedOrderForDelete(null);
+                }}
+              >
+                Cancel
+              </button>
+              <button 
+                className="btn-delete"
+                onClick={handleDeleteOrder}
+              >
+                Delete Order
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
