@@ -321,58 +321,98 @@ const updateStatus = async (req, res) => {
     try {
         const { orderId, status, cancelReason } = req.body;
 
-        // Get the order and user details
-        const order = await orderModel.findById(orderId).populate('userId');
-        if (!order) {
-            return res.status(404).json({ success: false, message: "Order not found" });
-        }
-
-        // Update order status
-        await orderModel.findByIdAndUpdate(orderId, { status });
-
-        // Format the user's phone number for WhatsApp
-        const formattedPhone = order.address.phone.replace(/^\+/, '');
-
-        // Prepare notification message based on status
-        let notificationMessage = '';
-        if (status === 'confirmed') {
-            notificationMessage = `🎉 Order Confirmed!\n\n` +
-                `Dear ${order.address.firstName},\n\n` +
-                `Your order #${order._id.toString().slice(-6)} has been confirmed!\n` +
-                `Amount: ₹${order.amount}\n\n` +
-                `You can track your order in the My Orders section of our website.\n\n` +
-                `Thank you for choosing Chanvi Farms! 🌿`;
-        } else if (status === 'cancelled') {
-            notificationMessage = `❌ Order Cancelled\n\n` +
-                `Dear ${order.address.firstName},\n\n` +
-                `We regret to inform you that your order #${order._id.toString().slice(-6)} has been cancelled.\n` +
-                `Reason: ${cancelReason || 'Not specified'}\n\n` +
-                `If you have any questions, please don't hesitate to contact us.\n\n` +
-                `We hope to serve you again soon!`;
-        }
-
-        // Send WhatsApp notification if status is confirmed or cancelled
-        if (notificationMessage) {
-            const whatsappUrl = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(notificationMessage)}`;
-            
-            // Return success response with WhatsApp URL
-            return res.json({
-                success: true,
-                message: "Status Updated",
-                whatsappUrl
+        // Input validation
+        if (!orderId || !status) {
+            return res.status(400).json({
+                success: false,
+                message: "Order ID and status are required"
             });
         }
 
-        // Return regular success response for other status updates
-        res.json({
+        // Get the order details
+        const order = await orderModel.findById(orderId);
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: "Order not found"
+            });
+        }
+
+        // Handle WhatsApp Pay specific logic for confirming orders
+        if (status === 'confirmed' && order.payment.method === 'WHATSAPP_PAY') {
+            order.payment.status = 'completed';
+            order.payment.whatsappPaymentTimestamp = new Date();
+            order.payment.transactionId = `WP_${Date.now()}`;
+        }
+
+        // Update order status
+        order.status = status;
+        await order.save();
+
+        // Format customer's phone number for WhatsApp
+        const formattedPhone = order.address.phone.replace(/^\+/, '').replace(/\s/g, '');
+        
+        // Prepare notification message based on status
+        let notificationMessage = '';
+        if (status === 'confirmed') {
+            notificationMessage = `🎉 *Order Confirmed!*\n\n` +
+                `Dear ${order.address.firstName},\n\n` +
+                `Your order #${order._id.toString().slice(-6)} has been confirmed!\n` +
+                `*Amount:* ₹${order.amount}\n\n` +
+                `*Order Details:*\n` +
+                order.items.map((item, index) => 
+                    `${index + 1}. ${item.name} (${item.size}) × ${item.quantity}`
+                ).join('\n') + '\n\n' +
+                `You can track your order in the My Orders section of our website.\n\n` +
+                `Thank you for choosing Chanvi Farms! 🌿`;
+        } else if (status === 'cancelled') {
+            if (!cancelReason) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Cancellation reason is required"
+                });
+            }
+            notificationMessage = `❌ *Order Cancelled*\n\n` +
+                `Dear ${order.address.firstName},\n\n` +
+                `We regret to inform you that your order #${order._id.toString().slice(-6)} has been cancelled.\n\n` +
+                `*Reason:* ${cancelReason}\n\n` +
+                `*Order Details:*\n` +
+                order.items.map((item, index) => 
+                    `${index + 1}. ${item.name} (${item.size}) × ${item.quantity}`
+                ).join('\n') + '\n\n' +
+                `If you have any questions, please don't hesitate to contact us.\n\n` +
+                `We hope to serve you again soon!`;
+        } else if (status === 'out-for-delivery') {
+            notificationMessage = `🚚 *Order Out for Delivery!*\n\n` +
+                `Dear ${order.address.firstName},\n\n` +
+                `Your order #${order._id.toString().slice(-6)} is out for delivery!\n` +
+                `We'll deliver your order to:\n` +
+                `${order.address.street}\n` +
+                `${order.address.city}, ${order.address.state}\n` +
+                `${order.address.zipcode}\n\n` +
+                `Our delivery partner will contact you shortly.\n\n` +
+                `Thank you for choosing Chanvi Farms! 🌿`;
+        }
+
+        // If we have a notification message, create WhatsApp URL
+        let whatsappUrl = null;
+        if (notificationMessage) {
+            whatsappUrl = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(notificationMessage)}`;
+        }
+
+        // Return success response with WhatsApp URL if available
+        return res.json({
             success: true,
-            message: "Status Updated"
+            message: `Order status updated to ${status}`,
+            whatsappUrl,
+            updatedStatus: status
         });
+
     } catch (error) {
         console.error("Error updating order status:", error);
         res.status(500).json({
             success: false,
-            message: "Failed to update order status"
+            message: error.message || "Failed to update order status"
         });
     }
 }

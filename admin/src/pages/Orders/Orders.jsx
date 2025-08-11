@@ -37,10 +37,15 @@ const Orders = () => {
     const currentStatus = currentOrder.status;
     
     try {
-      // Validate status transition
-      if (currentStatus === 'pending' && newStatus !== 'confirmed' && newStatus !== 'cancelled') {
-        toast.error("Order must be confirmed or cancelled from pending state");
-        return;
+      let cancelReason = '';
+      
+      // If status is being changed to cancelled, prompt for reason
+      if (newStatus === 'cancelled') {
+        cancelReason = window.prompt('Please enter the reason for cancellation:');
+        if (!cancelReason) {
+          toast.error("Cancellation reason is required");
+          return;
+        }
       }
 
       // If it's a WhatsApp Pay order that's being confirmed
@@ -55,6 +60,9 @@ const Orders = () => {
           if (confirmResponse.data.whatsappConfirmationUrl) {
             window.open(confirmResponse.data.whatsappConfirmationUrl, '_blank');
           }
+        } else {
+          toast.error("Failed to confirm WhatsApp payment");
+          return;
         }
       }
 
@@ -62,17 +70,23 @@ const Orders = () => {
       const response = await axios.post(url + "/api/order/status", {
         orderId,
         status: newStatus,
+        cancelReason // Include cancel reason if status is cancelled
       });
 
       if (response.data.success) {
+        // If we got a WhatsApp notification URL in the response, open it
+        if (response.data.whatsappUrl) {
+          window.open(response.data.whatsappUrl, '_blank');
+        }
+        
         toast.success(`Order status updated to ${newStatus}`);
         await fetchAllOrders();
       } else {
-        toast.error("Failed to update status");
+        toast.error(response.data.message || "Failed to update status");
       }
     } catch (error) {
       console.error("Error updating order status:", error);
-      toast.error("Failed to update status");
+      toast.error(error.response?.data?.message || "Failed to update status");
     }
   };
 
