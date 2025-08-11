@@ -11,10 +11,20 @@ import crypto from 'crypto';
 import Order from './models/orderModel.js';
 
 // Initialize Razorpay
-const razorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID,
-    key_secret: process.env.RAZORPAY_KEY_SECRET
-});
+let razorpay;
+try {
+    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+        console.error("Razorpay credentials are missing in environment variables");
+    } else {
+        razorpay = new Razorpay({
+            key_id: process.env.RAZORPAY_KEY_ID,
+            key_secret: process.env.RAZORPAY_KEY_SECRET
+        });
+        console.log("Razorpay initialized successfully");
+    }
+} catch (error) {
+    console.error("Failed to initialize Razorpay:", error);
+}
 
 // Validate required environment variables
 const requiredEnvVars = [
@@ -75,10 +85,10 @@ const validateRequest = (req, res, next) => {
             });
         }
         
-        if (!payment?.method || !['COD', 'Online'].includes(payment.method)) {
+        if (!payment?.method || !['COD', 'Online', 'WHATSAPP_PAY'].includes(payment.method)) {
             return res.status(400).json({
                 success: false,
-                message: "Invalid payment method"
+                message: "Invalid payment method. Please select a valid payment option."
             });
         }
     }
@@ -91,7 +101,21 @@ app.use(validateRequest);
 // Razorpay order creation endpoint
 app.post('/api/order/create', async (req, res) => {
     try {
+        if (!razorpay) {
+            return res.status(503).json({
+                success: false,
+                message: 'Payment service is currently unavailable'
+            });
+        }
+
         const { amount } = req.body;
+        if (!amount || amount <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid amount'
+            });
+        }
+
         const options = {
             amount: amount * 100, // Razorpay expects amount in paise
             currency: 'INR',
@@ -112,7 +136,8 @@ app.post('/api/order/create', async (req, res) => {
         console.error('Razorpay order creation error:', error);
         res.status(500).json({
             success: false,
-            message: 'Failed to create payment order'
+            message: 'Failed to create payment order',
+            error: error.message
         });
     }
 });

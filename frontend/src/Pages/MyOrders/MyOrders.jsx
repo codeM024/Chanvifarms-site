@@ -38,16 +38,44 @@ const MyOrders = () => {
         }
     }, [token]);
 
-    const getStatusColor = (status) => {
-        const colors = {
-            pending: '#ff9800',
-            confirmed: '#2196f3',
-            packing: '#673ab7',
-            'out-for-delivery': '#009688',
-            delivered: '#4caf50',
-            cancelled: '#f44336'
+    const getStatusDetails = (status) => {
+        const statusMap = {
+            pending: {
+                color: '#ff9800',
+                text: 'Order Pending',
+                description: 'Your order has been received and is awaiting confirmation'
+            },
+            confirmed: {
+                color: '#2196f3',
+                text: 'Order Confirmed',
+                description: 'Your order has been confirmed and will be processed soon'
+            },
+            packing: {
+                color: '#673ab7',
+                text: 'Packing',
+                description: 'Your order is being packed'
+            },
+            'out-for-delivery': {
+                color: '#009688',
+                text: 'Out for Delivery',
+                description: 'Your order is on its way'
+            },
+            delivered: {
+                color: '#4caf50',
+                text: 'Delivered',
+                description: 'Your order has been delivered'
+            },
+            cancelled: {
+                color: '#f44336',
+                text: 'Cancelled',
+                description: 'Your order has been cancelled'
+            }
         };
-        return colors[status] || '#757575';
+        return statusMap[status] || {
+            color: '#757575',
+            text: status.charAt(0).toUpperCase() + status.slice(1),
+            description: 'Status is being updated'
+        };
     };
 
     const formatDate = (date) => {
@@ -90,12 +118,19 @@ const MyOrders = () => {
                                     <p className="order-date">{formatDate(order.createdAt)}</p>
                                 </div>
                                 <div className="tracking-section">
-                                    <div 
-                                        className="order-status"
-                                        style={{ backgroundColor: getStatusColor(order.status) + '20',
-                                                color: getStatusColor(order.status) }}
-                                    >
-                                        {order.status.replace(/-/g, ' ').toUpperCase()}
+                                    <div className="order-status-container">
+                                        <div 
+                                            className="order-status"
+                                            style={{ 
+                                                backgroundColor: getStatusDetails(order.status).color + '20',
+                                                color: getStatusDetails(order.status).color 
+                                            }}
+                                        >
+                                            {getStatusDetails(order.status).text}
+                                        </div>
+                                        <div className="status-description">
+                                            {getStatusDetails(order.status).description}
+                                        </div>
                                     </div>
                                     <button 
                                         className={`track-order-btn ${trackingOrder === order._id ? 'tracking' : ''}`}

@@ -10,6 +10,7 @@ const OrderPage = () => {
     const [addresses, setAddresses] = useState([]);
     const [selectedAddress, setSelectedAddress] = useState(null);
     const [paymentMethod, setPaymentMethod] = useState('COD');
+    const [orderId, setOrderId] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -35,6 +36,28 @@ const OrderPage = () => {
             console.error('Error loading addresses:', error);
             toast.error('Failed to load delivery addresses');
         }
+    };
+
+    const formatWhatsAppMessage = (orderData, orderId) => {
+        const items = orderData.items.map(item => 
+            `• ${item.name} (${item.size}) x ${item.quantity} - ₹${(item.price * item.quantity).toFixed(2)}`
+        ).join('\n');
+
+        const address = orderData.address;
+        
+        return encodeURIComponent(
+            `🛒 *New Order from Chanvi Farms*\n\n` +
+            `*Order ID:* ${orderId}\n\n` +
+            `*Order Items:*\n${items}\n\n` +
+            `*Total Amount:* ₹${orderData.amount.toFixed(2)}\n\n` +
+            `*Delivery Address:*\n` +
+            `${address.firstName} ${address.lastName}\n` +
+            `${address.street}\n` +
+            `${address.city}, ${address.state} ${address.zipcode}\n` +
+            `📱 ${address.phone}\n\n` +
+            `*Payment Method:* Order via WhatsApp\n\n` +
+            `Please confirm my order. Thank you! 🌿`
+        );
     };
 
     const handlePlaceOrder = async () => {
@@ -72,7 +95,19 @@ const OrderPage = () => {
             const response = await axios.post('/api/order/place', orderData);
 
             if (response.data.success) {
-                if (paymentMethod === 'COD') {
+                const newOrderId = response.data.orderId || response.data.data?.order_id;
+                setOrderId(newOrderId);
+
+                if (paymentMethod === 'WhatsApp') {
+                    const whatsappNumber = "917899940804";
+                    const whatsappMessage = formatWhatsAppMessage(orderData, newOrderId);
+                    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
+                    
+                    await clearCart();
+                    window.open(whatsappUrl, '_blank');
+                    toast.success('Order details sent to WhatsApp. Please complete your order there.');
+                    navigate('/orders');
+                } else if (paymentMethod === 'COD') {
                     await clearCart();
                     toast.success('Order placed successfully!');
                     navigate('/orders');
@@ -162,34 +197,51 @@ const OrderPage = () => {
                 )}
             </div>
 
-            {/* Payment Method Selection */}
+                    {/* Payment Method Selection */}
             <div className="mb-6">
                 <h2 className="text-xl font-semibold mb-4">Payment Method</h2>
-                <div className="space-y-2">
-                    <label className="flex items-center space-x-2">
+                <div className="space-y-3">
+                    <label className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
                         <input
                             type="radio"
                             value="COD"
                             checked={paymentMethod === 'COD'}
                             onChange={(e) => setPaymentMethod(e.target.value)}
-                            className="form-radio"
+                            className="form-radio text-green-600"
                         />
-                        <span>Cash on Delivery</span>
+                        <span className="flex items-center">
+                            <i className="fas fa-money-bill-wave mr-2 text-green-600"></i>
+                            Cash on Delivery
+                        </span>
                     </label>
-                    <label className="flex items-center space-x-2">
+                    <label className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
                         <input
                             type="radio"
                             value="Online"
                             checked={paymentMethod === 'Online'}
                             onChange={(e) => setPaymentMethod(e.target.value)}
-                            className="form-radio"
+                            className="form-radio text-blue-600"
                         />
-                        <span>Online Payment</span>
+                        <span className="flex items-center">
+                            <i className="fas fa-credit-card mr-2 text-blue-600"></i>
+                            Online Payment
+                        </span>
+                    </label>
+                    <label className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input
+                            type="radio"
+                            value="WhatsApp"
+                            checked={paymentMethod === 'WhatsApp'}
+                            onChange={(e) => setPaymentMethod(e.target.value)}
+                            className="form-radio text-green-600"
+                        />
+                        <span className="flex items-center">
+                            <i className="fab fa-whatsapp mr-2 text-green-500 text-xl"></i>
+                            Order via WhatsApp
+                        </span>
                     </label>
                 </div>
-            </div>
-
-            {/* Order Summary */}
+            </div>            {/* Order Summary */}
             <div className="mb-6">
                 <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
                 <div className="bg-gray-50 p-4 rounded-lg">

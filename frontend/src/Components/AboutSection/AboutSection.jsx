@@ -48,32 +48,13 @@ const AboutSection = () => {
             </div>
           </div>
 
-          <a href="tel:+918919825034" className="call-now-btn">
+          <a href="tel:+919900088164" className="call-now-btn">
           <i className="fas fa-phone"></i>
             Call Now
           </a>
         </div>
         <div className="about-image">
           <img src={headerImg} alt="Fresh produce" />
-        </div>
-      </div>
-
-      <div className="promo-cards">
-        <div className="promo-card vegetables" style={{backgroundImage: `url(${veggiesPromo})`}}>
-          <div className="promo-content">
-            <h3>Get 10% off</h3>
-            <p>On Fresh vegetables</p>
-          </div>
-        </div>
-        <div className="promo-card grapes" style={{backgroundImage: `url(${grapesPromo})`}}>
-          <div className="discount-sticker">
-            <span>5%</span>
-            <span>OFF</span>
-          </div>
-          <div className="promo-content">
-            <h3>Heavy Discount</h3>
-            <p>On Fresh Fruits</p>
-          </div>
         </div>
       </div>
     </div>

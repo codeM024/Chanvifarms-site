@@ -1,33 +1,222 @@
-.loading-container {
+/* Enhanced background */
+.enhanced-bg {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* Enhanced content centering and shadow */
+.enhanced-content {
+  padding: 4rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
-  width: 100%;
-  background: rgba(255, 255, 255, 0.9);
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 1000;
+  backdrop-filter: blur(10px);
+  width: 90%;
+  max-width: 700px;
+  min-height: 600px;
+  gap: 3rem;
 }
 
-.loading-spinner {
-  width: 50px;
-  height: 50px;
-  border: 5px solid #f3f3f3;
-  border-top: 5px solid #4CAF50;
+/* Glowing animated ring */
+.glow-ring {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 140px; height: 140px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 6px solid #a5d6a7;
+  box-shadow: 0 0 32px 8px #81c784, 0 0 0 0 #fff;
+  animation: glow-pulse 2s infinite alternate;
+  z-index: 0;
+}
+
+@keyframes glow-pulse {
+  0% { box-shadow: 0 0 32px 8px #81c784, 0 0 0 0 #fff; }
+  100% { box-shadow: 0 0 48px 16px #66bb6a, 0 0 16px 8px #fff; }
+}
+
+/* Enhanced logo */
+.logo-wrapper {
+  position: relative;
+  width: 250px;
+  height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.spinner-ring {
+  position: absolute;
+  width: 280px;
+  height: 280px;
+  border: 4px solid rgba(76, 175, 80, 0.1);
+  border-top: 4px solid #4CAF50;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
 
-.loading-container p {
-  margin-top: 20px;
-  color: #333;
-  font-size: 1.2em;
+.enhanced-logo-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+.enhanced-logo {
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
+  z-index: 1;
+  animation: logo-bounce 1.5s infinite alternate;
+}
+@keyframes logo-bounce {
+  0% { filter: drop-shadow(0 0 0 #8bc34a); }
+  100% { filter: drop-shadow(0 0 16px #8bc34a); }
+}
+
+/* Enhanced loading text */
+.enhanced-loading-text {
+  text-align: center;
+  width: 100%;
+  max-width: 500px;
+}
+
+.enhanced-loading-text h2 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  color: #388e3c;
+  letter-spacing: 2px;
+  margin-bottom: 0.5rem;
+  font-size: 2.5rem;
+  text-transform: uppercase;
+}
+
+.animated-loading-text {
+  font-size: 1.3rem;
+  color: #388e3c;
+  margin-bottom: 1.5rem;
+  animation: text-fade 2s infinite alternate;
+  font-weight: 500;
+}
+@keyframes text-fade {
+  0% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+/* Enhanced progress bar */
+.progress-container {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.enhanced-progress-bar {
+  width: 100%;
+  height: 20px;
+  background: #e0e0e0;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 12px rgba(76,175,80,0.12);
+  position: relative;
+}
+.enhanced-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #43a047, #8bc34a, #43a047);
+  background-size: 200% 100%;
+  animation: progress-shimmer 2s linear infinite;
+  border-radius: 7px;
+  transition: width 0.4s cubic-bezier(.68,-0.55,.27,1.55);
+}
+@keyframes progress-shimmer {
+  0% { background-position: 0% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Enhanced percentage */
+.enhanced-percentage {
+  font-weight: 600;
+  color: #388e3c;
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+  transition: color 0.3s;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .enhanced-content {
+    padding: 3rem 2rem;
+    min-height: 500px;
+  }
+
+  .logo-wrapper {
+    width: 200px;
+    height: 200px;
+  }
+
+  .spinner-ring {
+    width: 220px;
+    height: 220px;
+  }
+
+  .enhanced-logo {
+    width: 160px;
+    height: 160px;
+  }
+
+  .enhanced-loading-text h2 {
+    font-size: 2rem;
+  }
+
+  .animated-loading-text {
+    font-size: 1.1rem;
+  }
+
+  .progress-container {
+    max-width: 300px;
+  }
+
+  .enhanced-progress-bar {
+    height: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .enhanced-content {
+    padding: 2rem 1.5rem;
+    min-height: 450px;
+  }
+
+  .logo-wrapper {
+    width: 150px;
+    height: 150px;
+  }
+
+  .spinner-ring {
+    width: 170px;
+    height: 170px;
+  }
+
+  .enhanced-logo {
+    width: 120px;
+    height: 120px;
+  }
+
+  .enhanced-loading-text h2 {
+    font-size: 1.5rem;
+  }
+
+  .animated-loading-text {
+    font-size: 1rem;
+  }
+
+  .progress-container {
+    max-width: 260px;
+  }
 }

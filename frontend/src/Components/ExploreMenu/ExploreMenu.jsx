@@ -4,7 +4,7 @@ import exoticveggi from '../../assets/exoticveggicard.jpg'
 import veggicard from '../../assets/veggicard.jpg'
 import mixfruits from '../../assets/mixfru.jpg'
 import emixfruits from '../../assets/mix-fruits.jpg'
-import meatImage from '../../assets/food_8.png' // You'll need to add this image
+import rawmeat from '../../assets/rawmeat.jpg' // You'll need to add this image
 
 const ExploreMenu = () => {
   const categories = [
@@ -31,7 +31,7 @@ const ExploreMenu = () => {
     {
       title: "Meat",
       description: "Premium quality, fresh meat products sourced from trusted suppliers.",
-      image: meatImage
+      image: rawmeat
     }
   ]
 

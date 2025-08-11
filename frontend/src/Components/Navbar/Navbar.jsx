@@ -98,7 +98,7 @@ const Navbar = ({ setShowLogin }) => {
       <div className={`announcement-bar ${showAnnouncement ? "show" : "hide"}`}>
         <div className="announcement-content">
           <p className="discount-text">
-            Order Above 1000/- and get <strong>10%</strong> Off on all products
+           Fresh organic veggies & fruits now at <strong>Chanvi Farms</strong> – grab yours today!
           </p>
           <p className="location-text">
             <span className="location-icon">📍</span>

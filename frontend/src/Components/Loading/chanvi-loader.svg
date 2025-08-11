@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Circular background -->
+  <circle cx="100" cy="100" r="95" fill="#fff" stroke="#4CAF50" stroke-width="5"/>
+  
+  <!-- Leaf left -->
+  <path d="M60,50 Q90,20 100,60 Q70,90 60,50" fill="#4CAF50">
+    <animate attributeName="d" values="M60,50 Q90,20 100,60 Q70,90 60,50;M65,55 Q95,25 105,65 Q75,95 65,55;M60,50 Q90,20 100,60 Q70,90 60,50" dur="3s" repeatCount="indefinite"/>
+  </path>
+  
+  <!-- Leaf right -->
+  <path d="M140,50 Q110,20 100,60 Q130,90 140,50" fill="#8BC34A">
+    <animate attributeName="d" values="M140,50 Q110,20 100,60 Q130,90 140,50;M135,55 Q105,25 95,65 Q125,95 135,55;M140,50 Q110,20 100,60 Q130,90 140,50" dur="3s" repeatCount="indefinite" begin="0.5s"/>
+  </path>
+  
+  <!-- Farm elements -->
+  <g>
+    <animateTransform attributeName="transform" type="rotate" from="0 100 100" to="360 100 100" dur="20s" repeatCount="indefinite" />
+    
+    <!-- Element 1: Tomato -->
+    <circle cx="100" cy="40" r="12" fill="#FF5722">
+      <animate attributeName="cy" values="40;35;40" dur="2s" repeatCount="indefinite" />
+    </circle>
+    
+    <!-- Element 2: Orange -->
+    <circle cx="60" cy="130" r="10" fill="#FF9800">
+      <animate attributeName="cy" values="130;125;130" dur="2s" repeatCount="indefinite" begin="0.3s" />
+    </circle>
+    
+    <!-- Element 3: Apple -->
+    <circle cx="140" cy="130" r="11" fill="#F44336">
+      <animate attributeName="cy" values="130;125;130" dur="2s" repeatCount="indefinite" begin="0.6s" />
+    </circle>
+  </g>
+  
+  <!-- CHANVI FARMS text -->
+  <text x="100" y="180" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="16" fill="#4CAF50">CHANVI FARMS</text>
+</svg>

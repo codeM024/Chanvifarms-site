@@ -47,6 +47,47 @@
     text-align: center;
 }
 
+.order-status-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.order-status {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: center;
+    display: inline-block;
+}
+
+.status-description {
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 4px;
+}
+
+.order-card[data-status="pending"] {
+    border-left: 4px solid #ff9800;
+}
+
+.order-card[data-status="pending"] .order-status {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.6;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
 .my-orders-loading {
     display: flex;
     flex-direction: column;

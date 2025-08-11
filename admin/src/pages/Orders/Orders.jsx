@@ -32,14 +32,66 @@ const Orders = () => {
     }
   };
 
-  const statusHandler = async (event, orderId) => {
-    const response = await axios.post(url + "/api/order/status", {
-      orderId,
-      status: event.target.value,
-    });
-    if (response.data.success) {
-      await fetchAllOrders();
+  const statusHandler = async (event, orderId, currentOrder) => {
+    const newStatus = event.target.value;
+    const currentStatus = currentOrder.status;
+    
+    try {
+      // Validate status transition
+      if (currentStatus === 'pending' && newStatus !== 'confirmed' && newStatus !== 'cancelled') {
+        toast.error("Order must be confirmed or cancelled from pending state");
+        return;
+      }
+
+      // If it's a WhatsApp Pay order that's being confirmed
+      if (currentOrder.payment.method === 'WHATSAPP_PAY' && newStatus === 'confirmed') {
+        const confirmResponse = await axios.post(url + "/api/order/confirm-whatsapp-payment", {
+          orderId,
+          transactionId: `WP_${Date.now()}`
+        });
+        
+        if (confirmResponse.data.success) {
+          // Send WhatsApp confirmation if available
+          if (confirmResponse.data.whatsappConfirmationUrl) {
+            window.open(confirmResponse.data.whatsappConfirmationUrl, '_blank');
+          }
+        }
+      }
+
+      // Update order status
+      const response = await axios.post(url + "/api/order/status", {
+        orderId,
+        status: newStatus,
+      });
+
+      if (response.data.success) {
+        toast.success(`Order status updated to ${newStatus}`);
+        await fetchAllOrders();
+      } else {
+        toast.error("Failed to update status");
+      }
+    } catch (error) {
+      console.error("Error updating order status:", error);
+      toast.error("Failed to update status");
     }
+  };
+
+  const handleWhatsAppClick = (order) => {
+    const orderDetails = order.items.map(item => 
+      `${item.name} (${item.size}) × ${item.quantity}`
+    ).join(", ");
+    
+    const message = `Order Details:
+Order ID: ${order._id}
+Customer: ${order.userId.name}
+Phone: ${order.userId.phone}
+Amount: ₹${order.amount}
+Items: ${orderDetails}
+Shipping Address: ${order.address.street}, ${order.address.city}, ${order.address.state} - ${order.address.pincode}
+Payment Method: ${order.payment.method}`;
+
+    const whatsappUrl = `https://wa.me/917899940804?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
   };
 
   const formatItems = (items) => {
@@ -230,6 +282,23 @@ ${mapLink}`;
                   <option value="all">All Payments</option>
                   <option value="cod">COD</option>
                   <option value="online">Online</option>
+                  <option value="whatsapp_pay">WhatsApp Pay</option>
+                </select>
+              </div>
+              <div className="status-filter">
+                <select
+                  value={selectedStatus}
+                  onChange={(e) => setSelectedStatus(e.target.value)}
+                  className="status-select"
+                >
+                  <option value="all">All Status</option>
+                  <option value="pending">Pending</option>
+                  <option value="confirmed">Confirmed</option>
+                  <option value="processing">Processing</option>
+                  <option value="packing">Packing</option>
+                  <option value="out-for-delivery">Out for Delivery</option>
+                  <option value="delivered">Delivered</option>
+                  <option value="cancelled">Cancelled</option>
                 </select>
               </div>
               <div className="sort-filter">
@@ -257,17 +326,27 @@ ${mapLink}`;
       <div className="orders-list-container">
         <div className="orders-list">
           {filteredOrders().map((order, index) => (
-            <div key={index} className="order-card">
+            <div key={index} className="order-card" data-status={order.status}>
               <div className="order-status-section">
-                <div className="order-id">Order #{order._id.slice(-6)}</div>
+                <div className="order-id-section">
+                  <div className="order-id">Order #{order._id.slice(-6)}</div>
+                  <button 
+                    className="whatsapp-button"
+                    onClick={() => handleWhatsAppClick(order)}
+                    title="Send to WhatsApp"
+                  >
+                    <FaWhatsapp />
+                  </button>
+                </div>
                 <div className="status-select-wrapper">
                   <select
-                    onChange={(event) => statusHandler(event, order._id)}
+                    onChange={(event) => statusHandler(event, order._id, order)}
                     value={order.status}
                     className={`status-select status-${order.status.toLowerCase()}`}
                   >
                     <option value="pending">Pending</option>
                     <option value="confirmed">Confirmed</option>
+                    <option value="processing">Processing</option>
                     <option value="packing">Packing</option>
                     <option value="out-for-delivery">Out for Delivery</option>
                     <option value="delivered">Delivered</option>

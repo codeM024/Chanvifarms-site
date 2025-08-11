@@ -42,14 +42,19 @@ const orderSchema = new mongoose.Schema({
     payment: {
         method: {
             type: String,
-            enum: ['COD', 'Online'],
+            enum: ['COD', 'Online', 'WHATSAPP_PAY'],
             required: true
         },
         status: {
             type: String,
-            enum: ['pending', 'initiated', 'completed', 'failed'],
+            enum: ['pending', 'initiated', 'completed', 'failed', 'awaiting_confirmation'],
             default: 'pending'
         },
+        whatsappPaymentInitiated: {
+            type: Boolean,
+            default: false
+        },
+        whatsappPaymentTimestamp: Date,
         transactionId: String,
         razorpayOrderId: String
     },

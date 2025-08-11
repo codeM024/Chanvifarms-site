@@ -379,6 +379,19 @@ const validateAddressSelection = () => {
           localStorage.removeItem('appliedPromo');
           toast.success('Order placed successfully!');
           navigate('/myorders');
+        } else if (selectedPayment === 'WHATSAPP_PAY') {
+          const orderId = response.data.orderId;
+          const whatsappMessage = `Hi, I'd like to pay for my order *#${orderId}*\n\n` +
+            `Amount: ₹${finalAmount}\n` +
+            `Order Details:\n${items.map(item => `- ${item.name} (${item.size}) × ${item.quantity}`).join('\n')}\n\n` +
+            `Delivery Address:\n${orderData.address.street}, ${orderData.address.city}, ${orderData.address.state} - ${orderData.address.zipcode}`;
+          
+          const whatsappUrl = `https://wa.me/917899940804?text=${encodeURIComponent(whatsappMessage)}`;
+          await clearCart();
+          localStorage.removeItem('appliedPromo');
+          window.open(whatsappUrl, '_blank');
+          toast.success('Order placed successfully! Redirecting to WhatsApp for payment.');
+          navigate('/myorders');
         } else {
           // Handle Razorpay payment
           const options = {
@@ -667,6 +680,17 @@ const validateAddressSelection = () => {
               <input
                 type="radio"
                 name="payment"
+                value="WHATSAPP_PAY"
+                checked={selectedPayment === 'WHATSAPP_PAY'}
+                onChange={(e) => setSelectedPayment(e.target.value)}
+              />
+              <span className="radio-custom"></span>
+              <span className="label-text">WhatsApp Pay</span>
+            </label>
+            <label className="radio-label">
+              <input
+                type="radio"
+                name="payment"
                 value="Online"
                 checked={selectedPayment === 'Online'}
                 onChange={(e) => setSelectedPayment(e.target.value)}
@@ -691,7 +715,7 @@ const validateAddressSelection = () => {
 
       <div className="place-order-right">
         <div className="cart-summary">
-          <p className="title">Order Summary</p>
+          <p className="title">Ordersssss Summary</p>
           {Object.entries(cartItems).map(([cartKey, cartItem]) => {
             const [itemId, size] = cartKey.split('_');
             const item = food_list.find(food => food._id === itemId);

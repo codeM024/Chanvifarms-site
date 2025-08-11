@@ -1,6 +1,6 @@
 import basket_icon from './basket_icon.png'
 import logo from './logo.png'
-import Chanvifarmlogo from './Chanvifarm_logo.jpeg'
+import Chanvifarmlogo from './Chanvifarm_logo1.png'
 import header_img from './header_img.png'
 import search_icon from './search_icon.png'
 import menu_1 from './menu_1.png'
@@ -23,6 +23,7 @@ import bag_icon from './bag_icon.png'
 import logout_icon from './logout_icon.png'
 import parcel_icon from './parcel_icon.png'
 import deliveryboy from './delivery.jpg'
+import rawmeat from './rawmeat.jpg'
 
 export const assets = {
     logo,
@@ -45,7 +46,8 @@ export const assets = {
     logout_icon,
     bag_icon,
     parcel_icon,
-    deliveryboy
+    deliveryboy,
+    rawmeat
 }
 
 export const menu_list = [
