@@ -686,17 +686,7 @@ const validateAddressSelection = () => {
               />
               <span className="radio-custom"></span>
               <span className="label-text">WhatsApp Pay</span>
-            </label>
-            <label className="radio-label">
-              <input
-                type="radio"
-                name="payment"
-                value="Online"
-                checked={selectedPayment === 'Online'}
-                onChange={(e) => setSelectedPayment(e.target.value)}
-              />
-              <span className="radio-custom"></span>
-              <span className="label-text">Online Payment</span>
+              <p className="payment-description">Pay through WhatsApp after placing order</p>
             </label>
             <label className="radio-label">
               <input
@@ -708,7 +698,7 @@ const validateAddressSelection = () => {
               />
               <span className="radio-custom"></span>
               <span className="label-text">Cash on Delivery</span>
-            </label>
+              <p className="payment-description">Pay when you receive your order</p>            </label>
           </div>
         </div>
       </div>

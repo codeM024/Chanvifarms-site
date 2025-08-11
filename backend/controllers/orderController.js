@@ -48,7 +48,7 @@ const placeOrder = async (req, res) => {
 
         const sendWhatsAppNotification = async (order) => {
             const user = await userModel.findById(order.userId);
-            const whatsappNumber = "+917899940804";
+            const whatsappNumber = "917899940804";
             const orderDetails = order.items.map(item => 
                 `${item.name} (${item.size}) × ${item.quantity}`
             ).join(", ");
@@ -212,7 +212,9 @@ const confirmWhatsAppPayment = async (req, res) => {
             `Transaction ID: ${transactionId || `WP_${Date.now()}`}\n\n` +
             `Thank you for your payment! Your order will be processed shortly.`;
 
-        const whatsappUrl = `https://wa.me/${user.phone}?text=${encodeURIComponent(confirmationMessage)}`;
+        // Format phone number to standard WhatsApp format (remove '+' if present)
+        const formattedPhone = user.phone.replace(/^\+/, '');
+        const whatsappUrl = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(confirmationMessage)}`;
 
         res.json({
             success: true,
@@ -315,14 +317,64 @@ const listOrders = async (req,res)=>{
 }
 
 // api for updating order status
-const updateStatus = async (req,res) =>{
-   try{
-       await orderModel.findByIdAndUpdate(req.body.orderId,{status:req.body.status})
-       res.json({success:true,message:"Status Updated"})
-   }catch(error){
-       console.log(error);
-       res.json({success:false,message:"Error"})
-   }
+const updateStatus = async (req, res) => {
+    try {
+        const { orderId, status, cancelReason } = req.body;
+
+        // Get the order and user details
+        const order = await orderModel.findById(orderId).populate('userId');
+        if (!order) {
+            return res.status(404).json({ success: false, message: "Order not found" });
+        }
+
+        // Update order status
+        await orderModel.findByIdAndUpdate(orderId, { status });
+
+        // Format the user's phone number for WhatsApp
+        const formattedPhone = order.address.phone.replace(/^\+/, '');
+
+        // Prepare notification message based on status
+        let notificationMessage = '';
+        if (status === 'confirmed') {
+            notificationMessage = `🎉 Order Confirmed!\n\n` +
+                `Dear ${order.address.firstName},\n\n` +
+                `Your order #${order._id.toString().slice(-6)} has been confirmed!\n` +
+                `Amount: ₹${order.amount}\n\n` +
+                `You can track your order in the My Orders section of our website.\n\n` +
+                `Thank you for choosing Chanvi Farms! 🌿`;
+        } else if (status === 'cancelled') {
+            notificationMessage = `❌ Order Cancelled\n\n` +
+                `Dear ${order.address.firstName},\n\n` +
+                `We regret to inform you that your order #${order._id.toString().slice(-6)} has been cancelled.\n` +
+                `Reason: ${cancelReason || 'Not specified'}\n\n` +
+                `If you have any questions, please don't hesitate to contact us.\n\n` +
+                `We hope to serve you again soon!`;
+        }
+
+        // Send WhatsApp notification if status is confirmed or cancelled
+        if (notificationMessage) {
+            const whatsappUrl = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(notificationMessage)}`;
+            
+            // Return success response with WhatsApp URL
+            return res.json({
+                success: true,
+                message: "Status Updated",
+                whatsappUrl
+            });
+        }
+
+        // Return regular success response for other status updates
+        res.json({
+            success: true,
+            message: "Status Updated"
+        });
+    } catch (error) {
+        console.error("Error updating order status:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to update order status"
+        });
+    }
 }
 
 export { placeOrder, verifyOrderPayment, userOrders, listOrders, updateStatus, confirmWhatsAppPayment }
