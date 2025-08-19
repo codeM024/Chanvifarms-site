@@ -14,7 +14,7 @@ import {
 } from "react-icons/fa";
 
 const Orders = () => {
-  const url = "https://chanvifarms-site-backend.onrender.com";
+  const url = "http://localhost:4000";
   const [orders, setOrders] = useState([]);
   const [copiedOrderId, setCopiedOrderId] = useState(null);
   const [startDate, setStartDate] = useState("");
