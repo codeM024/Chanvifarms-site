@@ -417,4 +417,42 @@ const updateStatus = async (req, res) => {
     }
 }
 
-export { placeOrder, verifyOrderPayment, userOrders, listOrders, updateStatus, confirmWhatsAppPayment }
+const deleteOrder = async (req, res) => {
+    try {
+        const orderId = req.params.id;
+
+        // Find the order first
+        const order = await orderModel.findById(orderId);
+        
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: "Order not found"
+            });
+        }
+
+        // Check if order status is either 'delivered' or 'cancelled'
+        if (order.status !== 'delivered' && order.status !== 'cancelled') {
+            return res.status(400).json({
+                success: false,
+                message: "Only delivered or cancelled orders can be deleted"
+            });
+        }
+
+        // Delete the order without requiring authentication
+        await orderModel.findByIdAndDelete(orderId);
+
+        return res.status(200).json({
+            success: true,
+            message: "Order deleted successfully"
+        });
+    } catch (error) {
+        console.error("Error in deleteOrder:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
+    }
+};
+
+export { placeOrder, verifyOrderPayment, userOrders, listOrders, updateStatus, confirmWhatsAppPayment, deleteOrder }
