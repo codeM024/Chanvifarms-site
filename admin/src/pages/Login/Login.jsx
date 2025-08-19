@@ -6,7 +6,8 @@ import './Login.css';
 
 const validCredentials = [
   { email: 'lovelyboyarun91@gmail.com', password: 'vali@18024' },
-  { email: 'manisake28@gmail.com', password: 'mani@18024' }
+  { email: 'manisake28@gmail.com', password: 'mani@18024' },
+  { email: 'chanvifarms9@gmail.com', password: 'Chanvifarms@99' },
 ];
 
 const Login = () => {
