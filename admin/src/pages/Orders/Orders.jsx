@@ -14,7 +14,7 @@ import {
 } from "react-icons/fa";
 
 const Orders = () => {
-  const url = "https://chanvifarms-site-backend.onrender.com";
+  const url = "http://localhost:4000";
   const [orders, setOrders] = useState([]);
   const [copiedOrderId, setCopiedOrderId] = useState(null);
   const [startDate, setStartDate] = useState("");
@@ -88,10 +88,19 @@ const Orders = () => {
   };
 
   const handleDeleteOrder = async () => {
+    if (!selectedOrderForDelete || !selectedOrderForDelete._id) {
+      toast.error("Invalid order selected for deletion");
+      return;
+    }
+
     try {
       const loadingToast = toast.loading("Deleting order...");
       
-      const response = await axios.delete(`${url}/api/order/delete/${selectedOrderForDelete._id}`);
+      const response = await axios.delete(`${url}/api/order/delete/${selectedOrderForDelete._id}`, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
       
       if (response.data.success) {
         toast.update(loadingToast, {
@@ -126,7 +135,7 @@ const Orders = () => {
       // Validate status transition from pending
       if (currentStatus === 'pending' && !['confirmed', 'cancelled'].includes(newStatus)) {
         toast.error("Pending orders can only be confirmed or cancelled");
-        event.target.value = currentStatus; // Reset select to original value
+        event.target.value = currentStatus;
         return;
       }
 
@@ -137,13 +146,7 @@ const Orders = () => {
           order: currentOrder
         });
         setShowCancelDialog(true);
-        // Format items for cancellation message preview
-        const itemsList = currentOrder.items.map((item, index) => 
-          `${index + 1}. ${item.name} (${item.size}) × ${item.quantity}`
-        ).join('\n');
-        // Set initial cancel reason with order details
-        setCancelReason(`Order Details:\n${itemsList}\n\nReason for cancellation: `);
-        event.target.value = currentStatus; // Keep the current status until confirmed
+        event.target.value = currentStatus;
         return;
       }
 
@@ -151,34 +154,14 @@ const Orders = () => {
       const loadingToast = toast.loading(`Updating order status to ${newStatus}...`);
 
       try {
-        // Handle WhatsApp Pay confirmation first if needed
-        if (currentOrder.payment.method === 'WHATSAPP_PAY' && newStatus === 'confirmed') {
-          const confirmResponse = await axios.post(url + "/api/order/confirm-whatsapp-payment", {
-            orderId,
-            transactionId: `WP_${Date.now()}`
-          });
-          
-          if (!confirmResponse.data.success) {
-            toast.update(loadingToast, { 
-              render: "Failed to confirm WhatsApp payment", 
-              type: "error",
-              isLoading: false,
-              autoClose: 3000
-            });
-            event.target.value = currentStatus; // Reset select to original value
-            return;
-          }
-        }
-
-        // Update order status
+        // Update order status - handle all payment methods the same way
         const response = await axios.post(url + "/api/order/status", {
           orderId,
           status: newStatus,
-          cancelReason
+          paymentMethod: currentOrder.payment?.method || 'COD' // Default to COD if no payment method
         });
 
         if (response.data.success) {
-          // Update loading toast to success
           toast.update(loadingToast, {
             render: `Order ${newStatus === 'confirmed' ? 'confirmed! 🎉' : `status updated to ${newStatus}`}`,
             type: "success",
@@ -186,9 +169,8 @@ const Orders = () => {
             autoClose: 3000
           });
 
-          // Open WhatsApp notification in new tab if URL is provided
+          // If we got a WhatsApp URL, open it after a short delay
           if (response.data.whatsappUrl) {
-            // Small delay to ensure the toast is seen
             setTimeout(() => {
               window.open(response.data.whatsappUrl, '_blank');
             }, 500);
@@ -202,7 +184,7 @@ const Orders = () => {
             isLoading: false,
             autoClose: 3000
           });
-          event.target.value = currentStatus; // Reset select to original value
+          event.target.value = currentStatus;
         }
       } catch (error) {
         toast.update(loadingToast, {
@@ -211,12 +193,12 @@ const Orders = () => {
           isLoading: false,
           autoClose: 3000
         });
-        event.target.value = currentStatus; // Reset select to original value
+        event.target.value = currentStatus;
       }
     } catch (error) {
       console.error("Error in status handler:", error);
       toast.error("An unexpected error occurred");
-      event.target.value = currentStatus; // Reset select to original value
+      event.target.value = currentStatus;
     }
   };
 
