@@ -1,7 +1,8 @@
 const adminAuth = (req, res, next) => {
     const validAdmins = [
         'lovelyboyarun91@gmail.com',
-        'manisake28@gmail.com'
+        'manisake28@gmail.com',
+        'chanvifarms9@gmail.com'
     ];
     
     const adminEmail = req.headers['admin-email'];
