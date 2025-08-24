@@ -14,4 +14,4 @@ export const assets = {
     parcel_icon
 }
 
-export const url = 'https://chanvifarms-site-backend.onrender.com'
+  const url = import.meta.env.VITE_BACKEND_URL;

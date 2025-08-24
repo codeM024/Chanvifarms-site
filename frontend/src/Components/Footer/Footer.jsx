@@ -170,7 +170,7 @@ const Footer = () => {
             Designed with <i className="fas fa-heart"></i> by
           </p>
           <a
-            href="https://vali024.github.io/"
+            href="https://valixdigitalservices.onrender.com/"
             target="_blank"
             rel="noopener noreferrer"
             className="designer-link"

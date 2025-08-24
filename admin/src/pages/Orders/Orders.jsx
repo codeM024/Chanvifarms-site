@@ -14,7 +14,7 @@ import {
 } from "react-icons/fa";
 
 const Orders = () => {
-  const url = "http://localhost:4000";
+  const url = import.meta.env.VITE_BACKEND_URL;
   const [orders, setOrders] = useState([]);
   const [copiedOrderId, setCopiedOrderId] = useState(null);
   const [startDate, setStartDate] = useState("");
