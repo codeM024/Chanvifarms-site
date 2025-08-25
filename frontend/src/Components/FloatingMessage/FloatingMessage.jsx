@@ -34,7 +34,7 @@ const FloatingMessage = ({ position = "top-right" }) => {
         <div className="message-text">
           <span className="timing">Order Before: 11:00 AM</span>
           <span className="details">
-            next day: <strong>7:00 AM </strong>• Receive at your doorstep
+            next day: <strong>6:00 AM </strong>• Receive at your doorstep
           </span>
         </div>
       </div>
