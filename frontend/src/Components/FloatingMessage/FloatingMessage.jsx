@@ -32,9 +32,8 @@ const FloatingMessage = ({ position = "top-right" }) => {
       <div className="message-content">
         <div className="message-icon">⏰</div>
         <div className="message-text">
-          <span className="timing">Order Before: 11:00 AM</span>
           <span className="details">
-            next day: <strong>6:00 AM </strong>• Receive at your doorstep
+            Place the order today by 6 pm and get fresh Organic Vegetables delivered day after tomorrow from 7 am - 9 am
           </span>
         </div>
       </div>
