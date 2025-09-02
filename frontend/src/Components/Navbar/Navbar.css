@@ -58,10 +58,11 @@
     outline: 2px solid #6B8E23;
     outline-offset: 2px;
 }
+
 .location-icon {
     margin-right: 5px;
     font-size: 1.1em;
-  }
+}
 
 .navbar {
     position: fixed;
@@ -89,6 +90,12 @@
 
 .navbar.navbar-visible {
     transform: translateY(0);
+}
+
+.navbar-logo {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
 }
 
 .navbar .logo {
@@ -128,8 +135,9 @@
     cursor: pointer;
     background: none;
     border: none;
-    padding: 5px;
+    padding: 10px;
     z-index: 1002;
+    position: relative;
 }
 
 .mobile-menu-button span {
@@ -141,7 +149,8 @@
     transition: all 0.3s ease;
 }
 
-.navbar button {
+.navbar button,
+.sign-in-btn {
     background: transparent;
     font-size: 15px;
     color: #49557e;
@@ -152,7 +161,8 @@
     transition: all 0.3s ease;
 }
 
-.navbar button:hover {
+.navbar button:hover,
+.sign-in-btn:hover {
     background-color: #6B8E23;
     color: white;
     transform: translateY(-1px);
@@ -170,6 +180,16 @@
 
 .navbar-search-icon {
     position: relative;
+}
+
+.navbar-search-icon img {
+    width: 24px;
+    height: 24px;
+    transition: transform 0.2s ease;
+}
+
+.navbar-search-icon:hover img {
+    transform: scale(1.1);
 }
 
 .navbar-search-icon .dot {
@@ -273,7 +293,7 @@ body {
         padding-top: 110px; /* Adjusted for smaller navbar */
     }
     .navbar .logo {
-        width: 80px;
+        width: 60px;
     }
     .navbar-menu {
         gap: 20px;
@@ -286,7 +306,7 @@ body {
         width: 22px;
     }
     .navbar-right button {
-        padding: 8px 25px;
+        padding: 8px 20px;
     }
 }
 
@@ -298,68 +318,106 @@ body {
     
     .navbar {
         position: fixed;
-        top: 0 !important; /* Force navbar to top regardless of announcement bar */
+        top: 0 !important;
         left: 0;
         right: 0;
-        padding: 8px 20px;
-        height: 70px;
-        background-color: rgba(255, 255, 255, 0.98); /* Slightly more opaque for mobile */
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Add shadow for better visibility */
+        padding: 15px 20px;
+        height: 80px;
+        background-color: rgba(255, 255, 255, 0.98);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        display: grid;
+        grid-template-columns: auto 1fr auto auto;
+        align-items: center;
+        gap: 15px;
     }
     
     body {
-        padding-top: 70px !important; /* Fixed padding for mobile - just the navbar height */
+        padding-top: 80px !important;
         margin-top: 0;
     }
 
-    .navbar .logo {
-        width: 60px;
-        margin-top: 5px;
+    .navbar-logo {
+        grid-column: 1;
+        z-index: 1003;
     }
 
-    .mobile-menu-button {
-        display: block;
-        position: absolute;
-        right: 20px;
-        top: 50%;
-        transform: translateY(-50%);
-        z-index: 1002;
+    .navbar .logo {
+        width: 55px;
     }
 
     .navbar-menu {
         position: fixed;
-        top: 70px; /* Start right below navbar */
+        top: 80px;
         left: 0;
         right: 0;
         background: white;
         flex-direction: column;
-        padding: 20px;
-        gap: 15px;
+        padding: 25px 20px;
+        gap: 0;
         transform: translateY(-100%);
         opacity: 0;
         transition: transform 0.3s ease, opacity 0.3s ease;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        z-index: 999;
-        height: auto;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+        z-index: 998;
         max-height: 0;
         overflow: hidden;
+        grid-column: 1 / -1;
     }
 
     .navbar-menu.active {
         transform: translateY(0);
         opacity: 1;
-        max-height: 300px;
+        max-height: 400px;
     }
 
     .navbar-menu a {
         display: block;
-        padding: 12px 0;
+        padding: 18px 0;
         border-bottom: 1px solid #f0f0f0;
         width: 100%;
+        font-size: 18px;
+        font-weight: 500;
     }
 
     .navbar-menu a:last-child {
         border-bottom: none;
+    }
+
+    .navbar-right {
+        grid-column: 3;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        z-index: 1003;
+    }
+
+    .navbar-search-icon {
+        position: relative;
+    }
+
+    .navbar-search-icon img {
+        width: 28px;
+        height: 28px;
+    }
+
+    .sign-in-btn {
+        padding: 8px 18px !important;
+        font-size: 14px !important;
+        font-weight: 500;
+        white-space: nowrap;
+        min-width: auto;
+    }
+
+    .navbar-profile img {
+        width: 28px;
+        height: 28px;
+    }
+
+    .mobile-menu-button {
+        display: block;
+        grid-column: 4;
+        padding: 8px;
+        z-index: 1003;
     }
 
     .mobile-menu-button.active span:nth-child(1) {
@@ -373,61 +431,17 @@ body {
     .mobile-menu-button.active span:nth-child(3) {
         transform: rotate(-45deg) translate(7px, -7px);
     }
-    
-    /* Fix for overlapping elements in mobile view */
-    .navbar-right {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 60px; /* Increased gap between elements */
-        width: 160px; /* Set a fixed width */
-    }
-    
-    /* Position the cart icon to the left */
-    .navbar-right .navbar-search-icon {
-        position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-    }
-    
-    /* Position the sign-in button to the right */
-    .navbar-right button {
-        position: absolute;
-        right: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        padding: 6px 16px;
-        font-size: 14px;
-    }
-    
-    /* Position the profile icon to the right */
-    .navbar-right .navbar-profile {
-        position: absolute;
-        right: 0;
-        top: 50%;
-        transform: translateY(-50%);
-    }
-    
-    .navbar-profile img {
-        width: 28px;
-        height: 28px;
-    }
-    
+
     /* Adjust dropdown position for mobile */
     .nav-profile-dropdown {
         position: fixed;
-        top: 70px;
-        left: 0;
-        right: 0;
-        width: 100%;
-        border-radius: 0;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        transform: translateY(-100%);
+        top: 80px;
+        right: 20px;
+        left: auto;
+        width: 200px;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        transform: translateY(-10px);
     }
     
     .nav-profile-dropdown.show {
@@ -435,30 +449,105 @@ body {
     }
     
     .nav-profile-dropdown li {
-        padding: 15px 20px;
+        padding: 16px 20px;
+        font-size: 16px;
+    }
+
+    /* Better touch targets */
+    .navbar-search-icon,
+    .sign-in-btn,
+    .navbar-profile {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .navbar-search-icon a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px;
     }
 }
 
 @media (max-width: 500px) {
     .navbar {
-        padding: 8px 15px;
+        padding: 12px 15px;
+        height: 75px;
+        gap: 10px;
+    }
+    
+    body {
+        padding-top: 75px !important;
+    }
+
+    .navbar .logo {
+        width: 50px;
     }
     
     .navbar-right {
-        width: 140px; /* Slightly smaller width for very small screens */
-        gap: 50px; /* Slightly smaller gap for very small screens */
+        gap: 15px;
     }
     
-    .navbar .logo {
-        width: 45px; /* Slightly smaller logo on very small screens */
-    }
-    
-    .navbar-right button {
-        padding: 5px 14px;
-        font-size: 13px;
+    .sign-in-btn {
+        padding: 6px 14px !important;
+        font-size: 13px !important;
     }
     
     .mobile-menu-button {
+        padding: 6px;
+    }
+
+    .navbar-menu {
+        top: 75px;
+        padding: 20px 15px;
+    }
+
+    .navbar-menu a {
+        padding: 15px 0;
+        font-size: 17px;
+    }
+
+    .nav-profile-dropdown {
+        top: 75px;
         right: 15px;
+        width: 180px;
+    }
+
+    .navbar-search-icon img,
+    .navbar-profile img {
+        width: 26px;
+        height: 26px;
+    }
+}
+
+@media (max-width: 350px) {
+    .navbar {
+        padding: 10px 12px;
+        height: 70px;
+    }
+    
+    body {
+        padding-top: 70px !important;
+    }
+
+    .navbar .logo {
+        width: 45px;
+    }
+    
+    .navbar-right {
+        gap: 12px;
+    }
+    
+    .sign-in-btn {
+        padding: 5px 12px !important;
+        font-size: 12px !important;
+    }
+
+    .navbar-search-icon img,
+    .navbar-profile img {
+        width: 24px;
+        height: 24px;
     }
 }

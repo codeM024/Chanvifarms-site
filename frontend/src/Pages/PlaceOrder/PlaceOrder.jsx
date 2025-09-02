@@ -772,13 +772,6 @@ const PlaceOrder = () => {
                 >
                   📍 Use Current Location
                 </button>
-                <button
-                  type="button"
-                  className="location-btn map-location"
-                  onClick={openLocationPicker}
-                >
-                  🗺️ Choose from Maps
-                </button>
               </div>
 
               <div className="form-row">

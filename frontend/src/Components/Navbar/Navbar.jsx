@@ -63,6 +63,8 @@ const Navbar = ({ setShowLogin }) => {
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
+    // Close profile dropdown when opening mobile menu
+    setIsProfileOpen(false);
   };
 
   const handleLocationClick = () => {
@@ -79,6 +81,13 @@ const Navbar = ({ setShowLogin }) => {
 
   const toggleProfile = () => {
     setIsProfileOpen(!isProfileOpen);
+    // Close mobile menu when opening profile
+    setMobileMenuOpen(false);
+  };
+
+  const handleSignInClick = () => {
+    setShowLogin(true);
+    setMobileMenuOpen(false);
   };
 
   // Close profile dropdown when clicking outside
@@ -115,22 +124,11 @@ const Navbar = ({ setShowLogin }) => {
         </div>
       </div>
       <div className={`navbar ${visible ? "navbar-visible" : "hidden"}`}>
-        <a href="/" onClick={handleLogoClick}>
-          <img src={assets.Chanvifarmlogo} alt="" className="logo" />
+        <a href="/" onClick={handleLogoClick} className="navbar-logo">
+          <img src={assets.Chanvifarmlogo} alt="Chanvi Farms Logo" className="logo" />
         </a>
 
-        <button
-          className={`mobile-menu-button ${mobileMenuOpen ? "active" : ""}`}
-          onClick={toggleMobileMenu}
-          aria-label="Toggle menu"
-        >
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
-
         <ul className={`navbar-menu ${mobileMenuOpen ? "active" : ""}`}>
-          {" "}
           <Link
             to="/"
             onClick={() => {
@@ -176,12 +174,15 @@ const Navbar = ({ setShowLogin }) => {
         <div className="navbar-right">
           <div className="navbar-search-icon">
             <Link to="/cart">
-              <img src={assets.basket_icon} alt="" />
+              <img src={assets.basket_icon} alt="Shopping Cart" />
             </Link>
             <div className={getTotalCartAmount() === 0 ? "" : "dot"}></div>
           </div>
+          
           {!token ? (
-            <button onClick={() => setShowLogin(true)}>Sign in</button>
+            <button className="sign-in-btn" onClick={handleSignInClick}>
+              Sign in
+            </button>
           ) : (
             <div
               className={`navbar-profile ${isProfileOpen ? "active" : ""}`}
@@ -217,6 +218,16 @@ const Navbar = ({ setShowLogin }) => {
             </div>
           )}
         </div>
+
+        <button
+          className={`mobile-menu-button ${mobileMenuOpen ? "active" : ""}`}
+          onClick={toggleMobileMenu}
+          aria-label="Toggle menu"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
       </div>
     </>
   );
