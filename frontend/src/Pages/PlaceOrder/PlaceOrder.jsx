@@ -42,6 +42,11 @@ const PlaceOrder = () => {
   const navigate = useNavigate();
 
   const [address, setAddress] = useState(emptyAddress);
+  const pinCodeData = {
+    560035: { city: "Sarjapura road,Bengaluru", state: "Karnataka", country: "India" },
+    560087: { city: "Varthur,Bengaluru", state: "Karnataka", country: "India" },
+    560100: { city: "Electronic City,Bengaluru", state: "Karnataka", country: "India" },
+  };
 
   // Load Razorpay script
   const loadRazorpayScript = () => {
@@ -82,58 +87,6 @@ const PlaceOrder = () => {
   useEffect(() => {
     fetchSavedAddresses();
   }, [fetchSavedAddresses]);
-
-  const getCurrentLocation = () => {
-    if (!navigator.geolocation) {
-      toast.error("Geolocation is not supported by your browser");
-      return;
-    }
-
-    toast.info("Detecting your location...");
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        try {
-          const { latitude, longitude } = position.coords;
-
-          const response = await axios.get(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`
-          );
-
-          const locationData = response.data;
-          const addressDetails = locationData.address;
-
-          setAddress((prev) => ({
-            ...prev,
-            street: `${addressDetails.road || ""} ${
-              addressDetails.house_number || ""
-            }`.trim(),
-            city:
-              addressDetails.city ||
-              addressDetails.town ||
-              addressDetails.village ||
-              "",
-            state: addressDetails.state || "",
-            country: addressDetails.country || "",
-            zipcode: addressDetails.postcode || "",
-            location: {
-              latitude,
-              longitude,
-              address: locationData.display_name,
-              mapsUrl: `https://www.google.com/maps?q=${latitude},${longitude}`,
-            },
-          }));
-
-          toast.success("Location detected successfully");
-        } catch (error) {
-          console.error("Error getting location:", error);
-          toast.error("Could not detect location details");
-        }
-      },
-      () => {
-        toast.error("Unable to retrieve your location");
-      }
-    );
-  };
 
   const openLocationPicker = () => {
     const mapWindow = window.open(
@@ -334,17 +287,10 @@ const PlaceOrder = () => {
     }
   };
 
-  const calculateTaxes = useCallback(() => {
-    const subtotal = getTotalCartAmount();
-    const sgst = subtotal * 0.05;
-    const cgst = subtotal * 0.05;
-    return { sgst, cgst };
-  }, [getTotalCartAmount]);
 
   const calculateFinalAmount = useCallback(() => {
     const subtotal = getTotalCartAmount();
-    const { sgst, cgst } = calculateTaxes();
-    let deliveryFee = subtotal === 0 ? 0 : 18;
+    let deliveryFee = subtotal === 0 ? 0 : 25;
     let discount = 0;
 
     const appliedPromo = localStorage.getItem("appliedPromo");
@@ -354,8 +300,8 @@ const PlaceOrder = () => {
       discount = subtotal * 0.05;
     }
 
-    return subtotal + deliveryFee + sgst + cgst - discount;
-  }, [getTotalCartAmount, calculateTaxes]);
+    return subtotal + deliveryFee - discount;
+  }, [getTotalCartAmount]);
 
   // Initialize Razorpay payment
   const initializeRazorpayPayment = async (orderData, orderResponse) => {
@@ -555,15 +501,12 @@ const PlaceOrder = () => {
         }
 
         const subtotal = getTotalCartAmount();
-        const { sgst, cgst } = calculateTaxes();
         const finalAmount = calculateFinalAmount();
 
         // Prepare order data
         const orderData = {
           items,
           subtotal,
-          sgst,
-          cgst,
           amount: finalAmount,
           savings: totalSavings,
           address: selectedAddressId
@@ -662,7 +605,6 @@ const PlaceOrder = () => {
       navigate,
       savedAddresses,
       calculateFinalAmount,
-      calculateTaxes,
       getTotalCartAmount,
     ]
   );
@@ -764,16 +706,6 @@ const PlaceOrder = () => {
 
           {showAddAddress && (
             <div className="address-form">
-              <div className="location-buttons">
-                <button
-                  type="button"
-                  className="location-btn current-location"
-                  onClick={getCurrentLocation}
-                >
-                  📍 Use Current Location
-                </button>
-              </div>
-
               <div className="form-row">
                 <input
                   type="text"
@@ -810,34 +742,50 @@ const PlaceOrder = () => {
               />
               <input
                 type="text"
-                placeholder="Street Address *"
+                placeholder="Flat/House No, Building/Residency Name, Street Address *"
                 name="street"
                 value={address.street}
                 onChange={onChangeHandler}
                 required
               />
-              {address.location?.address && (
-                <div className="detected-location">
-                  📍 {address.location.address}
-                  {address.location.mapsUrl && (
-                    <a
-                      href={address.location.mapsUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="view-on-maps"
-                    >
-                      View on Maps
-                    </a>
-                  )}
-                </div>
-              )}
+
+              <div className="form-row pin-dropdown">
+                <label htmlFor="zipcode" className="pin-label">
+                  Available Areas – Please Select *
+                </label>
+                <select
+                  id="zipcode"
+                  name="zipcode"
+                  value={address.zipcode}
+                  onChange={(e) => {
+                    const selectedPin = e.target.value;
+                    setAddress((prev) => ({
+                      ...prev,
+                      zipcode: selectedPin,
+                      city: pinCodeData[selectedPin]?.city || "",
+                      state: pinCodeData[selectedPin]?.state || "",
+                      country: pinCodeData[selectedPin]?.country || "",
+                    }));
+                  }}
+                  required
+                >
+                  <option value="">Select PIN Code</option>
+                  {Object.keys(pinCodeData).map((pin) => (
+                    <option key={pin} value={pin}>
+                      {pin}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* City, State, Country fields (auto-filled) */}
               <div className="form-row">
                 <input
                   type="text"
                   placeholder="City *"
                   name="city"
                   value={address.city}
-                  onChange={onChangeHandler}
+                  readOnly
                   required
                 />
                 <input
@@ -845,7 +793,7 @@ const PlaceOrder = () => {
                   placeholder="State *"
                   name="state"
                   value={address.state}
-                  onChange={onChangeHandler}
+                  readOnly
                   required
                 />
               </div>
@@ -855,29 +803,17 @@ const PlaceOrder = () => {
                   placeholder="Country *"
                   name="country"
                   value={address.country}
-                  onChange={onChangeHandler}
-                  required
-                />
-                <input
-                  type="text"
-                  placeholder="ZIP Code *"
-                  name="zipcode"
-                  value={address.zipcode}
-                  onChange={onChangeHandler}
+                  readOnly
                   required
                 />
               </div>
+
               <button
                 type="button"
-                className={`save-address-btn ${
-                  !address.location ? "location-required" : ""
-                }`}
+                className="save-address-btn"
                 onClick={saveAddress}
-                disabled={!address.location}
               >
-                {!address.location
-                  ? "Please select a location first"
-                  : "Save Address"}
+                Save Address
               </button>
             </div>
           )}
@@ -963,14 +899,6 @@ const PlaceOrder = () => {
             <p>₹{getTotalCartAmount().toFixed(2)}</p>
           </div>
           <div className="cart-summary-item">
-            <p>SGST (5%)</p>
-            <p>₹{calculateTaxes().sgst.toFixed(2)}</p>
-          </div>
-          <div className="cart-summary-item">
-            <p>CGST (5%)</p>
-            <p>₹{calculateTaxes().cgst.toFixed(2)}</p>
-          </div>
-          <div className="cart-summary-item">
             <p>Delivery Charge</p>
             <p>
               ₹
@@ -978,7 +906,7 @@ const PlaceOrder = () => {
                 ? 0
                 : getTotalCartAmount() === 0
                 ? 0
-                : 18
+                : 25
               ).toFixed(2)}
             </p>
           </div>

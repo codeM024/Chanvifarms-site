@@ -20,7 +20,7 @@ try {
 
 const placeOrder = async (req, res) => {
   try {
-    const { items, amount, address, payment, subtotal, sgst, cgst, savings } =
+    const { items, amount, address, payment, subtotal,savings } =
       req.body;
 
     // Enhanced validation
@@ -69,8 +69,6 @@ const placeOrder = async (req, res) => {
       items,
       amount: Math.round(amount * 100) / 100, // Ensure 2 decimal places
       subtotal: Math.round((subtotal || 0) * 100) / 100,
-      sgst: Math.round((sgst || 0) * 100) / 100,
-      cgst: Math.round((cgst || 0) * 100) / 100,
       savings: Math.round((savings || 0) * 100) / 100,
       address: {
         ...address,

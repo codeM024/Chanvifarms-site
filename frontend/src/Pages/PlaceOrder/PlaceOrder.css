@@ -778,3 +778,39 @@ input[type="radio"]:checked + .radio-custom::before {
   content: '⚠️';
   margin-left: 8px;
 }
+
+/* PIN code dropdown styling */
+.pin-dropdown {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.pin-label {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.pin-dropdown select {
+  padding: 10px 12px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  outline: none;
+  transition: all 0.2s ease;
+  background-color: #fff;
+  appearance: none; /* Remove default dropdown arrow */
+  cursor: pointer;
+}
+
+.pin-dropdown select:focus {
+  border-color: #3399cc;
+  box-shadow: 0 0 0 2px rgba(51, 153, 204, 0.2);
+}
+
+.pin-dropdown select option {
+  font-size: 14px;
+  padding: 8px;
+}

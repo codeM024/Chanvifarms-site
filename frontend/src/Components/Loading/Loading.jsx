@@ -18,10 +18,8 @@ const Loading = () => {
         progressFillRef.current.style.width = `${progressValue}%`
       }
       if (progressValue > 80) {
-        setLoadingText('Ready to harvest!')
-      } else if (progressValue > 50) {
-        setLoadingText('Nurturing fresh produce...')
-      }
+        setLoadingText('Ready to go!')
+      } 
     })
   }, [])
 
@@ -44,10 +42,6 @@ const Loading = () => {
         </div>
         
         <div className="loading-text enhanced-loading-text">
-          <h2 className="brand-title">CHANVI FARMS</h2>
-          <p className="animated-loading-text">
-            {loadingText}
-          </p>
           <div className="progress-container">
             <div className="progress-bar enhanced-progress-bar">
               <div 

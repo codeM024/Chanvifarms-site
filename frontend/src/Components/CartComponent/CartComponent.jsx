@@ -71,7 +71,7 @@ const CartComponent = () => {
 
   const getDeliveryFee = () => {
     if (appliedPromo?.type === 'free_delivery') return 0;
-    return getTotalCartAmount() === 0 ? 0 : 18;
+    return getTotalCartAmount() === 0 ? 0 : 25;
   };
 
   const handleCheckout = () => {
@@ -86,19 +86,12 @@ const CartComponent = () => {
     navigate('/shop');
   };
 
-  const calculateTaxes = () => {
-    const subtotal = getTotalCartAmount();
-    const sgst = (subtotal * 0.05); // 5% SGST
-    const cgst = (subtotal * 0.05); // 5% CGST
-    return { sgst, cgst };
-  };
 
   const calculateFinalAmount = () => {
     const subtotal = getTotalCartAmount();
-    const { sgst, cgst } = calculateTaxes();
     const deliveryFee = getDeliveryFee();
     const discount = getDiscountAmount();
-    return subtotal + deliveryFee + sgst + cgst - discount;
+    return subtotal + deliveryFee - discount;
   };
 
   if (loading) return null;
@@ -168,16 +161,6 @@ const CartComponent = () => {
                 <div className="cart-total-details">
                   <p>Subtotal</p>
                   <p>₹{getTotalCartAmount()}</p>
-                </div>
-                <hr />
-                <div className="cart-total-details">
-                  <p>SGST (5%)</p>
-                  <p>₹{calculateTaxes().sgst.toFixed(2)}</p>
-                </div>
-                <hr />
-                <div className="cart-total-details">
-                  <p>CGST (5%)</p>
-                  <p>₹{calculateTaxes().cgst.toFixed(2)}</p>
                 </div>
                 <hr />
                 <div className="cart-total-details">
