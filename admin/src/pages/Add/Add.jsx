@@ -10,18 +10,33 @@ const Add = () => {
     description: "",
     category: "",
     prices: {
+      g100: "",
+      g150: "",
+      g200: "",
       g250: "",
+      g300: "",
+      g400: "",
       g500: "",
       kg1: ""
     },
     marketPrices: {
+      g100: "",
+      g150: "",
+      g200: "",
       g250: "",
+      g300: "",
+      g400: "",
       g500: "",
       kg1: ""
     },
     status: "in-stock",
     quantityOptions: {
+      g100: false,
+      g150: false,
+      g200: false,
       g250: true,
+      g300: false,
+      g400: false,
       g500: false,
       kg1: false
     }
@@ -270,6 +285,7 @@ const Add = () => {
           <option value="Exotic Vegetables">Exotic Vegetables</option>
           <option value="Exotic Fruits">Exotic Fruits</option>
           <option value="Meat">Meat</option>
+          <option value="Groceries">Groceries</option>
         </select>
       </div>
 
@@ -283,7 +299,12 @@ const Add = () => {
             <span>Market Price (₹)</span>
           </div>
           {[
+            { key: 'g100', label: '100 gm' },
+            { key: 'g150', label: '150 gm' },
+            { key: 'g200', label: '200 gm' },
             { key: 'g250', label: '250 gm' },
+            { key: 'g300', label: '300 gm' },
+            { key: 'g400', label: '400 gm' },
             { key: 'g500', label: '500 gm' },
             { key: 'kg1', label: '1 kg' }
           ].map(({ key, label }) => (

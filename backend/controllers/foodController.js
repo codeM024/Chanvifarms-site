@@ -27,7 +27,7 @@ const addFood = async (req, res) => {
             });
         }
 
-        if (!prices.g250 && !prices.g500 && !prices.kg1) {
+    if (!prices.g100 && !prices.g150 && !prices.g200 && !prices.g250 && !prices.g300 && !prices.g400 && !prices.g500 && !prices.kg1) {
             return res.status(400).json({
                 success: false,
                 message: "Please provide at least one price option"
@@ -99,9 +99,9 @@ const listFood = async (req, res) => {
         // Ensure each food item has the required fields
         const processedFoods = foods.map(food => ({
             ...food.toObject(),
-            prices: food.prices || { g250: 0 },
-            marketPrices: food.marketPrices || { g250: 0 },
-            quantityOptions: food.quantityOptions || { g250: true },
+            prices: food.prices || { g100: 0, g150: 0, g200: 0, g250: 0, g300: 0, g400: 0, g500: 0, kg1: 0 },
+            marketPrices: food.marketPrices || { g100: 0, g150: 0, g200: 0, g250: 0, g300: 0, g400: 0, g500: 0, kg1: 0 },
+            quantityOptions: food.quantityOptions || { g100: false, g150: false, g200: false, g250: true, g300: false, g400: false, g500: false, kg1: false },
             status: food.status || 'in-stock'
         }));
 

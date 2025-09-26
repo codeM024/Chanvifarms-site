@@ -20,7 +20,14 @@ const CartComponent = () => {
 
   const getQuantityLabel = (size) => {
     switch (size) {
-      case 'g250': return '250 gm';
+  case 'g100': return '100 gm';
+  case 'g150': return '150 gm';
+  case 'g200': return '200 gm';
+  case 'g250': return '250 gm';
+  case 'g300': return '300 gm';
+  case 'g400': return '400 gm';
+  case 'g500': return '500 gm';
+  case 'kg1': return '1 kg';
       case 'g500': return '500 gm';
       case 'kg1': return '1 kg';
       default: return size;

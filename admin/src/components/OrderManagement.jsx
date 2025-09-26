@@ -126,7 +126,7 @@ const OrderManagement = () => {
                                             <div className="ml-4">
                                                 <p className="font-medium">{item.name}</p>
                                                 <p className="text-sm text-gray-600">
-                                                    Quantity: {item.quantity} ({item.size})
+                                                    Quantity: {item.quantity} ({item.size === 'g100' ? '100 gm' : item.size === 'g150' ? '150 gm' : item.size === 'g200' ? '200 gm' : item.size === 'g250' ? '250 gm' : item.size === 'g300' ? '300 gm' : item.size === 'g400' ? '400 gm' : item.size === 'g500' ? '500 gm' : item.size === 'kg1' ? '1 kg' : item.size})
                                                 </p>
                                             </div>
                                         </div>

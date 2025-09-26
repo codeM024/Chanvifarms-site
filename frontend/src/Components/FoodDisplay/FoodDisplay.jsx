@@ -10,7 +10,7 @@ const FoodDisplay = ({ category }) => {
     const navigate = useNavigate()
     const [selectedTab, setSelectedTab] = useState('All Products')
 
-    const tabs = ['All Products', 'Vegetables', 'Fruits', 'Exotic Vegetables', 'Exotic Fruits', 'Meat']
+    const tabs = ['All Products', 'Vegetables', 'Fruits', 'Exotic Vegetables', 'Exotic Fruits', 'Meat', 'Groceries']
     const displayCategory = selectedTab === 'All Products' ? category : selectedTab
 
     const filteredItems = food_list

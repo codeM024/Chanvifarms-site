@@ -131,6 +131,7 @@ const ShopComponent = () => {
                   category.toLowerCase().includes('vegetables') ? 'carrot' :
                   category.toLowerCase().includes('fruits') ? 'apple-alt' :
                   category.toLowerCase() === 'meat' ? 'drumstick-bite' :
+                  category.toLowerCase() === 'groceries' ? 'shopping-basket' :
                   'utensils'
                 }`}></i>
                 <span>{category}</span>
