@@ -90,9 +90,9 @@ const List = () => {
   const handleEdit = (item) => {
     setEditingItem({
       ...item,
-      prices: item.prices || { g250: 0, g500: 0, kg1: 0 },
-      marketPrices: item.marketPrices || { g250: 0, g500: 0, kg1: 0 },
-      quantityOptions: item.quantityOptions || { g250: true, g500: false, kg1: false }
+      prices: item.prices || { g100: 0, g150: 0, g200: 0, g250: 0, g300: 0, g400: 0, g500: 0, kg1: 0 },
+      marketPrices: item.marketPrices || { g100: 0, g150: 0, g200: 0, g250: 0, g300: 0, g400: 0, g500: 0, kg1: 0 },
+      quantityOptions: item.quantityOptions || { g100: false, g150: false, g200: false, g250: false, g300: false, g400: false, g500: false, kg1: false }
     });
   };
 
@@ -241,7 +241,7 @@ const List = () => {
             
             {editingItem?._id === item._id ? (
               <div className="edit-prices">
-                {['g250', 'g500', 'kg1'].map(size => (
+                {['g100', 'g150', 'g200', 'g250', 'g300', 'g400', 'g500', 'kg1'].map(size => (
                   <div key={size} className="price-row">
                     <label>
                       <input
@@ -257,7 +257,13 @@ const List = () => {
                           }));
                         }}
                       />
-                      {size === 'g250' ? '250g' : size === 'g500' ? '500g' : '1kg'}
+                      {size === 'g100' ? '100g' :
+                       size === 'g150' ? '150g' :
+                       size === 'g200' ? '200g' :
+                       size === 'g250' ? '250g' :
+                       size === 'g300' ? '300g' :
+                       size === 'g400' ? '400g' :
+                       size === 'g500' ? '500g' : '1kg'}
                     </label>
                     {editingItem.quantityOptions[size] && (
                       <div className="price-inputs">
@@ -302,7 +308,15 @@ const List = () => {
               <div className="quantity-prices">
                 {Object.entries(item.quantityOptions || {}).map(([size, enabled]) => enabled && (
                   <div key={size} className="quantity-price-badge">
-                    <span>{size === 'g250' ? '250g' : size === 'g500' ? '500g' : '1kg'}</span>
+                    <span>
+                      {size === 'g100' ? '100g' :
+                       size === 'g150' ? '150g' :
+                       size === 'g200' ? '200g' :
+                       size === 'g250' ? '250g' :
+                       size === 'g300' ? '300g' :
+                       size === 'g400' ? '400g' :
+                       size === 'g500' ? '500g' : '1kg'}
+                    </span>
                     <span>₹{item.prices[size]}</span>
                     {item.marketPrices[size] > item.prices[size] && (
                       <span className="market-price">₹{item.marketPrices[size]}</span>

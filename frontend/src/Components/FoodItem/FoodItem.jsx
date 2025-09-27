@@ -20,7 +20,10 @@ const FoodItemComponent = ({
     // Find first available quantity option
     const firstAvailable = Object.entries(quantityOptions || {})
       .find(([, isEnabled]) => isEnabled)
-    return firstAvailable ? firstAvailable[0] : 'g250'
+    // Try to find the smallest available quantity
+    const availableSizes = ['g100', 'g150', 'g200', 'g250', 'g300', 'g400', 'g500', 'kg1'];
+    const firstEnabled = availableSizes.find(size => quantityOptions?.[size]);
+    return firstEnabled || 'g250';
   })
   
   // Update selected quantity if current selection becomes unavailable
@@ -41,7 +44,13 @@ const FoodItemComponent = ({
     .filter(([, isEnabled]) => isEnabled)
     .map(([key]) => ({
       value: key,
-      label: key === 'g250' ? '250 gm' : key === 'g500' ? '500 gm' : '1 kg'
+      label: key === 'g100' ? '100 gm' :
+             key === 'g150' ? '150 gm' :
+             key === 'g200' ? '200 gm' :
+             key === 'g250' ? '250 gm' :
+             key === 'g300' ? '300 gm' :
+             key === 'g400' ? '400 gm' :
+             key === 'g500' ? '500 gm' : '1 kg'
     }));
 
   const currentPrice = prices?.[selectedQuantity] || 0;
@@ -181,11 +190,38 @@ const FoodItemComponent = ({
 FoodItemComponent.propTypes = {
   id: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
-  prices: PropTypes.object.isRequired,
-  marketPrices: PropTypes.object,
+  prices: PropTypes.shape({
+    g100: PropTypes.number,
+    g150: PropTypes.number,
+    g200: PropTypes.number,
+    g250: PropTypes.number,
+    g300: PropTypes.number,
+    g400: PropTypes.number,
+    g500: PropTypes.number,
+    kg1: PropTypes.number
+  }).isRequired,
+  marketPrices: PropTypes.shape({
+    g100: PropTypes.number,
+    g150: PropTypes.number,
+    g200: PropTypes.number,
+    g250: PropTypes.number,
+    g300: PropTypes.number,
+    g400: PropTypes.number,
+    g500: PropTypes.number,
+    kg1: PropTypes.number
+  }),
   description: PropTypes.string,
   image: PropTypes.string.isRequired,
-  quantityOptions: PropTypes.object,
+  quantityOptions: PropTypes.shape({
+    g100: PropTypes.bool,
+    g150: PropTypes.bool,
+    g200: PropTypes.bool,
+    g250: PropTypes.bool,
+    g300: PropTypes.bool,
+    g400: PropTypes.bool,
+    g500: PropTypes.bool,
+    kg1: PropTypes.bool
+  }),
   status: PropTypes.string,
   isExpanded: PropTypes.bool,
   onExpand: PropTypes.func

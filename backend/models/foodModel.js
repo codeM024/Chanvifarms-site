@@ -5,23 +5,34 @@ const foodSchema = new mongoose.Schema(
     name: { type: String, required: true },
     description: { type: String, required: true },
     prices: {
-    g100: { type: Number },
-     g150: { type: Number },
-        g200: { type: Number },   
-     g250: { type: Number },
-        g300: { type: Number },
+      g100: { type: Number },
+      g150: { type: Number },
+      g200: { type: Number },
+      g250: { type: Number },
+      g300: { type: Number },
+      g400: { type: Number },
       g500: { type: Number },
-      kg1: { type: Number },
+      kg1: { type: Number }
     },
     marketPrices: {
+      g100: { type: Number },
+      g150: { type: Number },
+      g200: { type: Number },
       g250: { type: Number },
+      g300: { type: Number },
+      g400: { type: Number },
       g500: { type: Number },
-      kg1: { type: Number },
+      kg1: { type: Number }
     },
     quantityOptions: {
+      g100: { type: Boolean, default: false },
+      g150: { type: Boolean, default: false },
+      g200: { type: Boolean, default: false },
       g250: { type: Boolean, default: false },
+      g300: { type: Boolean, default: false },
+      g400: { type: Boolean, default: false },
       g500: { type: Boolean, default: false },
-      kg1: { type: Boolean, default: false },
+      kg1: { type: Boolean, default: false }
     },
     image: { type: String, required: true },
     category: {
@@ -47,7 +58,7 @@ const foodSchema = new mongoose.Schema(
   }
 );
 
-// Add middleware to set marketPrices if not provided
+// Add middleware to handle prices and validation
 foodSchema.pre("save", function (next) {
   if (this.quantityOptions.g100 && !this.marketPrices.g100)
     this.marketPrices.g100 = this.prices.g100;

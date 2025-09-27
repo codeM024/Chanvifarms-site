@@ -37,14 +37,21 @@ const ShopComponent = () => {
   const categories = ['all', ...new Set(food_list.map(item => item.category))]
 
   const getLowestAvailablePrice = (item) => {
-    if (!item.quantityOptions) return item.prices?.g250 || 0;
+    if (!item.quantityOptions || !item.prices) return 0;
     
-    // Find the first available quantity and its price
-    const availableQuantity = Object.entries(item.quantityOptions)
-      .find(([, isEnabled]) => isEnabled);
+    const quantities = [
+      'g100', 'g150', 'g200', 'g250', 
+      'g300', 'g400', 'g500', 'kg1'
+    ];
     
-    if (!availableQuantity) return item.prices?.g250 || 0;
-    return item.prices?.[availableQuantity[0]] || 0;
+    let lowestPrice = Infinity;
+    quantities.forEach(size => {
+      if (item.quantityOptions[size] && item.prices[size] !== undefined) {
+        lowestPrice = Math.min(lowestPrice, item.prices[size]);
+      }
+    });
+    
+    return lowestPrice === Infinity ? 0 : lowestPrice;
   };
 
   const filteredAndSortedItems = useMemo(() => {
