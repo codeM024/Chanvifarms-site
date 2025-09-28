@@ -8,8 +8,35 @@
     margin: 0;
     font-size: 24px;
     font-weight: 500;
+}
+
+.edit-name-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: white;
+    transition: border-color 0.3s ease;
+}
+
+.edit-name-input:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
+.edit-name-input::placeholder {
+    color: #999;
+}
+
+/* Preserve layout when editing */
+.list-table-format > input.edit-name-input {
+    margin: 0;
+    min-width: 200px;
     margin-bottom: 20px;
 }
+  
 
 .list-header {
     display: flex;

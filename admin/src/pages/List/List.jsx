@@ -90,6 +90,7 @@ const List = () => {
   const handleEdit = (item) => {
     setEditingItem({
       ...item,
+      name: item.name,
       prices: item.prices || { g100: 0, g150: 0, g200: 0, g250: 0, g300: 0, g400: 0, g500: 0, kg1: 0 },
       marketPrices: item.marketPrices || { g100: 0, g150: 0, g200: 0, g250: 0, g300: 0, g400: 0, g500: 0, kg1: 0 },
       quantityOptions: item.quantityOptions || { g100: false, g150: false, g200: false, g250: false, g300: false, g400: false, g500: false, kg1: false }
@@ -108,7 +109,14 @@ const List = () => {
       return;
     }
 
+    // Validate name
+    if (!editingItem.name?.trim()) {
+      toast.error("Product name cannot be empty");
+      return;
+    }
+
     await updateFood(editingItem._id, {
+      name: editingItem.name.trim(),
       prices: editingItem.prices,
       marketPrices: editingItem.marketPrices,
       quantityOptions: editingItem.quantityOptions,
@@ -236,7 +244,22 @@ const List = () => {
               alt={item.name} 
               className={item.status !== 'in-stock' ? 'grayscale' : ''}
             />
-            <p>{item.name}</p>
+            {editingItem?._id === item._id ? (
+              <input
+                type="text"
+                value={editingItem.name}
+                onChange={(e) => {
+                  setEditingItem(prev => ({
+                    ...prev,
+                    name: e.target.value
+                  }));
+                }}
+                className="edit-name-input"
+                placeholder="Enter product name"
+              />
+            ) : (
+              <p>{item.name}</p>
+            )}
             <p>{item.category}</p>
             
             {editingItem?._id === item._id ? (
