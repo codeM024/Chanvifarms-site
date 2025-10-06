@@ -35,7 +35,7 @@ const WhyChooseUs = () => {
     <>
       <div className="why-choose-us" id="why-choose-us">
         <div className="section-header">
-          <h1>Why Chanvifarm</h1>
+          <h1>Why Chanvifarms</h1>
           <h2>Why Choose Us?</h2>
         </div>
 

@@ -157,7 +157,7 @@ const Navbar = ({ setShowLogin }) => {
             }}
             className={activeNav === "shop" ? "active" : ""}
           >
-            Shop
+            Organic Products
           </Link>
           <Link
             to="/contact"

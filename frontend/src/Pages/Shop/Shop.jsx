@@ -125,29 +125,58 @@ const ShopComponent = () => {
         <div className="categories-sidebar">
           <h2>Select from Categories below</h2>
           <div className="categories-list">
-            {categories.map((category, index) => (
-              <div
-                key={index}
-                className={`category-item ${selectedCategory === category ? 'active' : ''}`}
-                onClick={() => setSelectedCategory(category)}
-              >
-                <i className={`fas fa-${
-                  category === 'all' ? 'th-large' :
-                  category.toLowerCase().includes('exotic vegetables') ? 'seedling' :
-                  category.toLowerCase().includes('exotic fruits') ? 'lemon' :
-                  category.toLowerCase().includes('vegetables') ? 'carrot' :
-                  category.toLowerCase().includes('fruits') ? 'apple-alt' :
-                  category.toLowerCase() === 'meat' ? 'drumstick-bite' :
-                  category.toLowerCase() === 'groceries' ? 'shopping-basket' :
-                  'utensils'
-                }`}></i>
-                <span>{category}</span>
-                <span className="category-count">
-                  {food_list.filter(item => category === 'all' ? true : item.category === category).length}
-                </span>
-              </div>
-            ))}
-          </div>
+  {categories.map((category, index) => {
+    // 📝 Create display name mapping
+    let displayName = category;
+    if (category.toLowerCase().includes('vegetables')) {
+      displayName = `Organic ${category}`;
+    } else if (category.toLowerCase().includes('fruits')) {
+      displayName = `Organic ${category}`;
+    } else if (category.toLowerCase() === 'groceries') {
+      displayName = 'Organic Groceries';
+    } else if (category.toLowerCase() === 'all') {
+      displayName = 'All Products';
+    }
+
+    return (
+      <div
+        key={index}
+        className={`category-item ${selectedCategory === category ? 'active' : ''}`}
+        onClick={() => setSelectedCategory(category)}
+      >
+        <i
+          className={`fas fa-${
+            category === 'all'
+              ? 'th-large'
+              : category.toLowerCase().includes('exotic vegetables')
+              ? 'seedling'
+              : category.toLowerCase().includes('exotic fruits')
+              ? 'lemon'
+              : category.toLowerCase().includes('vegetables')
+              ? 'carrot'
+              : category.toLowerCase().includes('fruits')
+              ? 'apple-alt'
+              : category.toLowerCase() === 'meat'
+              ? 'drumstick-bite'
+              : category.toLowerCase() === 'groceries'
+              ? 'shopping-basket'
+              : 'utensils'
+          }`}
+        ></i>
+
+        {/* ✅ Display modified name on UI */}
+        <span>{displayName}</span>
+
+        <span className="category-count">
+          {food_list.filter(item =>
+            category === 'all' ? true : item.category === category
+          ).length}
+        </span>
+      </div>
+    );
+  })}
+</div>
+
         </div>
 
         {/* Main Content */}

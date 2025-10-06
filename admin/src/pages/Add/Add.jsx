@@ -280,12 +280,12 @@ const Add = () => {
         <p>Product Category <span className="required">*</span></p>
         <select value={data.category} onChange={inputHandler} name="category">
           <option value="">Select Category</option>
-          <option value="Vegetables">Vegetables</option>
-          <option value="Fruits">Fruits</option>
-          <option value="Exotic Vegetables">Exotic Vegetables</option>
-          <option value="Exotic Fruits">Exotic Fruits</option>
+          <option value="Vegetables">Organic Vegetables</option>
+          <option value="Fruits">Organic Fruits</option>
+          <option value="Exotic Vegetables">Exotic Organic Vegetables</option>
+          <option value="Exotic Fruits">Exotic Organic Fruits</option>
           <option value="Meat">Meat</option>
-          <option value="Groceries">Groceries</option>
+          <option value="Groceries">Organic Groceries</option>
         </select>
       </div>
 

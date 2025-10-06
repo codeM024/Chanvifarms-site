@@ -89,7 +89,7 @@ const About = () => {
           <h2>Our Specialty</h2>
           <h3>Why We&apos;re Different</h3>
           <p>
-            At Chanvi Farm, we go beyond the ordinary. Unlike traditional
+            At Chanvi Farms, we go beyond the ordinary. Unlike traditional
             grocery stores or large online platforms, we are committed to
             delivering farm-fresh produce that is responsibly sourced and
             carefully handled. Our passionate team is dedicated to promoting
@@ -103,12 +103,12 @@ const About = () => {
       {/* About Section */}
       <div className="card-section about-card">
         <div className="card-content">
-          <h2>About Chanvi Farm</h2>
-          <h3>Fresh Vegetables, Fruits And Exotic</h3>
+          <h2>About Chanvi Farms</h2>
+          <h3>Fresh Organic Vegetables, Organic Fruits And Exotic</h3>
           <p>
             At Chanvifarm, we believe in the power of fresh, healthy food. Our
-            mission is simple: to bring the farm-fresh goodness of vegetables,
-            fruits and exotic produce directly to your home, ensuring you and
+            mission is simple: to bring the farm-fresh goodness of Organic vegetables,
+            Organic fruits and exotic produce directly to your home, ensuring you and
             your family enjoy the highest quality produce every day.
           </p>
 
@@ -200,8 +200,8 @@ const About = () => {
           <h2>Our Vision</h2>
           <h3>Join Our Mission</h3>
           <p>
-            When you choose Chanvi Farm, you&apos;re not just buying fresh
-            fruits and vegetables — you&apos;re becoming a part of something
+            When you choose Chanvi Farms, you&apos;re not just buying fresh
+            Organic fruits and Organic vegetables — you&apos;re becoming a part of something
             bigger. You&apos;re supporting local farmers, encouraging
             sustainable agriculture, and promoting a healthier lifestyle for
             yourself and your community.
@@ -295,7 +295,7 @@ const About = () => {
               <i className="fas fa-star"></i>
             </div>
             <p>
-              &ldquo;The freshness of vegetables from Chanvi Farm is unmatched!
+              &ldquo;The freshness of Organic vegetables from Chanvi Farms is unmatched!
               I&apos;ve been ordering for 3 months now and have never been
               disappointed. Their customer service is excellent too!&rdquo;
             </p>
@@ -314,7 +314,7 @@ const About = () => {
               <i className="fas fa-star-half-alt"></i>
             </div>
             <p>
-              &ldquo;What I love most about Chanvi Farm is their commitment to
+              &ldquo;What I love most about Chanvi Farms is their commitment to
               quality. The fruits are always fresh and perfectly ripe. Their
               pre-order system makes planning meals so much easier!&rdquo;
             </p>
@@ -333,7 +333,7 @@ const About = () => {
               <i className="fas fa-star"></i>
             </div>
             <p>
-              &rdquo;Chanvi Farm takes the stress out of grocery shopping. As
+              &rdquo;Chanvi Farms takes the stress out of grocery shopping. As
               someone always on the go, I truly appreciate their timely service
               and fresh fruits and veggies.&rdquo;
             </p>
@@ -352,7 +352,7 @@ const About = () => {
               <i className="fas fa-star-half-alt"></i>
             </div>
             <p>
-              &ldquo;Being a working professional, Chanvi Farm has made my life
+              &ldquo;Being a working professional, Chanvi Farms has made my life
               easier. Their produce is always fresh, and the doorstep delivery
               is super convenient. Highly recommended!&rdquo;
             </p>
@@ -370,7 +370,7 @@ const About = () => {
               <i className="fas fa-star"></i>
             </div>
             <p>
-              &ldquo;Balancing work and life isn’t easy, but Chanvi Farm makes
+              &ldquo;Balancing work and life isn’t easy, but Chanvi Farms makes
               eating healthy effortless with their top-notch produce and
               seamless delivery.&rdquo;
             </p>

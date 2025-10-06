@@ -25,10 +25,10 @@ const AboutSection = () => {
     <div className="about-section">
       <div className="about-content">
         <div className="about-info">
-          <h1>About Chanvi Farm</h1>
-          <h2>Fresh Vegetables, Fruits And Exotic</h2>
-          <p>At Chanvifarm, we believe in the power of fresh, healthy food. Our mission is simple: to bring the farm-fresh goodness of vegetables, fruits and exotic directly to your home, ensuring you and your family enjoy the highest quality produce every day.</p>
-          
+          <h1>About Chanvi Farms</h1>
+          <h2>Fresh Organic Vegetables, Organic Fruits And Organic Exotic</h2>
+          <p>At Chanvi Farms, we believe in the power of fresh, healthy food. Our mission is simple: to bring the farm-fresh goodness of organic vegetables, organic fruits and exotic directly to your home, ensuring you and your family enjoy the highest quality produce every day.</p>
+
           <div className="about-features">
             <div className="feature">
               <i className="fas fa-leaf"></i>

@@ -5,38 +5,33 @@ import veggicard from '../../assets/veggicard.jpg'
 import mixfruits from '../../assets/mixfru.jpg'
 import emixfruits from '../../assets/mix-fruits.jpg'
 import rawmeat from '../../assets/rawmeat.jpg'
-import groceries from '../../assets/menu_8.png'
+import groceries from '../../assets/grocriess.jpeg'
 
 const ExploreMenu = () => {
   const categories = [
     {
-      title: "Vegetables",
-      description: "From farm-fresh leafy greens to crisp root vegetables, discover our premium quality local produce.",
+      title: "Organic Vegetables",
+      description: "From farm-fresh leafy greens to crisp root Organic vegetables, discover our premium quality local produce.",
       image: veggicard
     },
     {
-      title: "Fruits",
-      description: "Experience the sweetness of nature with our handpicked seasonal fruits.",
+      title: "Organic Fruits",
+      description: "Experience the sweetness of nature with our handpicked seasonal Organicfruits.",
       image: mixfruits
     },
     {
-      title: "Exotic Vegetables",
-      description: "Discover rare and unique vegetables from around the world for your culinary adventures.",
+      title: "Exotic Organic Vegetables",
+      description: "Discover rare and unique Organic vegetables from around the world for your culinary adventures.",
       image: exoticveggi
     },
     {
-      title: "Exotic Fruits",
-      description: "Explore our collection of exotic fruits from across the globe.",
+      title: "Exotic Organic Fruits",
+      description: "Explore our collection of exotic Organic fruits from across the globe.",
       image: emixfruits
     },
     {
-      title: "Meat",
-      description: "Premium quality, fresh meat products sourced from trusted suppliers.",
-      image: rawmeat
-    },
-    {
-      title: "Groceries",
-      description: "Essential grocery items and pantry staples for your everyday needs.",
+      title: "Organic Groceries",
+      description: "Essential Organic grocery items and pantry staples for your everyday needs.",
       image: groceries
     }
   ]

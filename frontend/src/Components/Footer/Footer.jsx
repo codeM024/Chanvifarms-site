@@ -78,27 +78,27 @@ const Footer = () => {
             <ul>
               <li>
                 <Link to="/shop?category=vegetables">
-                  <i className="fas fa-chevron-right"></i> Vegetables
+                  <i className="fas fa-chevron-right"></i>Organic Vegetables
                 </Link>
               </li>
               <li>
                 <Link to="/shop?category=fruits">
-                  <i className="fas fa-chevron-right"></i> Fruits
+                  <i className="fas fa-chevron-right"></i>Organic Fruits
                 </Link>
               </li>
               <li>
                 <Link to="/shop?category=exotic vegetables">
-                  <i className="fas fa-chevron-right"></i> Exotic Vegetables
+                  <i className="fas fa-chevron-right"></i> Exotic Organic Vegetables
                 </Link>
               </li>
               <li>
                 <Link to="/shop?category=exotic fruits">
-                  <i className="fas fa-chevron-right"></i> Exotic Fruits
+                  <i className="fas fa-chevron-right"></i> Exotic Organic Fruits
                 </Link>
               </li>
               <li>
-                <Link to="/shop?category=meat">
-                  <i className="fas fa-chevron-right"></i> Meat
+                <Link to="/shop?category=groceries">
+                  <i className="fas fa-chevron-right"></i> Organic Groceries
                 </Link>
               </li>
             </ul>
@@ -170,12 +170,12 @@ const Footer = () => {
             Designed with <i className="fas fa-heart"></i> by
           </p>
           <a
-            href="https://valixdigitalservices.onrender.com/"
+            href="https://nanodigitalservices.onrender.com/"
             target="_blank"
             rel="noopener noreferrer"
             className="designer-link"
           >
-            <span className="designer-name">Vali</span>
+            <span className="designer-name">Nano Digital Services</span>
             <i className="fas fa-external-link-alt link-icon"></i>
           </a>
         </div>

@@ -6,11 +6,11 @@ const FAQ = () => {
 
   const faqData = [
     {
-      question: "Where does Chanvi Farm source its fruits and vegetables?",
+      question: "Where does Chanvi Farms source its Organic fruits and Organic vegetables?",
       answer: "We partner directly with trusted local farmers and growers who follow sustainable and ethical farming practices. This ensures you receive produce that is fresh, safe, and full of natural goodness."
     },
     {
-      question: "How can I place an order with Chanvi Farm?",
+      question: "How can I place an order with Chanvi Farms?",
       answer: "Placing an order is simple! Just visit our website, browse through our selection, add your favorite items to the cart, and proceed to checkout."
     },
     {
@@ -62,7 +62,7 @@ const FAQ = () => {
       answer: "Yes, we regularly offer seasonal discounts, bundle deals, and promotional offers. Stay updated by subscribing to our newsletter or following us on social media."
     },
     {
-      question: "Can I refer a friend to Chanvi Farm?",
+      question: "Can I refer a friend to Chanvi Farms?",
       answer: "Absolutely! Refer a friend and both of you can enjoy special rewards. Check our 'Refer & Earn' section for more details."
     },
     {
