@@ -836,20 +836,7 @@ const PlaceOrder = () => {
                 Pay securely with UPI, cards, netbanking, and more.
               </p>
             </label>
-            <label className="radio-label">
-              <input
-                type="radio"
-                name="payment"
-                value="WHATSAPP_PAY"
-                checked={selectedPayment === "WHATSAPP_PAY"}
-                onChange={(e) => setSelectedPayment(e.target.value)}
-              />
-              <span className="radio-custom"></span>
-              <span className="label-text">WhatsApp Pay</span>
-              <p className="payment-description">
-                Pay through WhatsApp after placing order.
-              </p>
-            </label>
+
             <label className="radio-label">
               <input
                 type="radio"
