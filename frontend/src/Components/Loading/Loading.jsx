@@ -34,7 +34,7 @@ const Loading = () => {
               alt="Chanvi Farms" 
               className="logo-svg enhanced-logo"
               style={{
-                transform: `scale(${1.8 + progress/200}) rotate(${progress * 1.8}deg)`,
+                transform: `scale(${1.8 + progress/200})`,
                 transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
               }}
             />
