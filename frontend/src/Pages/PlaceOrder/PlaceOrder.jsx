@@ -290,14 +290,30 @@ const PlaceOrder = () => {
 
   const calculateFinalAmount = useCallback(() => {
     const subtotal = getTotalCartAmount();
-    let deliveryFee = subtotal === 0 ? 0 : 25;
+    let deliveryFee = subtotal === 0 ? 0 : 40; // Updated to match CartComponent
     let discount = 0;
 
-    const appliedPromo = localStorage.getItem("appliedPromo");
-    if (appliedPromo === "FIRSTORDER") {
-      deliveryFee = 0;
-    } else if (appliedPromo === "ABOVE500" && subtotal >= 500) {
-      discount = subtotal * 0.05;
+    const savedPromo = localStorage.getItem("appliedPromo");
+    if (savedPromo) {
+      try {
+        const appliedPromo = JSON.parse(savedPromo);
+        if (subtotal >= appliedPromo.minAmount) {
+          // Calculate discount based on promo type
+          if (appliedPromo.type === 'combo') {
+            const discountBenefit = appliedPromo.benefits.find(b => b.type === 'percentage');
+            if (discountBenefit) {
+              discount = Math.round((subtotal * discountBenefit.value) / 100);
+            }
+            if (appliedPromo.benefits.some(b => b.type === 'free_delivery')) {
+              deliveryFee = 0;
+            }
+          } else if (appliedPromo.type === 'percentage') {
+            discount = Math.round((subtotal * appliedPromo.value) / 100);
+          }
+        }
+      } catch (error) {
+        console.error('Error parsing promo code:', error);
+      }
     }
 
     return subtotal + deliveryFee - discount;
@@ -468,6 +484,28 @@ const PlaceOrder = () => {
 
         // Prepare order items
         for (const [cartKey, cartItem] of Object.entries(cartItems)) {
+          if (cartKey.startsWith('box_')) {
+            // Handle box items
+            const boxData = cartItem.boxData;
+            items.push({
+              _id: boxData._id,
+              name: boxData.name,
+              price: boxData.price,
+              marketPrice: boxData.marketPrice || boxData.price,
+              quantity: cartItem.quantity,
+              size: 'box',
+              image: 'box.png',
+              type: 'box',
+              boxItems: boxData.items.map(item => ({
+                name: item.itemId.name,
+                size: item.size,
+                quantity: 1
+              }))
+            });
+            totalSavings += ((boxData.marketPrice || boxData.price) - boxData.price) * cartItem.quantity;
+            continue;
+          }
+
           const [itemId, size] = cartKey.split("_");
           const item = food_list.find((food) => food._id === itemId);
 
@@ -859,6 +897,31 @@ const PlaceOrder = () => {
         <div className="cart-summary">
           <p className="title">Order Summary</p>
           {Object.entries(cartItems).map(([cartKey, cartItem]) => {
+            if (cartKey.startsWith('box_')) {
+              // Handle box items
+              const boxData = cartItem.boxData;
+              return (
+                <div key={cartKey} className="cart-summary-item">
+                  <div className="item-info">
+                    <p className="item-name">{boxData.name}</p>
+                    <div className="item-details">
+                      <span className="size">Box Package</span>
+                      <span className="box-contents">
+                        ({boxData.items.map(item => 
+                          `${item.itemId.name} - ${getQuantityLabel(item.size)}`
+                        ).join(', ')})
+                      </span>
+                      <span className="quantity">× {cartItem.quantity}</span>
+                    </div>
+                  </div>
+                  <div className="item-price">
+                    <span className="market-price">₹{(boxData.marketPrice || boxData.price).toFixed(2)}</span>
+                    <span>₹{(boxData.price * cartItem.quantity).toFixed(2)}</span>
+                  </div>
+                </div>
+              );
+            }
+
             const [itemId, size] = cartKey.split("_");
             const item = food_list.find((food) => food._id === itemId);
 
@@ -889,28 +952,56 @@ const PlaceOrder = () => {
             <p>Delivery Charge</p>
             <p>
               ₹
-              {(localStorage.getItem("appliedPromo") === "FIRSTORDER"
-                ? 0
-                : getTotalCartAmount() === 0
-                ? 0
-                : 25
-              ).toFixed(2)}
+              {((() => {
+                const savedPromo = localStorage.getItem("appliedPromo");
+                if (savedPromo) {
+                  try {
+                    const appliedPromo = JSON.parse(savedPromo);
+                    if (appliedPromo.type === 'combo' && 
+                        appliedPromo.benefits.some(b => b.type === 'free_delivery')) {
+                      return 0;
+                    }
+                  } catch (error) {}
+                }
+                return getTotalCartAmount() === 0 ? 0 : 40;
+              })()).toFixed(2)}
             </p>
           </div>
+          {(() => {
+            const savedPromo = localStorage.getItem("appliedPromo");
+            if (savedPromo) {
+              try {
+                const appliedPromo = JSON.parse(savedPromo);
+                const subtotal = getTotalCartAmount();
+                let promoDiscount = 0;
+
+                if (subtotal >= appliedPromo.minAmount) {
+                  if (appliedPromo.type === 'combo') {
+                    const discountBenefit = appliedPromo.benefits.find(b => b.type === 'percentage');
+                    if (discountBenefit) {
+                      promoDiscount = Math.round((subtotal * discountBenefit.value) / 100);
+                    }
+                  } else if (appliedPromo.type === 'percentage') {
+                    promoDiscount = Math.round((subtotal * appliedPromo.value) / 100);
+                  }
+                }
+
+                if (promoDiscount > 0) {
+                  return (
+                    <div className="cart-summary-item promo-discount">
+                      <p>Promo Discount ({appliedPromo.code})</p>
+                      <p className="discount-amount">-₹{promoDiscount.toFixed(2)}</p>
+                    </div>
+                  );
+                }
+              } catch (error) {}
+            }
+            return null;
+          })()}
           <div className="cart-summary-item savings">
             <p>Total Savings</p>
             <p>₹{getTotalCartSavings().toFixed(2)}</p>
           </div>
-          {localStorage.getItem("appliedPromo") && (
-            <div className="cart-summary-item promo">
-              <p>Applied Promocode: {localStorage.getItem("appliedPromo")}</p>
-              <p className="promo-discount">
-                {localStorage.getItem("appliedPromo") === "FIRSTORDER"
-                  ? "(Free Delivery)"
-                  : "(5% Off)"}
-              </p>
-            </div>
-          )}
           <div className="cart-summary-total">
             <p>Total Amount</p>
             <p>₹{calculateFinalAmount().toFixed(2)}</p>

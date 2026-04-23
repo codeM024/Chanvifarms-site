@@ -4,6 +4,7 @@ import {Routes, Route, Navigate} from 'react-router-dom'
 import PropTypes from 'prop-types'
 import Add from './pages/Add/Add'
 import List from './pages/List/List'
+import Boxes from './pages/Boxes/Boxes'
 import Orders from './pages/Orders/Orders'
 import Login from './pages/Login/Login'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -47,6 +48,13 @@ const App = () => {
           <ProtectedRoute>
             <AuthenticatedLayout>
               <List />
+            </AuthenticatedLayout>
+          </ProtectedRoute>
+        }/>
+        <Route path="/boxes" element={
+          <ProtectedRoute>
+            <AuthenticatedLayout>
+              <Boxes />
             </AuthenticatedLayout>
           </ProtectedRoute>
         }/>

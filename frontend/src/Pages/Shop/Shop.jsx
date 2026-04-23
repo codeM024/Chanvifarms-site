@@ -3,10 +3,11 @@ import { useSearchParams } from 'react-router-dom'
 import './Shop.css'
 import { StoreContext } from '../../Context/StoreContext'
 import FoodItem from '../../Components/FoodItem/FoodItem'
+import BoxItem from '../../Components/BoxItem/BoxItem'
 import { NavContext } from '../../Context/NavContext'
 
 const ShopComponent = () => {
-  const { food_list, loading } = useContext(StoreContext)
+  const { food_list, box_list, loading } = useContext(StoreContext)
   const { setActiveNav } = useContext(NavContext)
   const [searchParams] = useSearchParams()
   const [expandedItem, setExpandedItem] = useState(null)
@@ -34,7 +35,7 @@ const ShopComponent = () => {
     }
   }, [searchParams])
 
-  const categories = ['all', ...new Set(food_list.map(item => item.category))]
+  const categories = ['all', 'Boxes', ...new Set(food_list.map(item => item.category))]
 
   const getLowestAvailablePrice = (item) => {
     if (!item.quantityOptions || !item.prices) return 0;
@@ -55,9 +56,10 @@ const ShopComponent = () => {
   };
 
   const filteredAndSortedItems = useMemo(() => {
-    let items = selectedCategory === 'all' 
-      ? food_list 
-      : food_list.filter(item => 
+    let items = []
+    if (selectedCategory === 'all') items = food_list
+    else if (selectedCategory === 'Boxes') items = [] // boxes handled separately
+    else items = food_list.filter(item => 
           item.category.toLowerCase() === selectedCategory.toLowerCase()
         )
 
@@ -83,6 +85,13 @@ const ShopComponent = () => {
       }
     })
   }, [food_list, selectedCategory, searchQuery, sortBy])
+
+  // For boxes, derive list to display
+  const displayedBoxes = useMemo(() => {
+    if (selectedCategory !== 'Boxes') return []
+    // sort boxes by name for now
+    return box_list.slice().sort((a,b) => a.name.localeCompare(b.name))
+  }, [box_list, selectedCategory])
 
   // Calculate pagination
   const totalPages = Math.ceil(filteredAndSortedItems.length / itemsPerPage)
@@ -168,7 +177,7 @@ const ShopComponent = () => {
         <span>{displayName}</span>
 
         <span className="category-count">
-          {food_list.filter(item =>
+          {category === 'Boxes' ? box_list.length : food_list.filter(item =>
             category === 'all' ? true : item.category === category
           ).length}
         </span>
@@ -183,7 +192,7 @@ const ShopComponent = () => {
         <div className="shop-content">
           <div className="shop-controls">
             <p className="products-count">
-              Showing {paginatedItems.length} of {filteredAndSortedItems.length} products
+              Showing {selectedCategory === 'Boxes' ? displayedBoxes.length : paginatedItems.length} of {selectedCategory === 'Boxes' ? displayedBoxes.length : filteredAndSortedItems.length} products
             </p>
             <div className="controls-right">
               <div className="search-bar">
@@ -208,23 +217,29 @@ const ShopComponent = () => {
           </div>
           
           <div className="food-display-list">
-            {paginatedItems.map((item) => (
-              <FoodItem
-                key={item._id}
-                id={item._id}
-                {...item}
-                isExpanded={expandedItem === item._id}
-                onExpand={() => {
-                  // Close any open item before expanding the new one
-                  if (expandedItem === item._id) {
-                    setExpandedItem(null);
-                  } else {
-                    setExpandedItem(item._id);
-                  }
-                }}
-              />
-            ))}
-            {paginatedItems.length === 0 && (
+            {selectedCategory === 'Boxes' ? (
+              displayedBoxes.map(box => (
+                <BoxItem key={box._id} box={box} />
+              ))
+            ) : (
+              paginatedItems.map((item) => (
+                <FoodItem
+                  key={item._id}
+                  id={item._id}
+                  {...item}
+                  isExpanded={expandedItem === item._id}
+                  onExpand={() => {
+                    // Close any open item before expanding the new one
+                    if (expandedItem === item._id) {
+                      setExpandedItem(null);
+                    } else {
+                      setExpandedItem(item._id);
+                    }
+                  }}
+                />
+              ))
+            )}
+            {(selectedCategory === 'Boxes' ? displayedBoxes.length === 0 : paginatedItems.length === 0) && (
               <div className="no-results">
                 <i className="fas fa-search"></i>
                 <p>No products found</p>

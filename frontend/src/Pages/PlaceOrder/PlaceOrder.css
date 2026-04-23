@@ -10,7 +10,31 @@
   flex: 2;
 }
 
-.place-order-right {
+.pla.cart-summary {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.box-contents {
+  font-size: 0.85em;
+  color: #666;
+  display: block;
+  margin-top: 4px;
+}
+
+.item-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.market-price {
+  color: #999;
+  text-decoration: line-through;
+  font-size: 0.9em;}der-right {
   flex: 1;
 }
 

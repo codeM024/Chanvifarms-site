@@ -11,7 +11,14 @@ const createToken = (id) => {
     if (!process.env.JWT_SECRET) {
         throw new Error('JWT_SECRET is not defined in environment variables');
     }
-    return jwt.sign({ userId: id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    return jwt.sign(
+        { 
+            userId: id,
+            iat: Math.floor(Date.now() / 1000),
+            exp: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60) // 7 days
+        }, 
+        process.env.JWT_SECRET
+    );
 }
 
 // login user 

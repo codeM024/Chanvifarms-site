@@ -2,7 +2,7 @@ import React from 'react'
 import './Sidebar.css'
 import { assets } from '../../assets/assets'
 import {NavLink} from 'react-router-dom'
-import { FaList, FaPlus, FaShoppingBag, FaUsers } from 'react-icons/fa'
+import { FaList, FaPlus, FaShoppingBag, FaUsers, FaBox } from 'react-icons/fa'
 
 const Sidebar = () => {
   return (
@@ -15,6 +15,10 @@ const Sidebar = () => {
             <NavLink to='/list' className="sidebar-option">
                 <FaList className="icon" />
                 <p>List Items</p>
+            </NavLink>
+            <NavLink to='/boxes' className="sidebar-option">
+                <FaBox className="icon" />
+                <p>Boxes</p>
             </NavLink>
             <NavLink to='/orders' className="sidebar-option">
                 <FaShoppingBag className="icon" />

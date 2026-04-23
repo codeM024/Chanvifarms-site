@@ -6,6 +6,7 @@ import foodRouter from "./routes/foodRoute.js";
 import userRouter from "./routes/userRoute.js";
 import cartRouter from "./routes/cartRoute.js";
 import orderRouter from "./routes/orderRoute.js";
+import boxRouter from "./routes/boxRoute.js";
 import Razorpay from 'razorpay';
 import crypto from 'crypto';
 import Order from './models/orderModel.js';
@@ -26,12 +27,11 @@ try {
     console.error("Failed to initialize Razorpay:", error);
 }
 
-// Validate required environment variables
+// Validate required environment variables for core runtime
+// Razorpay keys are optional for local development; log a warning if missing but don't exit.
 const requiredEnvVars = [
     'MONGODB_URI',
-    'JWT_SECRET',
-    'RAZORPAY_KEY_ID',
-    'RAZORPAY_KEY_SECRET'
+    'JWT_SECRET'
 ];
 
 const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
@@ -40,18 +40,32 @@ if (missingEnvVars.length > 0) {
     process.exit(1);
 }
 
+if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+    console.warn('Warning: Razorpay credentials are missing. Payment endpoints will be disabled in this environment.');
+}
+
 //app config
 const app = express()
 const port = process.env.PORT || 4000
 
+// Serve static files from uploads directory
+app.use('/images', express.static('uploads'))
+
 // middleware 
 app.use(express.json())
-app.use(cors({
+const corsOptions = {
     origin: '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'token']
-}))
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'token', 'admin-email'],
+    optionsSuccessStatus: 204
+}
+app.use(cors(corsOptions))
 
+// quick response for OPTIONS preflight requests
+app.use((req, res, next) => {
+    if (req.method === 'OPTIONS') return res.sendStatus(204)
+    next()
+})
 //DB connection
 connectDB().catch(err => {
     console.error('Failed to connect to database:', err);
@@ -206,6 +220,7 @@ app.use('/images', express.static('uploads'))
 app.use('/api/user', userRouter)
 app.use("/api/cart", cartRouter)
 app.use("/api/order", orderRouter)
+app.use('/api/box', boxRouter)
 
 // Error handling middleware
 app.use((err, req, res, next) => {

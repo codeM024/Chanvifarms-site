@@ -1,4 +1,57 @@
 import userModel from "../models/userModel.js"
+import Box from '../models/boxModel.js'
+
+const addBoxToCart = async (req, res) => {
+  try {
+    const { boxId } = req.body;
+    if (!boxId) {
+      return res.status(400).json({
+        success: false,
+        message: "Box ID is required"
+      });
+    }
+
+    let userData = await userModel.findById(req.userId);
+    if (!userData) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    // Get box details
+    const box = await Box.findById(boxId).populate({
+      path: 'items.itemId',
+      select: 'name image prices marketPrices quantityOptions category status'
+    });
+
+    if (!box) {
+      return res.status(404).json({
+        success: false,
+        message: "Box not found"
+      });
+    }
+
+    let cartData = userData.cartData || {};
+    const cartKey = `box_${boxId}`;
+
+    if(!cartData[cartKey]) {
+      cartData[cartKey] = {
+        type: 'box',
+        quantity: 1,
+        boxData: box
+      };
+    } else {
+      cartData[cartKey].quantity += 1;
+    }
+
+    await userModel.findByIdAndUpdate(req.userId, { cartData });
+    res.json({ success: true, message: "Box added to cart" });
+  } catch(error) {
+    console.error("Error adding box to cart:", error);
+    res.status(500).json({ success: false, message: "Error adding box to cart" });
+  }
+};
 
 //add item to the user cart
 const addToCart = async (req,res)=>{
@@ -96,4 +149,4 @@ const clearCart = async (req, res) => {
     }
 };
 
-export { addToCart, removeFromCart, getCart, clearCart }
+export { addToCart, removeFromCart, getCart, clearCart, addBoxToCart }

@@ -13,8 +13,31 @@ const orderSchema = new mongoose.Schema({
         marketPrice: Number,
         quantity: Number,
         size: String,
-        image: String
+        image: String,
+        isFreeItem: {
+            type: Boolean,
+            default: false
+        }
     }],
+    appliedOffer: {
+        code: String,
+        type: {
+            type: String,
+            enum: ['percentage', 'free_item', 'free_delivery', 'combo']
+        },
+        discountAmount: Number,
+        freeDelivery: Boolean,
+        benefits: [{
+            type: {
+                type: String,
+                enum: ['percentage', 'free_item', 'free_delivery']
+            },
+            value: Number,
+            itemType: String,
+            quantity: Number,
+            size: String
+        }]
+    },
     amount: {
         type: Number,
         required: true

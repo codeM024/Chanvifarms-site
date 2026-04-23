@@ -14,6 +14,7 @@ const FoodItemComponent = ({
   status,
   isExpanded,
   onExpand
+  , hideAddToCart
 }) => {
   const {cartItems, addToCart, removeFromCart, url} = useContext(StoreContext)
   const [selectedQuantity, setSelectedQuantity] = useState(() => {
@@ -154,34 +155,36 @@ const FoodItemComponent = ({
           </div>
         </div>
 
-        <div className="cart-actions">
-          {!cartItem ? (
-            <button 
-              className="add-to-cart-btn"
-              onClick={handleAddToCart}
-              disabled={status !== 'in-stock'}
-            >
-              <i className="fas fa-shopping-cart"></i>
-              {status === 'in-stock' ? 'Add to Cart' : getStatusDisplay()}
-            </button>
-          ) : (
-            <div className="quantity-controls">
+        {!hideAddToCart && (
+          <div className="cart-actions">
+            {!cartItem ? (
               <button 
-                className="quantity-btn decrease"
-                onClick={() => handleQuantityChange('decrease')}
+                className="add-to-cart-btn"
+                onClick={handleAddToCart}
+                disabled={status !== 'in-stock'}
               >
-                <i className="fas fa-minus"></i>
+                <i className="fas fa-shopping-cart"></i>
+                {status === 'in-stock' ? 'Add to Cart' : getStatusDisplay()}
               </button>
-              <span className="quantity-display">{cartItem.quantity}</span>
-              <button 
-                className="quantity-btn increase"
-                onClick={() => handleQuantityChange('increase')}
-              >
-                <i className="fas fa-plus"></i>
-              </button>
-            </div>
-          )}
-        </div>
+            ) : (
+              <div className="quantity-controls">
+                <button 
+                  className="quantity-btn decrease"
+                  onClick={() => handleQuantityChange('decrease')}
+                >
+                  <i className="fas fa-minus"></i>
+                </button>
+                <span className="quantity-display">{cartItem.quantity}</span>
+                <button 
+                  className="quantity-btn increase"
+                  onClick={() => handleQuantityChange('increase')}
+                >
+                  <i className="fas fa-plus"></i>
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )

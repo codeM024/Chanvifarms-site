@@ -1,0 +1,14 @@
+.box-item { border:1px solid #eee; padding:12px; border-radius:6px; width:100%; max-width:520px; box-sizing:border-box }
+.box-header h3 { margin:0 0 8px }
+.box-contents { display:flex; flex-direction:column; gap:8px }
+.box-content-row { display:flex; gap:12px; align-items:center; justify-content:space-between }
+.box-content-row img { width:64px; height:64px; object-fit:cover; border-radius:8px }
+.box-content-info { flex:1; margin-left:12px }
+.item-prices { min-width:110px; text-align:right }
+.item-market { text-decoration:line-through; color:#888; display:block }
+.item-price { font-weight:600; display:block }
+.box-prices { margin-top:12px; display:flex; gap:8px; align-items:center; justify-content:flex-end }
+.box-prices .market { text-decoration:line-through; color:#888 }
+.box-prices .price { font-weight:800; font-size:1.1rem }
+.box-add-btn { margin-left:12px; background:#28a745; color:#fff; border:none; padding:8px 12px; border-radius:6px; cursor:pointer }
+.box-add-btn:disabled { opacity:0.7; cursor:not-allowed }
