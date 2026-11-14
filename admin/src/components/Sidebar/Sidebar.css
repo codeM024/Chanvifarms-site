@@ -186,3 +186,26 @@
         border-radius: 0 0 4px 4px;
     }
 }
+
+/* Short labels are only used in the phone tab bar */
+.sidebar-option .sidebar-label-short {
+    display: none;
+}
+
+@media (max-width: 640px) {
+    .sidebar {
+        padding-left: 4px;
+        padding-right: 4px;
+    }
+    .sidebar-option {
+        min-width: 0;
+        padding: 0 2px;
+    }
+    .sidebar-option .sidebar-label {
+        display: none;
+    }
+    .sidebar-option .sidebar-label-short {
+        display: block;
+        font-size: 0.68rem;
+    }
+}

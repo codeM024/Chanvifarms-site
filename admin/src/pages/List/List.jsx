@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import './List.css';
 import axios from 'axios';
+import { imageUrl } from '../../utils/imageUrl';
 import { toast } from 'react-toastify';
 import { TableSkeleton, EmptyState } from '../../components/Feedback/Feedback';
 
@@ -333,7 +334,7 @@ const List = () => {
             {filteredList.map((item) => (
               <div key={item._id} className={`list-table-format ${item.status !== 'in-stock' ? 'disabled' : ''} ${editingItem?._id === item._id ? 'editing' : ''}`}>
                 <img
-                  src={`${url}/images/${item.image}`}
+                  src={imageUrl(item.image)}
                   alt={item.name}
                   loading="lazy"
                   className={item.status !== 'in-stock' ? 'grayscale' : ''}

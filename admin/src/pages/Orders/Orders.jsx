@@ -1,6 +1,7 @@
 import "./Orders.css";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { imageUrl } from "../../utils/imageUrl";
 import { toast } from "react-toastify";
 import {
   FaWhatsapp,
@@ -551,7 +552,7 @@ ${mapLink}`;
                       <div key={idx} className="item-card">
                         <div className="item-image-container">
                           <img
-                            src={`${url}/images/${item.image}`}
+                            src={imageUrl(item.image)}
                             alt={item.name}
                             loading="lazy"
                             className="product-image"

@@ -1,0 +1,165 @@
+/* ---------- Switch ---------- */
+.switch {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.switch input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    pointer-events: none;
+}
+
+.switch-track {
+    position: relative;
+    flex-shrink: 0;
+    width: 40px;
+    height: 24px;
+    border-radius: 99px;
+    background: #cfd8d1;
+    transition: background-color 200ms ease, box-shadow 150ms ease;
+}
+
+.switch-thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(20, 40, 25, .25);
+    transition: transform 200ms var(--ease-out);
+}
+
+.switch input:checked + .switch-track {
+    background: var(--brand-500);
+}
+
+.switch input:checked + .switch-track .switch-thumb {
+    transform: translateX(16px);
+}
+
+.switch input:focus-visible + .switch-track {
+    box-shadow: var(--ring);
+}
+
+.switch.is-disabled {
+    cursor: not-allowed;
+    opacity: .6;
+}
+
+.switch.is-busy .switch-thumb::after {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    border: 2px solid var(--brand-400);
+    border-right-color: transparent;
+    animation: spin 700ms linear infinite;
+}
+
+.switch-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text);
+}
+
+/* ---------- Wide modal ---------- */
+.modal.modal-wide {
+    max-width: 640px;
+}
+
+/* ---------- Menu / Settings tabs ---------- */
+.tiffin-tabs {
+    display: inline-flex;
+    gap: 4px;
+    padding: 4px;
+    margin-bottom: 18px;
+    border-radius: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    max-width: 100%;
+}
+
+.tiffin-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 9px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: background-color 150ms ease, color 150ms ease;
+}
+
+.tiffin-tab:hover {
+    color: var(--text);
+    background: var(--surface-2);
+}
+
+.tiffin-tab.active {
+    background: var(--brand-50);
+    color: var(--brand-700);
+    box-shadow: inset 0 0 0 1px var(--brand-100);
+}
+
+/* ---------- Badges ---------- */
+.open-badge {
+    text-transform: none;
+}
+
+.open-badge.is-open::before {
+    animation: pulse-dot 1.6s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+    50% { opacity: .3; }
+}
+
+.pill.no-dot::before {
+    display: none;
+}
+
+/* ---------- Small form helpers ---------- */
+.field-hint {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.field-error {
+    font-size: 0.8rem;
+    color: var(--danger-700);
+}
+
+.input.has-error,
+.textarea.has-error {
+    border-color: var(--danger-500);
+}
+
+.form-error-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    background: var(--danger-50);
+    color: var(--danger-700);
+    font-size: 0.88rem;
+    animation: fade-up 200ms var(--ease-out) both;
+}
+
+.form-error-banner svg {
+    flex-shrink: 0;
+    margin-top: 3px;
+}
