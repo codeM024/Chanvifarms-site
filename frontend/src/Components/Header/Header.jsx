@@ -19,7 +19,7 @@ const Header = () => {
         <div className={`header-contents ${isVisible ? 'visible' : ''}`}>
             <h2>Farm-Fresh Organic Vegetables & Fruits Delivered to Your Doorstep</h2>
             <p>
-              Order online and enjoy the freshest organic vegetables and fruits, sourced directly from trusted local farmers. Experience quality, taste, and nutrition delivered right to your home.
+              Order online and enjoy the freshest organic vegetables and tiffins, sourced directly from trusted local farmers. Experience quality, taste, and nutrition delivered right to your home.
             </p>
             <Link to="/shop">
               <button>
