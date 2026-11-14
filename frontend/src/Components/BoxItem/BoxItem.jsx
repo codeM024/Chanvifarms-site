@@ -1,7 +1,32 @@
-import React, { useContext, useState } from 'react'
+import { useContext, useState } from 'react'
 import PropTypes from 'prop-types'
+import { motion } from 'framer-motion'
 import './BoxItem.css'
 import { StoreContext } from '../../Context/StoreContext'
+
+const BoxThumb = ({ product }) => {
+  const [loaded, setLoaded] = useState(false)
+  if (!product.image) {
+    return <div className="box-thumb box-thumb-fallback">{product.name ? product.name.charAt(0) : '?'}</div>
+  }
+  return (
+    <div className={`box-thumb ${loaded ? '' : 'skeleton'}`}>
+      <img
+        src={`${import.meta.env.VITE_BACKEND_URL}/images/${product.image}`}
+        alt={product.name || 'product'}
+        loading="lazy"
+        decoding="async"
+        className={`img-fade ${loaded ? 'is-loaded' : ''}`}
+        onLoad={() => setLoaded(true)}
+        onError={() => setLoaded(true)}
+      />
+    </div>
+  )
+}
+
+BoxThumb.propTypes = {
+  product: PropTypes.object.isRequired
+}
 
 const BoxItem = ({ box }) => {
   const { name, items, price, marketPrice } = box;
@@ -24,6 +49,7 @@ const BoxItem = ({ box }) => {
   return (
     <div className="box-item">
       <div className="box-header">
+        <span className="box-badge"><i className="fas fa-box-open"></i> Box</span>
         <h3>{name}</h3>
       </div>
 
@@ -34,11 +60,7 @@ const BoxItem = ({ box }) => {
           const market = product.marketPrices?.[it.size] ?? product.marketPrice ?? ourPrice
           return (
             <div key={idx} className="box-content-row">
-              {product.image ? (
-                <img src={`${import.meta.env.VITE_BACKEND_URL}/images/${product.image}`} alt={product.name || 'product'} />
-              ) : (
-                <div style={{width:64,height:64,background:'#f0f0f0',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:8}}>{product.name ? product.name.charAt(0) : '?'}</div>
-              )}
+              <BoxThumb product={product} />
               <div className="box-content-info">
                 <div className="name">{product.name}</div>
                 <div className="size">{formatSizeLabel(it.size)}</div>
@@ -53,16 +75,23 @@ const BoxItem = ({ box }) => {
       </div>
 
       <div className="box-prices">
-        <span className="total-label">Total:</span>
-        {marketPrice > price && <span className="market">₹{marketPrice}</span>}
-        <span className="price">₹{price}</span>
-        <button 
-          className="box-add-btn" 
-          onClick={handleAddBox} 
+        <div className="box-total">
+          <span className="total-label">Total</span>
+          <div>
+            {marketPrice > price && <span className="market">₹{marketPrice}</span>}
+            <span className="price">₹{price}</span>
+          </div>
+        </div>
+        <motion.button
+          className="box-add-btn"
+          onClick={handleAddBox}
           disabled={adding}
+          whileTap={adding ? undefined : { scale: 0.93 }}
+          transition={{ type: 'spring', stiffness: 600, damping: 20 }}
         >
+          <i className={`fas ${adding ? 'fa-spinner fa-spin' : 'fa-cart-plus'}`}></i>
           {adding ? 'Adding...' : 'Add Box'}
-        </button>
+        </motion.button>
       </div>
     </div>
   )

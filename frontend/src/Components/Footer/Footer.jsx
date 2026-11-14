@@ -1,11 +1,13 @@
 import "./Footer.css";
 import { assets } from "../../assets/assets";
 import { Link } from "react-router-dom";
+import Reveal from "../Motion/Reveal";
+import deliveryImg from "../../assets/delivery.webp";
 
 const Footer = () => {
   return (
     <div className="footer" id="footer">
-      <div className="cta-section">
+      <Reveal className="cta-section">
         <div className="cta-box">
           <div className="cta-container">
             <div className="cta-content-left">
@@ -14,6 +16,8 @@ const Footer = () => {
                   src={assets.Chanvifarmlogo}
                   alt="Chanvi Farms Logo"
                   className="logo"
+                  loading="lazy"
+                  decoding="async"
                 />
               </Link>
               <p>
@@ -22,7 +26,7 @@ const Footer = () => {
               </p>
             </div>
             <div className="cta-image">
-              <img src="/src/assets/delivery.jpg" alt="Fresh delivery" />
+              <img src={deliveryImg} alt="Fresh delivery" loading="lazy" decoding="async" />
               <div className="cta-content">
                 <h2>Farm Fresh Delivery At your doorstep!</h2>
                 <a href="tel:+919900088164" className="cta-button">
@@ -33,7 +37,7 @@ const Footer = () => {
             </div>
           </div>
         </div>
-      </div>
+      </Reveal>
 
       <div className="footer-content">
         <div className="footer-content-left">
@@ -50,6 +54,7 @@ const Footer = () => {
               target="_blank"
               rel="noopener noreferrer"
               className="social-icon"
+              aria-label="Facebook"
             >
               <i className="fab fa-facebook-f"></i>
             </a>
@@ -58,6 +63,7 @@ const Footer = () => {
               target="_blank"
               rel="noopener noreferrer"
               className="social-icon"
+              aria-label="X (Twitter)"
             >
               <i className="fab fa-twitter"></i>
             </a>
@@ -66,6 +72,7 @@ const Footer = () => {
               target="_blank"
               rel="noopener noreferrer"
               className="social-icon"
+              aria-label="Instagram"
             >
               <i className="fab fa-instagram"></i>
             </a>

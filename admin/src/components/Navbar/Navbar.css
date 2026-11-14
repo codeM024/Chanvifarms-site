@@ -1,45 +1,138 @@
-.navbar{
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 4%;
-    background: white;
+    gap: 12px;
+    height: var(--navbar-h);
+    padding: 0 clamp(16px, 3vw, 28px);
+    background: rgba(255, 255, 255, .88);
+    backdrop-filter: saturate(160%) blur(10px);
+    -webkit-backdrop-filter: saturate(160%) blur(10px);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
 }
-.navbar .logo{
-    width: max(5%, 50px);
+
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
 }
-.navbar .profile{
-    width:40px;
+
+.navbar .logo {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+    border-radius: 10px;
+    flex-shrink: 0;
+}
+
+.nav-brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+    min-width: 0;
+}
+
+.nav-brand-name {
+    font-weight: 600;
+    font-size: 1.02rem;
+    color: var(--brand-800);
+    white-space: nowrap;
+}
+
+.nav-brand-tag {
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--brand-500);
 }
 
 .nav-right {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 12px;
+    min-width: 0;
 }
 
-.admin-email {
-    color: #666;
-    font-size: 0.9rem;
-}
-
-.logout-btn {
+.nav-user {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-    background: #ff4444;
-    color: white;
+    min-width: 0;
+    padding: 4px 12px 4px 4px;
+    border-radius: 99px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+}
+
+.nav-avatar {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--brand-500);
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+
+.admin-email {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 220px;
+}
+
+.logout-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 38px;
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--text-muted);
+    font-weight: 500;
+    font-size: 0.9rem;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease, transform 150ms var(--ease-out);
 }
 
 .logout-btn:hover {
-    background: #cc0000;
+    color: var(--danger-500);
+    border-color: #f3c6c7;
+    background: var(--danger-50);
 }
 
-.logout-btn i {
-    font-size: 1rem;
+.logout-btn:active {
+    transform: scale(.97);
+}
+
+@media (max-width: 760px) {
+    .admin-email {
+        display: none;
+    }
+    .nav-user {
+        padding: 2px;
+    }
+}
+
+@media (max-width: 480px) {
+    .logout-label,
+    .nav-brand-tag {
+        display: none;
+    }
+    .logout-btn {
+        padding: 8px 10px;
+    }
 }

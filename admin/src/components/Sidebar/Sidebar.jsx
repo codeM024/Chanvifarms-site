@@ -1,32 +1,34 @@
-import React from 'react'
 import './Sidebar.css'
-import { assets } from '../../assets/assets'
-import {NavLink} from 'react-router-dom'
-import { FaList, FaPlus, FaShoppingBag, FaUsers, FaBox } from 'react-icons/fa'
+import { NavLink, useLocation } from 'react-router-dom'
+import { FaList, FaPlus, FaShoppingBag, FaBox } from 'react-icons/fa'
+
+const links = [
+  { to: '/add', label: 'Add Items', Icon: FaPlus },
+  { to: '/list', label: 'List Items', Icon: FaList },
+  { to: '/boxes', label: 'Boxes', Icon: FaBox },
+  { to: '/orders', label: 'Orders', Icon: FaShoppingBag },
+]
 
 const Sidebar = () => {
+  const { pathname } = useLocation();
+  const activeIndex = links.findIndex(l => pathname.startsWith(l.to));
+
   return (
-    <div className="sidebar">
-        <div className="sidebar-options">
-            <NavLink to='/add' className="sidebar-option">
-                <FaPlus className="icon" />
-                <p>Add Items</p>
-            </NavLink>
-            <NavLink to='/list' className="sidebar-option">
-                <FaList className="icon" />
-                <p>List Items</p>
-            </NavLink>
-            <NavLink to='/boxes' className="sidebar-option">
-                <FaBox className="icon" />
-                <p>Boxes</p>
-            </NavLink>
-            <NavLink to='/orders' className="sidebar-option">
-                <FaShoppingBag className="icon" />
-                <p>Orders</p>
-            </NavLink>
+    <nav className="sidebar" aria-label="Main navigation">
+        <p className="sidebar-heading">Menu</p>
+        <div
+          className="sidebar-options"
+          style={{ '--active-index': Math.max(activeIndex, 0), '--count': links.length }}
+        >
+            {activeIndex >= 0 && <span className="sidebar-indicator" aria-hidden="true" />}
+            {links.map(({ to, label, Icon }) => (
+              <NavLink key={to} to={to} className="sidebar-option">
+                  <Icon className="icon" />
+                  <p>{label}</p>
+              </NavLink>
+            ))}
         </div>
-    
-    </div>
+    </nav>
   )
 }
 

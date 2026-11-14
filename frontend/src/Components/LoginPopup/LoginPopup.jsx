@@ -1,5 +1,6 @@
 import { useContext, useState, useEffect } from "react";
 import PropTypes from "prop-types";
+import { motion, AnimatePresence } from "framer-motion";
 import "./LoginPopup.css";
 import { assets } from "../../assets/assets";
 import { StoreContext } from "../../Context/StoreContext";
@@ -17,7 +18,7 @@ const LoginPopup = ({ setShowLogin }) => {
 
   const handleClose = () => {
     setIsClosing(true);
-    setTimeout(() => setShowLogin(false), 300);
+    setTimeout(() => setShowLogin(false), 220);
   };
 
   useEffect(() => {
@@ -62,24 +63,65 @@ const LoginPopup = ({ setShowLogin }) => {
   };
 
   return (
-    <div
-      className={`login-popup ${isClosing ? "fade-out" : ""}`}
+    <motion.div
+      className="login-popup"
       onClick={handleClose}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: isClosing ? 0 : 1 }}
+      transition={{ duration: 0.2, ease: "easeOut" }}
     >
-      <div
+      <motion.div
         className="login-popup-container"
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="login-popup-heading"
+        initial={{ opacity: 0, scale: 0.94, y: 12 }}
+        animate={
+          isClosing
+            ? { opacity: 0, scale: 0.96, y: 8 }
+            : { opacity: 1, scale: 1, y: 0 }
+        }
+        transition={
+          isClosing
+            ? { duration: 0.18, ease: "easeIn" }
+            : { type: "spring", stiffness: 420, damping: 30 }
+        }
       >
         <div className="login-popup-title">
-          <h2>Login</h2>
-          <img onClick={handleClose} src={assets.cross_icon} alt="Close" />
+          <div className="login-popup-brand">
+            <img src={assets.Chanvifarmlogo} alt="" className="login-popup-logo" />
+            <h2 id="login-popup-heading">Login</h2>
+          </div>
+          <button
+            type="button"
+            className="login-popup-close"
+            onClick={handleClose}
+            aria-label="Close"
+          >
+            <img src={assets.cross_icon} alt="" />
+          </button>
         </div>
-
-        {error && <div className="error-message">{error}</div>}
 
         <div className="welcome-message">
           <p>Sign in to access your account and explore our Products</p>
         </div>
+
+        <AnimatePresence initial={false}>
+          {error && (
+            <motion.div
+              className="error-message"
+              role="alert"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <i className="fas fa-exclamation-circle"></i>
+              <span>{error}</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div className="login-popup-condition">
           <label className="terms-checkbox">
@@ -114,10 +156,28 @@ const LoginPopup = ({ setShowLogin }) => {
               </Link>
             </span>
           </label>
-          {!acceptTerms && <p className="terms-warning">Please accept the terms to continue</p>}
+          <AnimatePresence initial={false}>
+            {!acceptTerms && (
+              <motion.p
+                className="terms-warning"
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.18 }}
+              >
+                Please accept the terms to continue
+              </motion.p>
+            )}
+          </AnimatePresence>
         </div>
 
-        <div className={`google-login-container ${!acceptTerms ? 'disabled' : ''}`}>
+        <div className={`google-login-container ${!acceptTerms ? 'disabled' : ''} ${loading ? 'is-loading' : ''}`}>
+          {loading && (
+            <div className="google-login-loading" aria-live="polite">
+              <span className="login-spinner" aria-hidden="true"></span>
+              Signing you in…
+            </div>
+          )}
           <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
             <div className={!acceptTerms ? 'google-button-overlay' : ''}>
               <GoogleLogin
@@ -134,8 +194,8 @@ const LoginPopup = ({ setShowLogin }) => {
             </div>
           </GoogleOAuthProvider>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

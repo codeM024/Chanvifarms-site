@@ -1,5 +1,6 @@
 import { useContext, useState, useEffect, memo } from 'react'
 import PropTypes from 'prop-types'
+import { motion, AnimatePresence } from 'framer-motion'
 import "./FoodItem.css"
 import { StoreContext } from '../../Context/StoreContext'
 
@@ -17,10 +18,8 @@ const FoodItemComponent = ({
   , hideAddToCart
 }) => {
   const {cartItems, addToCart, removeFromCart, url} = useContext(StoreContext)
+  const [imgLoaded, setImgLoaded] = useState(false)
   const [selectedQuantity, setSelectedQuantity] = useState(() => {
-    // Find first available quantity option
-    const firstAvailable = Object.entries(quantityOptions || {})
-      .find(([, isEnabled]) => isEnabled)
     // Try to find the smallest available quantity
     const availableSizes = ['g100', 'g150', 'g200', 'g250', 'g300', 'g400', 'g500', 'kg1'];
     const firstEnabled = availableSizes.find(size => quantityOptions?.[size]);
@@ -83,12 +82,15 @@ const FoodItemComponent = ({
 
   return (
     <div className={`food-item ${status !== 'in-stock' ? 'disabled' : ''} ${isExpanded ? 'expanded' : ''}`}>
-      <div className="food-item-img-container">
-        <img 
-          className={`food-item-image ${status !== 'in-stock' ? 'grayscale' : ''}`}
-          src={`${url}/images/${image}`} 
+      <div className={`food-item-img-container ${imgLoaded ? '' : 'skeleton'}`}>
+        <img
+          className={`food-item-image img-fade ${imgLoaded ? 'is-loaded' : ''} ${status !== 'in-stock' ? 'grayscale' : ''}`}
+          src={`${url}/images/${image}`}
           alt={name}
           loading="lazy"
+          decoding="async"
+          onLoad={() => setImgLoaded(true)}
+          onError={() => setImgLoaded(true)}
         />
         {status !== 'in-stock' && (
           <div className="status-badge">{getStatusDisplay()}</div>
@@ -112,9 +114,19 @@ const FoodItemComponent = ({
           )}
         </div>
 
-        {isExpanded && description && (
-          <p className="product-description">{description}</p>
-        )}
+        <AnimatePresence initial={false}>
+          {isExpanded && description && (
+            <motion.p
+              className="product-description"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {description}
+            </motion.p>
+          )}
+        </AnimatePresence>
 
         <div className="price-section">
           <div className="price-header">
@@ -158,30 +170,49 @@ const FoodItemComponent = ({
         {!hideAddToCart && (
           <div className="cart-actions">
             {!cartItem ? (
-              <button 
+              <motion.button
                 className="add-to-cart-btn"
                 onClick={handleAddToCart}
                 disabled={status !== 'in-stock'}
+                whileTap={status === 'in-stock' ? { scale: 0.94 } : undefined}
+                transition={{ type: 'spring', stiffness: 600, damping: 20 }}
               >
                 <i className="fas fa-shopping-cart"></i>
                 {status === 'in-stock' ? 'Add to Cart' : getStatusDisplay()}
-              </button>
+              </motion.button>
             ) : (
-              <div className="quantity-controls">
-                <button 
+              <motion.div
+                className="quantity-controls"
+                initial={{ scale: 0.92, opacity: 0.6 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: 'spring', stiffness: 500, damping: 18 }}
+              >
+                <motion.button
                   className="quantity-btn decrease"
                   onClick={() => handleQuantityChange('decrease')}
+                  whileTap={{ scale: 0.85 }}
+                  aria-label="Decrease quantity"
                 >
                   <i className="fas fa-minus"></i>
-                </button>
-                <span className="quantity-display">{cartItem.quantity}</span>
-                <button 
+                </motion.button>
+                <motion.span
+                  key={cartItem.quantity}
+                  className="quantity-display"
+                  initial={{ scale: 1.35 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: 'spring', stiffness: 600, damping: 15 }}
+                >
+                  {cartItem.quantity}
+                </motion.span>
+                <motion.button
                   className="quantity-btn increase"
                   onClick={() => handleQuantityChange('increase')}
+                  whileTap={{ scale: 0.85 }}
+                  aria-label="Increase quantity"
                 >
                   <i className="fas fa-plus"></i>
-                </button>
-              </div>
+                </motion.button>
+              </motion.div>
             )}
           </div>
         )}
@@ -227,7 +258,8 @@ FoodItemComponent.propTypes = {
   }),
   status: PropTypes.string,
   isExpanded: PropTypes.bool,
-  onExpand: PropTypes.func
+  onExpand: PropTypes.func,
+  hideAddToCart: PropTypes.bool
 }
 
 FoodItemComponent.defaultProps = {

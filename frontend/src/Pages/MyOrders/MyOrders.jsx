@@ -1,9 +1,11 @@
-import React, { useContext, useState, useEffect } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import './MyOrders.css';
 import { StoreContext } from '../../Context/StoreContext';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { toast } from 'react-toastify';
+import Reveal from '../../Components/Motion/Reveal';
 
 const MyOrders = () => {
     const [orders, setOrders] = useState([]);
@@ -41,38 +43,38 @@ const MyOrders = () => {
     const getStatusDetails = (status) => {
         const statusMap = {
             pending: {
-                color: '#ff9800',
+                color: '#d97706',
                 text: 'Order Pending',
                 description: 'Your order has been received and is awaiting confirmation'
             },
             confirmed: {
-                color: '#2196f3',
+                color: '#2563eb',
                 text: 'Order Confirmed',
                 description: 'Your order has been confirmed and will be processed soon'
             },
             packing: {
-                color: '#673ab7',
+                color: '#7c3aed',
                 text: 'Packing',
                 description: 'Your order is being packed'
             },
             'out-for-delivery': {
-                color: '#009688',
+                color: '#0d9488',
                 text: 'Out for Delivery',
                 description: 'Your order is on its way'
             },
             delivered: {
-                color: '#4caf50',
+                color: '#2e8b45',
                 text: 'Delivered',
                 description: 'Your order has been delivered'
             },
             cancelled: {
-                color: '#f44336',
+                color: '#e5484d',
                 text: 'Cancelled',
                 description: 'Your order has been cancelled'
             }
         };
         return statusMap[status] || {
-            color: '#757575',
+            color: '#5b6b60',
             text: status.charAt(0).toUpperCase() + status.slice(1),
             description: 'Status is being updated'
         };
@@ -91,27 +93,61 @@ const MyOrders = () => {
 
     if (loading) {
         return (
-            <div className="my-orders-loading">
-                <div className="loading-spinner"></div>
-                <p>Loading your orders...</p>
+            <div className="my-orders" aria-busy="true" aria-live="polite">
+                <div className="my-orders-header">
+                    <div className="my-orders-header">
+                <h1>My Orders</h1>
+                {orders.length > 0 && (
+                    <p className="my-orders-sub">{orders.length} {orders.length === 1 ? 'order' : 'orders'} placed</p>
+                )}
+            </div>
+
+        <p className="my-orders-sub">Loading your orders...</p>
+                </div>
+                <div className="orders-container">
+                    {[0, 1, 2].map((i) => (
+                        <div key={i} className="order-card order-card-skeleton" aria-hidden="true">
+                            <div className="sk-row">
+                                <div className="skeleton sk-line sk-w-40"></div>
+                                <div className="skeleton sk-pill"></div>
+                            </div>
+                            <div className="skeleton sk-line sk-w-25 sk-thin"></div>
+                            <div className="sk-item">
+                                <div className="skeleton sk-thumb"></div>
+                                <div className="sk-item-lines">
+                                    <div className="skeleton sk-line sk-w-60"></div>
+                                    <div className="skeleton sk-line sk-w-35 sk-thin"></div>
+                                </div>
+                                <div className="skeleton sk-line sk-w-15"></div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
         );
     }
 
     return (
         <div className="my-orders">
-            <h1>My Orders</h1>
-            
+            <div className="my-orders-header">
+                <h1>My Orders</h1>
+                {orders.length > 0 && (
+                    <p className="my-orders-sub">{orders.length} {orders.length === 1 ? 'order' : 'orders'} placed</p>
+                )}
+            </div>
+
+
             {orders.length === 0 ? (
                 <div className="no-orders">
                     <i className="fas fa-shopping-bag"></i>
                     <h2>No Orders Yet</h2>
                     <p>You have not placed any orders yet. Start shopping to see your orders here!</p>
+                    <Link to="/shop" className="btn-primary"><i className="fas fa-leaf"></i> Start Shopping</Link>
                 </div>
             ) : (
                 <div className="orders-container">
-                    {orders.map((order) => (
-                        <div key={order._id} className="order-card">
+                    {orders.map((order, index) => (
+                        <Reveal key={order._id} className="order-card" delay={Math.min(index, 4) * 0.05} y={16}>
                             <div className="order-header">
                                 <div className="order-info">
                                     <h3>Order #{order._id.slice(-8)}</h3>
@@ -120,12 +156,10 @@ const MyOrders = () => {
                                 <div className="tracking-section">
                                     <div className="order-status-container">
                                         <div 
-                                            className="order-status"
-                                            style={{ 
-                                                backgroundColor: getStatusDetails(order.status).color + '20',
-                                                color: getStatusDetails(order.status).color 
-                                            }}
+                                            className={`order-status status-${order.status}`}
+                                            style={{ '--status-color': getStatusDetails(order.status).color }}
                                         >
+                                            <span className="status-dot" aria-hidden="true"></span>
                                             {getStatusDetails(order.status).text}
                                         </div>
                                         <div className="status-description">
@@ -137,7 +171,7 @@ const MyOrders = () => {
                                         onClick={() => handleTrackOrder(order._id)}
                                         disabled={trackingOrder === order._id}
                                     >
-                                        <i className="fas fa-map-marker-alt"></i>
+                                        <i className={`fas ${trackingOrder === order._id ? 'fa-sync-alt fa-spin' : 'fa-map-marker-alt'}`}></i>
                                         {trackingOrder === order._id ? 'Tracking...' : 'Track Order'}
                                     </button>
                                 </div>
@@ -147,7 +181,7 @@ const MyOrders = () => {
                                 {order.items.map((item, index) => (
                                     <div key={index} className="order-item">
                                         <div className="item-image">
-                                            <img src={`${url}/images/${item.image}`} alt={item.name} />
+                                            <img src={`${url}/images/${item.image}`} alt={item.name} loading="lazy" decoding="async" />
                                         </div>
                                         <div className="item-details">
                                             <h4>{item.name}</h4>
@@ -178,7 +212,7 @@ const MyOrders = () => {
                                     <p>Phone: {order.address.phone}</p>
                                 </div>
                             </div>
-                        </div>
+                        </Reveal>
                     ))}
                 </div>
             )}

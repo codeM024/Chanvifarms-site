@@ -1,6 +1,7 @@
 import 'dotenv/config.js'
 import express from "express";
 import cors from "cors";
+import compression from "compression";
 import { connectDB } from "./config/db.js";
 import foodRouter from "./routes/foodRoute.js";
 import userRouter from "./routes/userRoute.js";
@@ -48,8 +49,12 @@ if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
 const app = express()
 const port = process.env.PORT || 4000
 
-// Serve static files from uploads directory
-app.use('/images', express.static('uploads'))
+// gzip API responses (product/box lists shrink ~70-80%)
+app.use(compression())
+
+// Serve uploaded product images with browser caching (filenames are timestamped, so they never change)
+const imageCache = express.static('uploads', { maxAge: '30d', immutable: true })
+app.use('/images', imageCache)
 
 // middleware 
 app.use(express.json())
@@ -216,7 +221,6 @@ app.post('/api/order/verify-payment', async (req, res) => {
 
 //api endpoints
 app.use('/api/food', foodRouter)
-app.use('/images', express.static('uploads'))
 app.use('/api/user', userRouter)
 app.use("/api/cart", cartRouter)
 app.use("/api/order", orderRouter)

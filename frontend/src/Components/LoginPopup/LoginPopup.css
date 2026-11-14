@@ -1,106 +1,126 @@
 .login-popup {
   position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 1000;
-  width: 100%;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(8px);
+  inset: 0;
+  z-index: 1100;
   display: grid;
   place-items: center;
-  animation: fadeIn 0.3s ease-out;
   padding: 20px;
+  background-color: rgba(13, 30, 20, 0.55);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
 }
 
 .login-popup-container {
-  place-self: center;
-  width: max(25vw, 350px);
-  max-width: 400px;
-  color: #4a4a4a;
-  background-color: white;
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 25px;
-  padding: 32px;
-  border-radius: 20px;
-  font-size: 14px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  gap: 18px;
+  width: 100%;
+  max-width: 410px;
+  padding: 28px;
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 30px 60px rgba(13, 30, 20, 0.25), var(--shadow-md);
+  color: var(--text);
+  font-size: 0.9rem;
   transform-origin: center;
-  animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  background: linear-gradient(145deg, #ffffff, #f8f9fa);
+  will-change: transform, opacity;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes popIn {
-  from {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
+/* ===== Title ===== */
 .login-popup-title {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 5px;
+  gap: 12px;
+}
+
+.login-popup-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.login-popup-logo {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
 }
 
 .login-popup-title h2 {
-  font-size: 32px;
   margin: 0;
-  background: linear-gradient(135deg, #1a73e8, #165cc5);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-weight: 700;
-  letter-spacing: -0.5px;
+  color: var(--text);
+  font-size: 1.6rem;
+  font-weight: 800;
 }
 
-.login-popup-title img {
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+.login-popup-close {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background: var(--surface-2);
+}
+
+.login-popup-close img {
+  width: 12px;
+  height: 12px;
   opacity: 0.6;
-  padding: 8px;
-  border-radius: 50%;
-  background: #f5f5f5;
+  transition: transform var(--dur) var(--ease-out), opacity var(--dur) var(--ease-out);
 }
 
-.login-popup-title img:hover {
+.login-popup-close:hover {
+  background: var(--brand-50);
+}
+
+.login-popup-close:hover img {
   transform: rotate(90deg);
   opacity: 1;
-  background: #e8e8e8;
-}
-
-.welcome-message {
-  text-align: center;
-  margin: -10px 0 10px;
 }
 
 .welcome-message p {
-  color: #666;
-  font-size: 15px;
-  line-height: 1.5;
   margin: 0;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  text-align: left;
 }
 
+/* ===== Error ===== */
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+  padding: 0 14px;
+  border-radius: var(--radius-md);
+  background-color: #fdecec;
+  border: 1px solid rgba(229, 72, 77, 0.25);
+  color: var(--danger-500);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.error-message i {
+  flex: 0 0 auto;
+}
+
+.error-message span {
+  padding: 12px 0;
+}
+
+/* ===== Terms ===== */
 .login-popup-condition {
-  margin-top: -10px;
-  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
 }
 
 .terms-checkbox {
@@ -108,45 +128,92 @@
   align-items: flex-start;
   gap: 12px;
   cursor: pointer;
-  font-size: 14px;
-  color: #666;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  line-height: 1.5;
 }
 
 .terms-checkbox input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  margin-top: 2px;
+  appearance: none;
+  -webkit-appearance: none;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  margin: 1px 0 0;
+  border: 2px solid var(--brand-300);
+  border-radius: 6px;
+  background: var(--surface);
   cursor: pointer;
-  accent-color: #1a73e8;
+}
+
+.terms-checkbox input[type="checkbox"]::after {
+  content: "";
+  width: 5px;
+  height: 10px;
+  margin-top: -2px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg) scale(0);
+  transition: transform var(--dur-fast) var(--ease-spring);
+}
+
+.terms-checkbox input[type="checkbox"]:checked {
+  background: var(--brand-500);
+  border-color: var(--brand-500);
+}
+
+.terms-checkbox input[type="checkbox"]:checked::after {
+  transform: rotate(45deg) scale(1);
+}
+
+.terms-checkbox input[type="checkbox"]:hover {
+  border-color: var(--brand-500);
+}
+
+.terms-checkbox input[type="checkbox"]:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
 }
 
 .terms-link {
-  color: #1a73e8;
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.2s ease;
+  color: var(--brand-600);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--brand-200);
+  text-underline-offset: 2px;
 }
 
 .terms-link:hover {
-  color: #1557b0;
-  text-decoration: underline;
+  color: var(--brand-700);
+  text-decoration-color: var(--brand-600);
 }
 
 .terms-warning {
-  color: #d32f2f;
-  font-size: 13px;
-  margin: 8px 0 0 30px;
+  margin: 0 0 0 32px;
+  color: var(--accent-500);
+  font-size: 0.8rem;
   font-weight: 500;
 }
 
+/* ===== Google button ===== */
 .google-login-container {
   position: relative;
-  transition: opacity 0.3s ease;
+  width: 100%;
+  transition: opacity var(--dur) var(--ease-out), filter var(--dur) var(--ease-out);
 }
 
 .google-login-container.disabled {
-  opacity: 0.7;
+  opacity: 0.55;
+  filter: grayscale(0.4);
   cursor: not-allowed;
+}
+
+.google-login-container > div {
+  width: 100% !important;
+  display: flex;
+  justify-content: center;
 }
 
 .google-button-overlay {
@@ -156,258 +223,51 @@
 .google-button-overlay::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: transparent;
+  inset: 0;
   z-index: 1;
   cursor: not-allowed;
 }
 
-.error-message {
-  color: #e74c3c;
-  background-color: #fdeaea;
-  padding: 14px;
-  border-radius: 12px;
-  font-size: 14px;
-  text-align: center;
-  border: 1px solid rgba(231, 76, 60, 0.2);
-  animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+.google-login-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  font-weight: 500;
-}
-
-.error-message::before {
-  content: "⚠️";
-  font-size: 16px;
-}
-
-@keyframes shake {
-  10%,
-  90% {
-    transform: translate3d(-1px, 0, 0);
-  }
-  20%,
-  80% {
-    transform: translate3d(2px, 0, 0);
-  }
-  30%,
-  50%,
-  70% {
-    transform: translate3d(-4px, 0, 0);
-  }
-  40%,
-  60% {
-    transform: translate3d(4px, 0, 0);
-  }
-}
-
-.login-popup-inputs {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.login-popup-inputs input {
-  outline: none;
-  border: 2px solid #e8e8e8;
-  padding: 14px 16px;
-  border-radius: 12px;
-  font-size: 15px;
-  transition: all 0.3s ease;
-  background-color: #f8f9fa;
-  width: 100%;
-  box-sizing: border-box;
-  color: #2c3e50;
-  font-weight: 500;
-}
-
-.login-popup-inputs input:focus {
-  border-color: #2c5364;
-  background-color: white;
-  box-shadow: 0 0 0 4px rgba(44, 83, 100, 0.1);
-  transform: translateY(-1px);
-}
-
-.password-disclaimer {
-  color: #dc3545;
-  font-size: 12px;
-  margin-top: -15px;
-  margin-bottom: -5px;
-}
-
-.login-popup-container button {
-  border: none;
-  padding: 14px;
-  border-radius: 12px;
-  color: white;
-  background: linear-gradient(135deg, #2c5364, #203a43);
-  font-size: 16px;
+  gap: 10px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--brand-700);
   font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  transform: translateY(0);
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
+  animation: fadeIn var(--dur) var(--ease-out);
 }
 
-.login-popup-container button:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(44, 83, 100, 0.3);
-  background: linear-gradient(135deg, #2b4f5e, #263a86);
-}
-
-.login-popup-container button:disabled {
-  background: linear-gradient(135deg, #a8a8a8, #878787);
-  cursor: not-allowed;
-  transform: none;
-  opacity: 0.8;
-}
-
-.loading-text {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.loading-text:after {
-  content: "";
-  width: 20px;
-  height: 20px;
-  border: 3px solid #ffffff;
+.login-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--brand-200);
+  border-top-color: var(--brand-500);
   border-radius: 50%;
-  border-top-color: transparent;
-  animation: spin 0.8s linear infinite;
+  animation: loginSpin 0.7s linear infinite;
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
+@keyframes loginSpin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 420px) {
+  .login-popup {
+    padding: 12px;
+    align-items: end;
   }
-}
 
-.login-popup-condition {
-  display: flex;
-  align-items: start;
-  gap: 10px;
-  margin-top: 5px;
-  padding: 0 10px;
-}
+  .login-popup-container {
+    padding: 22px 18px;
+    border-radius: var(--radius-lg);
+  }
 
-.login-popup-condition label {
-  display: flex;
-  align-items: start;
-  gap: 10px;
-  cursor: pointer;
-  font-size: 13px;
-  color: #666;
-  line-height: 1.4;
-}
-
-.login-popup-condition input {
-  margin-top: 3px;
-  cursor: pointer;
-  accent-color: #1a73e8;
-}
-
-.login-popup p {
-  text-align: center;
-  margin: 0;
-}
-
-.login-popup p span {
-  color: #23418e;
-  font-weight: 500;
-  cursor: pointer;
-  transition: color 0.3s ease;
-}
-
-.login-popup p span:hover {
-  color: #1f255e;
-  text-decoration: underline;
-}
-
-.or-divider {
-  display: flex;
-  align-items: center;
-  text-align: center;
-  margin: -10px 0;
-}
-
-.or-divider::before,
-.or-divider::after {
-  content: "";
-  flex: 1;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.or-divider span {
-  padding: 0 10px;
-  color: #808080;
-  font-size: 14px;
-}
-
-.google-login-container {
-  width: 100%;
-  margin: 15px 0;
-}
-
-.google-login-container > div {
-  width: 100% !important;
-}
-
-.google-login-container button {
-  width: 100% !important;
-  justify-content: center !important;
-  font-family: inherit !important;
-  font-weight: 500 !important;
-  height: 50px !important;
-  transition: all 0.3s ease !important;
-  border-radius: 25px !important;
-  font-size: 16px !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-}
-
-.google-login-container button:hover {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
-}
-
-.google-login-container button:active {
-  transform: translateY(0) !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-}
-/* Add these styles to LoginPopup.css */
-.terms-checkbox {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  cursor: pointer;
-}
-
-.terms-checkbox input {
-  margin-top: 4px;
-}
-
-.terms-link {
-  color: #1a73e8;
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.2s ease;
-}
-
-.terms-link:hover {
-  color: #1557b0;
-  text-decoration: underline;
-}
-
-.error-message {
-  color: #d32f2f;
-  font-size: 14px;
-  margin-top: 8px;
-  text-align: center;
+  .login-popup-title h2 {
+    font-size: 1.4rem;
+  }
 }

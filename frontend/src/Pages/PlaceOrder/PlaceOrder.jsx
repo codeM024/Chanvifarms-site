@@ -4,6 +4,9 @@ import { StoreContext } from "../../Context/StoreContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { motion, AnimatePresence } from "framer-motion";
+
+const EASE_OUT = [0.22, 1, 0.36, 1];
 
 const emptyAddress = {
   firstName: "",
@@ -670,197 +673,283 @@ const PlaceOrder = () => {
 
   return (
     <form className="place-order" onSubmit={placeOrder}>
+      <div className="place-order-heading">
+        <h1>Checkout</h1>
+        <p>Just two quick steps and your fresh produce is on its way.</p>
+      </div>
+
       <div className="place-order-left">
-        <div className="shipping-address">
-          <h2>Shipping Details</h2>
+        <section className="shipping-address checkout-card">
+          <div className="checkout-card-head">
+            <span className="step-badge" aria-hidden="true">1</span>
+            <div>
+              <h2>Shipping Details</h2>
+              <p className="checkout-card-sub">Choose where we should deliver your order</p>
+            </div>
+          </div>
 
           {savedAddresses.length > 0 && (
             <div className="saved-addresses">
               <h3>Saved Addresses</h3>
-              {savedAddresses.map((addr) => (
-                <div
-                  key={addr._id}
-                  className={`address-option ${
-                    selectedAddressId === addr._id ? "selected" : ""
-                  }`}
-                  onClick={() => handleAddressSelect(addr._id)}
-                >
-                  <input
-                    type="radio"
-                    name="savedAddress"
-                    checked={selectedAddressId === addr._id}
-                    onChange={() => handleAddressSelect(addr._id)}
-                  />
-                  <div className="address-details">
-                    <p className="name">
-                      {addr.firstName} {addr.lastName}
-                    </p>
-                    <p>{addr.street}</p>
-                    <p>
-                      {addr.city}, {addr.state}, {addr.country}, {addr.zipcode}
-                    </p>
-                    <p className="phone">{addr.phone}</p>
-                    {addr.location?.address && (
-                      <p className="location-text">{addr.location.address}</p>
-                    )}
-                    <div className="address-actions">
-                      <button
-                        type="button"
-                        className="edit-btn"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          startEditingAddress(addr);
-                        }}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        type="button"
-                        className="delete-btn"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deleteAddress(addr._id);
-                        }}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                    {selectedAddressId === addr._id && (
-                      <div className="selected-address-indicator">✓</div>
-                    )}
-                  </div>
-                </div>
-              ))}
+              <motion.div className="address-grid" layout>
+                <AnimatePresence initial={false}>
+                  {savedAddresses.map((addr) => (
+                    <motion.div
+                      layout
+                      key={addr._id}
+                      initial={{ opacity: 0, scale: 0.97 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.97 }}
+                      transition={{ duration: 0.2, ease: EASE_OUT }}
+                      className={`address-option ${
+                        selectedAddressId === addr._id ? "selected" : ""
+                      }`}
+                      onClick={() => handleAddressSelect(addr._id)}
+                    >
+                      <input
+                        type="radio"
+                        name="savedAddress"
+                        aria-label={`Deliver to ${addr.firstName} ${addr.lastName}`}
+                        checked={selectedAddressId === addr._id}
+                        onChange={() => handleAddressSelect(addr._id)}
+                      />
+                      <div className="address-details">
+                        <p className="name">
+                          {addr.firstName} {addr.lastName}
+                        </p>
+                        <p>{addr.street}</p>
+                        <p>
+                          {addr.city}, {addr.state}, {addr.country}, {addr.zipcode}
+                        </p>
+                        <p className="phone">
+                          <i className="fas fa-phone-alt" aria-hidden="true"></i> {addr.phone}
+                        </p>
+                        {addr.location?.address && (
+                          <p className="location-text">{addr.location.address}</p>
+                        )}
+                        <div className="address-actions">
+                          <button
+                            type="button"
+                            className="edit-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              startEditingAddress(addr);
+                            }}
+                          >
+                            <i className="fas fa-pen" aria-hidden="true"></i> Edit
+                          </button>
+                          <button
+                            type="button"
+                            className="delete-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteAddress(addr._id);
+                            }}
+                          >
+                            <i className="fas fa-trash-alt" aria-hidden="true"></i> Delete
+                          </button>
+                        </div>
+                        {selectedAddressId === addr._id && (
+                          <div className="selected-address-indicator" aria-hidden="true">
+                            <i className="fas fa-check"></i>
+                          </div>
+                        )}
+                      </div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </motion.div>
             </div>
           )}
 
           <button
             type="button"
-            className="add-address-btn"
+            className={`add-address-btn ${showAddAddress ? "is-open" : ""}`}
             onClick={toggleAddAddress}
+            aria-expanded={showAddAddress}
           >
-            Add New Address
+            <i className={`fas ${showAddAddress ? "fa-times" : "fa-plus"}`} aria-hidden="true"></i>
+            {showAddAddress ? "Cancel" : "Add New Address"}
           </button>
 
-          {showAddAddress && (
-            <div className="address-form">
-              <div className="form-row">
-                <input
-                  type="text"
-                  placeholder="First Name *"
-                  name="firstName"
-                  value={address.firstName}
-                  onChange={onChangeHandler}
-                  required
-                />
-                <input
-                  type="text"
-                  placeholder="Last Name *"
-                  name="lastName"
-                  value={address.lastName}
-                  onChange={onChangeHandler}
-                  required
-                />
-              </div>
-              <input
-                type="email"
-                placeholder="Email *"
-                name="email"
-                value={address.email}
-                onChange={onChangeHandler}
-                required
-              />
-              <input
-                type="tel"
-                placeholder="Phone Number *"
-                name="phone"
-                value={address.phone}
-                onChange={onChangeHandler}
-                required
-              />
-              <input
-                type="text"
-                placeholder="Flat/House No, Building/Residency Name, Street Address *"
-                name="street"
-                value={address.street}
-                onChange={onChangeHandler}
-                required
-              />
-
-              <div className="form-row pin-dropdown">
-                <label htmlFor="zipcode" className="pin-label">
-                  Available Areas – Please Select *
-                </label>
-                <select
-                  id="zipcode"
-                  name="zipcode"
-                  value={address.zipcode}
-                  onChange={(e) => {
-                    const selectedPin = e.target.value;
-                    setAddress((prev) => ({
-                      ...prev,
-                      zipcode: selectedPin,
-                      city: pinCodeData[selectedPin]?.city || "",
-                      state: pinCodeData[selectedPin]?.state || "",
-                      country: pinCodeData[selectedPin]?.country || "",
-                    }));
-                  }}
-                  required
-                >
-                  <option value="">Select PIN Code</option>
-                  {Object.keys(pinCodeData).map((pin) => (
-                    <option key={pin} value={pin}>
-                      {pin}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* City, State, Country fields (auto-filled) */}
-              <div className="form-row">
-                <input
-                  type="text"
-                  placeholder="City *"
-                  name="city"
-                  value={address.city}
-                  readOnly
-                  required
-                />
-                <input
-                  type="text"
-                  placeholder="State *"
-                  name="state"
-                  value={address.state}
-                  readOnly
-                  required
-                />
-              </div>
-              <div className="form-row">
-                <input
-                  type="text"
-                  placeholder="Country *"
-                  name="country"
-                  value={address.country}
-                  readOnly
-                  required
-                />
-              </div>
-
-              <button
-                type="button"
-                className="save-address-btn"
-                onClick={saveAddress}
+          <AnimatePresence initial={false}>
+            {showAddAddress && (
+              <motion.div
+                key="address-form"
+                className="address-form"
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8, transition: { duration: 0.15 } }}
+                transition={{ duration: 0.25, ease: EASE_OUT }}
               >
-                Save Address
-              </button>
-            </div>
-          )}
-        </div>
+                <p className="address-form-title">
+                  {editingAddress ? "Edit address" : "New address"}
+                </p>
+                <div className="form-row">
+                  <div className="field">
+                    <label htmlFor="po-firstName">First Name *</label>
+                    <input
+                      id="po-firstName"
+                      type="text"
+                      placeholder="e.g. Priya"
+                      name="firstName"
+                      autoComplete="given-name"
+                      value={address.firstName}
+                      onChange={onChangeHandler}
+                      required
+                    />
+                  </div>
+                  <div className="field">
+                    <label htmlFor="po-lastName">Last Name *</label>
+                    <input
+                      id="po-lastName"
+                      type="text"
+                      placeholder="e.g. Sharma"
+                      name="lastName"
+                      autoComplete="family-name"
+                      value={address.lastName}
+                      onChange={onChangeHandler}
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="form-row">
+                  <div className="field">
+                    <label htmlFor="po-email">Email *</label>
+                    <input
+                      id="po-email"
+                      type="email"
+                      placeholder="you@example.com"
+                      name="email"
+                      autoComplete="email"
+                      value={address.email}
+                      onChange={onChangeHandler}
+                      required
+                    />
+                  </div>
+                  <div className="field">
+                    <label htmlFor="po-phone">Phone Number *</label>
+                    <input
+                      id="po-phone"
+                      type="tel"
+                      placeholder="10-digit mobile number"
+                      name="phone"
+                      autoComplete="tel"
+                      inputMode="numeric"
+                      value={address.phone}
+                      onChange={onChangeHandler}
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="field">
+                  <label htmlFor="po-street">Street Address *</label>
+                  <input
+                    id="po-street"
+                    type="text"
+                    placeholder="Flat/House No, Building/Residency Name, Street"
+                    name="street"
+                    autoComplete="street-address"
+                    value={address.street}
+                    onChange={onChangeHandler}
+                    required
+                  />
+                </div>
 
-        <div className="payment-method">
-          <h2>Payment Method</h2>
+                <div className="form-row pin-dropdown">
+                  <div className="field">
+                    <label htmlFor="zipcode" className="pin-label">
+                      Available Areas – Please Select *
+                    </label>
+                    <select
+                      id="zipcode"
+                      name="zipcode"
+                      value={address.zipcode}
+                      onChange={(e) => {
+                        const selectedPin = e.target.value;
+                        setAddress((prev) => ({
+                          ...prev,
+                          zipcode: selectedPin,
+                          city: pinCodeData[selectedPin]?.city || "",
+                          state: pinCodeData[selectedPin]?.state || "",
+                          country: pinCodeData[selectedPin]?.country || "",
+                        }));
+                      }}
+                      required
+                    >
+                      <option value="">Select PIN Code</option>
+                      {Object.keys(pinCodeData).map((pin) => (
+                        <option key={pin} value={pin}>
+                          {pin}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* City, State, Country fields (auto-filled) */}
+                <div className="form-row form-row-3">
+                  <div className="field">
+                    <label htmlFor="po-city">City</label>
+                    <input
+                      id="po-city"
+                      type="text"
+                      placeholder="Auto-filled"
+                      name="city"
+                      value={address.city}
+                      readOnly
+                      required
+                    />
+                  </div>
+                  <div className="field">
+                    <label htmlFor="po-state">State</label>
+                    <input
+                      id="po-state"
+                      type="text"
+                      placeholder="Auto-filled"
+                      name="state"
+                      value={address.state}
+                      readOnly
+                      required
+                    />
+                  </div>
+                  <div className="field">
+                    <label htmlFor="po-country">Country</label>
+                    <input
+                      id="po-country"
+                      type="text"
+                      placeholder="Auto-filled"
+                      name="country"
+                      value={address.country}
+                      readOnly
+                      required
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  className="save-address-btn"
+                  onClick={saveAddress}
+                >
+                  <i className="fas fa-check" aria-hidden="true"></i>
+                  {editingAddress ? "Update Address" : "Save Address"}
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </section>
+
+        <section className="payment-method checkout-card">
+          <div className="checkout-card-head">
+            <span className="step-badge" aria-hidden="true">2</span>
+            <div>
+              <h2>Payment Method</h2>
+              <p className="checkout-card-sub">All transactions are secure and encrypted</p>
+            </div>
+          </div>
           <div className="payment-options">
-            <label className="radio-label">
+            <label className={`radio-label ${selectedPayment === "Online" ? "is-selected" : ""}`}>
               <input
                 type="radio"
                 name="payment"
@@ -869,13 +958,18 @@ const PlaceOrder = () => {
                 onChange={(e) => setSelectedPayment(e.target.value)}
               />
               <span className="radio-custom"></span>
-              <span className="label-text">Online Payment (Razorpay)</span>
-              <p className="payment-description">
-                Pay securely with UPI, cards, netbanking, and more.
-              </p>
+              <span className="payment-icon" aria-hidden="true">
+                <i className="fas fa-credit-card"></i>
+              </span>
+              <span className="payment-text">
+                <span className="label-text">Online Payment (Razorpay)</span>
+                <span className="payment-description">
+                  Pay securely with UPI, cards, netbanking, and more.
+                </span>
+              </span>
             </label>
 
-            <label className="radio-label">
+            <label className={`radio-label ${selectedPayment === "COD" ? "is-selected" : ""}`}>
               <input
                 type="radio"
                 name="payment"
@@ -884,136 +978,155 @@ const PlaceOrder = () => {
                 onChange={(e) => setSelectedPayment(e.target.value)}
               />
               <span className="radio-custom"></span>
-              <span className="label-text">Cash on Delivery</span>
-              <p className="payment-description">
-                Pay when you receive your order.
-              </p>
+              <span className="payment-icon" aria-hidden="true">
+                <i className="fas fa-money-bill-wave"></i>
+              </span>
+              <span className="payment-text">
+                <span className="label-text">Cash on Delivery</span>
+                <span className="payment-description">
+                  Pay when you receive your order.
+                </span>
+              </span>
             </label>
           </div>
-        </div>
+        </section>
       </div>
 
       <div className="place-order-right">
         <div className="cart-summary">
           <p className="title">Order Summary</p>
-          {Object.entries(cartItems).map(([cartKey, cartItem]) => {
-            if (cartKey.startsWith('box_')) {
-              // Handle box items
-              const boxData = cartItem.boxData;
-              return (
-                <div key={cartKey} className="cart-summary-item">
-                  <div className="item-info">
-                    <p className="item-name">{boxData.name}</p>
-                    <div className="item-details">
-                      <span className="size">Box Package</span>
+          <div className="summary-items">
+            {Object.entries(cartItems).map(([cartKey, cartItem]) => {
+              if (cartKey.startsWith('box_')) {
+                // Handle box items
+                const boxData = cartItem.boxData;
+                return (
+                  <div key={cartKey} className="cart-summary-item">
+                    <div className="item-info">
+                      <p className="item-name">{boxData.name}</p>
+                      <div className="item-details">
+                        <span className="size">Box Package</span>
+                        <span className="quantity">× {cartItem.quantity}</span>
+                      </div>
                       <span className="box-contents">
-                        ({boxData.items.map(item => 
+                        {boxData.items.map(item =>
                           `${item.itemId.name} - ${getQuantityLabel(item.size)}`
-                        ).join(', ')})
+                        ).join(', ')}
                       </span>
-                      <span className="quantity">× {cartItem.quantity}</span>
+                    </div>
+                    <div className="item-price">
+                      <span className="market-price">₹{(boxData.marketPrice || boxData.price).toFixed(2)}</span>
+                      <span>₹{(boxData.price * cartItem.quantity).toFixed(2)}</span>
                     </div>
                   </div>
-                  <div className="item-price">
-                    <span className="market-price">₹{(boxData.marketPrice || boxData.price).toFixed(2)}</span>
-                    <span>₹{(boxData.price * cartItem.quantity).toFixed(2)}</span>
-                  </div>
-                </div>
-              );
-            }
+                );
+              }
 
-            const [itemId, size] = cartKey.split("_");
-            const item = food_list.find((food) => food._id === itemId);
+              const [itemId, size] = cartKey.split("_");
+              const item = food_list.find((food) => food._id === itemId);
 
-            if (item && !item.outOfStock && item.status === "in-stock") {
-              const price = item.prices?.[size] || item.price;
-              return (
-                <div key={cartKey} className="cart-summary-item">
-                  <div className="item-info">
-                    <p className="item-name">{item.name || "Unknown Item"}</p>
-                    <div className="item-details">
-                      <span className="size">{getQuantityLabel(size)}</span>
-                      <span className="quantity">× {cartItem.quantity}</span>
+              if (item && !item.outOfStock && item.status === "in-stock") {
+                const price = item.prices?.[size] || item.price;
+                return (
+                  <div key={cartKey} className="cart-summary-item">
+                    <div className="item-info">
+                      <p className="item-name">{item.name || "Unknown Item"}</p>
+                      <div className="item-details">
+                        <span className="size">{getQuantityLabel(size)}</span>
+                        <span className="quantity">× {cartItem.quantity}</span>
+                      </div>
                     </div>
+                    <p className="item-price">
+                      ₹{(price * cartItem.quantity).toFixed(2)}
+                    </p>
                   </div>
-                  <p className="item-price">
-                    ₹{(price * cartItem.quantity).toFixed(2)}
-                  </p>
-                </div>
-              );
-            }
-            return null;
-          })}
-          <div className="cart-summary-item">
-            <p>Subtotal</p>
-            <p>₹{getTotalCartAmount().toFixed(2)}</p>
+                );
+              }
+              return null;
+            })}
           </div>
-          <div className="cart-summary-item">
-            <p>Delivery Charge</p>
-            <p>
-              ₹
-              {((() => {
-                const savedPromo = localStorage.getItem("appliedPromo");
-                if (savedPromo) {
-                  try {
-                    const appliedPromo = JSON.parse(savedPromo);
-                    if (appliedPromo.type === 'combo' && 
-                        appliedPromo.benefits.some(b => b.type === 'free_delivery')) {
-                      return 0;
-                    }
-                  } catch (error) {}
-                }
-                return getTotalCartAmount() === 0 ? 0 : 40;
-              })()).toFixed(2)}
-            </p>
-          </div>
-          {(() => {
-            const savedPromo = localStorage.getItem("appliedPromo");
-            if (savedPromo) {
-              try {
-                const appliedPromo = JSON.parse(savedPromo);
-                const subtotal = getTotalCartAmount();
-                let promoDiscount = 0;
-
-                if (subtotal >= appliedPromo.minAmount) {
-                  if (appliedPromo.type === 'combo') {
-                    const discountBenefit = appliedPromo.benefits.find(b => b.type === 'percentage');
-                    if (discountBenefit) {
-                      promoDiscount = Math.round((subtotal * discountBenefit.value) / 100);
-                    }
-                  } else if (appliedPromo.type === 'percentage') {
-                    promoDiscount = Math.round((subtotal * appliedPromo.value) / 100);
+          <div className="summary-totals">
+            <div className="cart-summary-item">
+              <p>Subtotal</p>
+              <p>₹{getTotalCartAmount().toFixed(2)}</p>
+            </div>
+            <div className="cart-summary-item">
+              <p>Delivery Charge</p>
+              <p>
+                ₹
+                {((() => {
+                  const savedPromo = localStorage.getItem("appliedPromo");
+                  if (savedPromo) {
+                    try {
+                      const appliedPromo = JSON.parse(savedPromo);
+                      if (appliedPromo.type === 'combo' &&
+                          appliedPromo.benefits.some(b => b.type === 'free_delivery')) {
+                        return 0;
+                      }
+                    } catch (error) { /* ignore invalid promo data */ }
                   }
-                }
+                  return getTotalCartAmount() === 0 ? 0 : 40;
+                })()).toFixed(2)}
+              </p>
+            </div>
+            {(() => {
+              const savedPromo = localStorage.getItem("appliedPromo");
+              if (savedPromo) {
+                try {
+                  const appliedPromo = JSON.parse(savedPromo);
+                  const subtotal = getTotalCartAmount();
+                  let promoDiscount = 0;
 
-                if (promoDiscount > 0) {
-                  return (
-                    <div className="cart-summary-item promo-discount">
-                      <p>Promo Discount ({appliedPromo.code})</p>
-                      <p className="discount-amount">-₹{promoDiscount.toFixed(2)}</p>
-                    </div>
-                  );
-                }
-              } catch (error) {}
-            }
-            return null;
-          })()}
-          <div className="cart-summary-item savings">
-            <p>Total Savings</p>
-            <p>₹{getTotalCartSavings().toFixed(2)}</p>
+                  if (subtotal >= appliedPromo.minAmount) {
+                    if (appliedPromo.type === 'combo') {
+                      const discountBenefit = appliedPromo.benefits.find(b => b.type === 'percentage');
+                      if (discountBenefit) {
+                        promoDiscount = Math.round((subtotal * discountBenefit.value) / 100);
+                      }
+                    } else if (appliedPromo.type === 'percentage') {
+                      promoDiscount = Math.round((subtotal * appliedPromo.value) / 100);
+                    }
+                  }
+
+                  if (promoDiscount > 0) {
+                    return (
+                      <div className="cart-summary-item promo-discount">
+                        <p>Promo Discount ({appliedPromo.code})</p>
+                        <p className="discount-amount">-₹{promoDiscount.toFixed(2)}</p>
+                      </div>
+                    );
+                  }
+                } catch (error) { /* ignore invalid promo data */ }
+              }
+              return null;
+            })()}
+            <div className="cart-summary-item savings">
+              <p>Total Savings</p>
+              <p>₹{getTotalCartSavings().toFixed(2)}</p>
+            </div>
           </div>
           <div className="cart-summary-total">
             <p>Total Amount</p>
             <p>₹{calculateFinalAmount().toFixed(2)}</p>
           </div>
+          <button
+            type="submit"
+            className={`place-order-btn ${processing ? "is-loading" : ""}`}
+            disabled={processing}
+            aria-busy={processing}
+          >
+            {processing && <span className="btn-spinner" aria-hidden="true"></span>}
+            {processing
+              ? selectedPayment === "Online"
+                ? "Opening Payment Gateway..."
+                : "Processing..."
+              : "Place Order"}
+          </button>
+          <p className="secure-note">
+            <i className="fas fa-lock" aria-hidden="true"></i>
+            {selectedPayment === "Online" ? "Payments secured by Razorpay" : "Pay in cash at your doorstep"}
+          </p>
         </div>
-        <button type="submit" className="place-order-btn" disabled={processing}>
-          {processing
-            ? selectedPayment === "Online"
-              ? "Opening Payment Gateway..."
-              : "Processing..."
-            : "Place Order"}
-        </button>
       </div>
     </form>
   );

@@ -1,70 +1,66 @@
+import { lazy, Suspense } from 'react'
+import { Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom'
 import Navbar from './components/Navbar/Navbar'
 import Sidebar from './components/Sidebar/Sidebar'
-import {Routes, Route, Navigate} from 'react-router-dom'
-import PropTypes from 'prop-types'
-import Add from './pages/Add/Add'
-import List from './pages/List/List'
-import Boxes from './pages/Boxes/Boxes'
-import Orders from './pages/Orders/Orders'
-import Login from './pages/Login/Login'
 import ProtectedRoute from './components/ProtectedRoute'
-import { ToastContainer} from 'react-toastify';
+import { RouteLoader } from './components/Feedback/Feedback'
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
+// Route-level code splitting: each page is downloaded only when first visited.
+const Add = lazy(() => import('./pages/Add/Add'))
+const List = lazy(() => import('./pages/List/List'))
+const Boxes = lazy(() => import('./pages/Boxes/Boxes'))
+const Orders = lazy(() => import('./pages/Orders/Orders'))
+const Login = lazy(() => import('./pages/Login/Login'))
+
+// Shared shell for every authenticated page. Rendered once as a layout route so the
+// navbar/sidebar persist between pages and only the content area transitions.
+const AuthenticatedLayout = () => {
+  const { pathname } = useLocation();
+  return (
+    <div className="app-shell">
+      <Navbar />
+      <div className="app-content">
+        <Sidebar />
+        <main className="app-main">
+          <Suspense fallback={<RouteLoader />}>
+            <div key={pathname} className="route-view">
+              <Outlet />
+            </div>
+          </Suspense>
+        </main>
+      </div>
+    </div>
+  );
+};
 
 const App = () => {
   const auth = JSON.parse(localStorage.getItem('adminAuth'));
-  const AuthenticatedLayout = ({ children }) => (
-    <>
-      <Navbar />
-      <hr/>
-      <div className="app-content">
-        <Sidebar/>
-        {children}
-      </div>
-    </>
-  );
-
-  AuthenticatedLayout.propTypes = {
-    children: PropTypes.node.isRequired
-  };
 
   return (
     <div>
-      <ToastContainer/>
+      <ToastContainer />
       <Routes>
         <Route path="/login" element={
-          auth?.isAuthenticated ? <Navigate to="/list" replace /> : <Login />
+          auth?.isAuthenticated ? <Navigate to="/list" replace /> : (
+            <Suspense fallback={<RouteLoader full />}>
+              <Login />
+            </Suspense>
+          )
         } />
         <Route path="/" element={<Navigate to={auth?.isAuthenticated ? "/list" : "/login"} replace />} />
-        
-        <Route path="/add" element={
+
+        <Route element={
           <ProtectedRoute>
-            <AuthenticatedLayout>
-              <Add />
-            </AuthenticatedLayout>
+            <AuthenticatedLayout />
           </ProtectedRoute>
-        }/>
-        <Route path="/list" element={
-          <ProtectedRoute>
-            <AuthenticatedLayout>
-              <List />
-            </AuthenticatedLayout>
-          </ProtectedRoute>
-        }/>
-        <Route path="/boxes" element={
-          <ProtectedRoute>
-            <AuthenticatedLayout>
-              <Boxes />
-            </AuthenticatedLayout>
-          </ProtectedRoute>
-        }/>
-        <Route path="/orders" element={
-          <ProtectedRoute>
-            <AuthenticatedLayout>
-              <Orders />
-            </AuthenticatedLayout>
-          </ProtectedRoute>
-        }/>
+        }>
+          <Route path="/add" element={<Add />} />
+          <Route path="/list" element={<List />} />
+          <Route path="/boxes" element={<Boxes />} />
+          <Route path="/orders" element={<Orders />} />
+        </Route>
       </Routes>
     </div>
   )

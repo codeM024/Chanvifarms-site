@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { format } from 'date-fns';
+import { CardSkeleton, EmptyState } from './Feedback/Feedback';
 
 const OrderManagement = () => {
     const [orders, setOrders] = useState([]);
@@ -53,13 +54,13 @@ const OrderManagement = () => {
 
     const getStatusColor = (status) => {
         const colors = {
-            pending: 'bg-yellow-100 text-yellow-800',
-            confirmed: 'bg-blue-100 text-blue-800',
-            shipped: 'bg-purple-100 text-purple-800',
-            delivered: 'bg-green-100 text-green-800',
-            cancelled: 'bg-red-100 text-red-800'
+            pending: 'pill-warning',
+            confirmed: 'pill-info',
+            shipped: 'pill-violet',
+            delivered: 'pill-success',
+            cancelled: 'pill-danger'
         };
-        return colors[status] || 'bg-gray-100 text-gray-800';
+        return colors[status] || '';
     };
 
     const formatDate = (date) => {
@@ -68,8 +69,11 @@ const OrderManagement = () => {
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center min-h-screen">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            <div>
+                <div className="page-header">
+                    <h1 className="page-title">Order Management</h1>
+                </div>
+                <CardSkeleton count={3} minWidth={420} />
             </div>
         );
     }
@@ -77,7 +81,7 @@ const OrderManagement = () => {
     return (
         <div className="p-6">
             <div className="mb-6">
-                <h1 className="text-2xl font-bold mb-4">Order Management</h1>
+                <h1 className="page-title">Order Management</h1>
                 <div className="flex gap-2">
                     {['all', 'pending', 'confirmed', 'shipped', 'delivered', 'cancelled'].map((status) => (
                         <button
@@ -96,8 +100,17 @@ const OrderManagement = () => {
             </div>
 
             <div className="grid gap-6">
+                {getFilteredOrders().length === 0 && (
+                    <div className="card">
+                        <EmptyState
+                            icon={<i className="fas fa-inbox" />}
+                            title="No orders found"
+                            text="Orders matching this filter will appear here."
+                        />
+                    </div>
+                )}
                 {getFilteredOrders().map((order) => (
-                    <div key={order._id} className="bg-white shadow rounded-lg p-6">
+                    <div key={order._id} className="card card-pad">
                         <div className="flex justify-between items-start mb-4">
                             <div>
                                 <p className="text-sm text-gray-600">Order ID: {order._id}</p>
@@ -108,7 +121,7 @@ const OrderManagement = () => {
                                     Placed on: {formatDate(order.createdAt)}
                                 </p>
                             </div>
-                            <div className={`px-3 py-1 rounded-full text-sm ${getStatusColor(order.status)}`}>
+                            <div className={`pill ${getStatusColor(order.status)}`}>
                                 {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                             </div>
                         </div>

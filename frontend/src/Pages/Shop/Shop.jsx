@@ -1,13 +1,17 @@
 import { useContext, useState, memo, useMemo, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import './Shop.css'
 import { StoreContext } from '../../Context/StoreContext'
 import FoodItem from '../../Components/FoodItem/FoodItem'
 import BoxItem from '../../Components/BoxItem/BoxItem'
+import FoodItemSkeleton from '../../Components/FoodItem/FoodItemSkeleton'
+import StatusState from '../../Components/FoodItem/StatusState'
+import Reveal from '../../Components/Motion/Reveal'
 import { NavContext } from '../../Context/NavContext'
 
 const ShopComponent = () => {
-  const { food_list, box_list, loading } = useContext(StoreContext)
+  const { food_list, box_list, loading, error } = useContext(StoreContext)
   const { setActiveNav } = useContext(NavContext)
   const [searchParams] = useSearchParams()
   const [expandedItem, setExpandedItem] = useState(null)
@@ -121,13 +125,24 @@ const ShopComponent = () => {
     setTimeout(scrollToTop, 100);
   };
 
-  // Don't render anything while initial data is loading
-  if (loading) return null
+  const isLoading = loading && food_list.length === 0
+  const hasFailed = !loading && selectedCategory !== 'Boxes' && (Boolean(error) || food_list.length === 0)
+  const isBoxes = selectedCategory === 'Boxes'
+  const gridKey = `${selectedCategory}-${currentPage}-${sortBy}`
+  const cardDelay = (index) => Math.min(index * 0.04, 0.3)
 
   return (
     <div className="shop">
       <div className="shop-banner">
-        <h1 className="banner-title">Our Products</h1>
+        <motion.div
+          className="shop-banner-inner"
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <span className="shop-banner-eyebrow"><i className="fas fa-leaf"></i> Fresh from the farm</span>
+          <h1 className="banner-title">Our Products</h1>
+        </motion.div>
       </div>
       <div className="shop-container">
         {/* Left Sidebar */}
@@ -152,7 +167,17 @@ const ShopComponent = () => {
         key={index}
         className={`category-item ${selectedCategory === category ? 'active' : ''}`}
         onClick={() => setSelectedCategory(category)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => { if (e.key === 'Enter') setSelectedCategory(category) }}
       >
+        {selectedCategory === category && (
+          <motion.span
+            layoutId="shop-category-pill"
+            className="category-item-pill"
+            transition={{ type: 'spring', stiffness: 500, damping: 40 }}
+          />
+        )}
         <i
           className={`fas fa-${
             category === 'all'
@@ -192,7 +217,9 @@ const ShopComponent = () => {
         <div className="shop-content">
           <div className="shop-controls">
             <p className="products-count">
-              Showing {selectedCategory === 'Boxes' ? displayedBoxes.length : paginatedItems.length} of {selectedCategory === 'Boxes' ? displayedBoxes.length : filteredAndSortedItems.length} products
+              {isLoading ? 'Loading fresh produce…' : hasFailed ? '' : (
+                <>Showing <strong>{isBoxes ? displayedBoxes.length : paginatedItems.length}</strong> of {isBoxes ? displayedBoxes.length : filteredAndSortedItems.length} products</>
+              )}
             </p>
             <div className="controls-right">
               <div className="search-bar">
@@ -216,44 +243,63 @@ const ShopComponent = () => {
             </div>
           </div>
           
-          <div className="food-display-list">
-            {selectedCategory === 'Boxes' ? (
-              displayedBoxes.map(box => (
-                <BoxItem key={box._id} box={box} />
-              ))
-            ) : (
-              paginatedItems.map((item) => (
-                <FoodItem
-                  key={item._id}
-                  id={item._id}
-                  {...item}
-                  isExpanded={expandedItem === item._id}
-                  onExpand={() => {
-                    // Close any open item before expanding the new one
-                    if (expandedItem === item._id) {
-                      setExpandedItem(null);
-                    } else {
-                      setExpandedItem(item._id);
-                    }
-                  }}
+          {isLoading ? (
+            <div className="food-display-list" aria-busy="true">
+              <FoodItemSkeleton count={9} />
+            </div>
+          ) : hasFailed ? (
+            <StatusState
+              icon={error ? 'fa-cloud-sun-rain' : 'fa-seedling'}
+              title={error ? "We couldn't load our produce" : 'Our shelves are being restocked'}
+              message={error
+                ? 'Please check your connection and try again.'
+                : 'Fresh products will be back shortly. Please try again in a moment.'}
+              onRetry={() => window.location.reload()}
+            />
+          ) : (
+            <div className={`food-display-list ${isBoxes ? 'is-boxes' : ''}`} key={gridKey}>
+              {isBoxes ? (
+                displayedBoxes.map((box, index) => (
+                  <Reveal key={box._id} className="shop-card-wrap" delay={cardDelay(index)} y={16}>
+                    <BoxItem box={box} />
+                  </Reveal>
+                ))
+              ) : (
+                paginatedItems.map((item, index) => (
+                  <Reveal key={item._id} className="shop-card-wrap" delay={cardDelay(index)} y={16}>
+                    <FoodItem
+                      id={item._id}
+                      {...item}
+                      isExpanded={expandedItem === item._id}
+                      onExpand={() => {
+                        // Close any open item before expanding the new one
+                        if (expandedItem === item._id) {
+                          setExpandedItem(null);
+                        } else {
+                          setExpandedItem(item._id);
+                        }
+                      }}
+                    />
+                  </Reveal>
+                ))
+              )}
+              {(isBoxes ? displayedBoxes.length === 0 : paginatedItems.length === 0) && (
+                <StatusState
+                  icon="fa-search"
+                  title="No products found"
+                  message="Try adjusting your search or filters"
                 />
-              ))
-            )}
-            {(selectedCategory === 'Boxes' ? displayedBoxes.length === 0 : paginatedItems.length === 0) && (
-              <div className="no-results">
-                <i className="fas fa-search"></i>
-                <p>No products found</p>
-                <p>Try adjusting your search or filters</p>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
 
-          {totalPages > 1 && (
+          {!isLoading && !hasFailed && totalPages > 1 && (
             <div className="pagination">
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
                 className="pagination-btn"
+                aria-label="Previous page"
               >
                 <i className="fas fa-chevron-left"></i>
               </button>
@@ -274,6 +320,7 @@ const ShopComponent = () => {
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
                 className="pagination-btn"
+                aria-label="Next page"
               >
                 <i className="fas fa-chevron-right"></i>
               </button>

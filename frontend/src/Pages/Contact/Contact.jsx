@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import Reveal from "../../Components/Motion/Reveal";
 import "./Contact.css";
 
 const Contact = () => {
@@ -25,14 +26,27 @@ const Contact = () => {
     window.location.href = `mailto:chanvifarms9@gmail.com`;
   };
 
+  const onCardKey = (handler) => (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handler();
+    }
+  };
+
   return (
     <div className="contact-container">
-      <h1>Contact Us</h1>
+      <Reveal className="contact-hero">
+        <span className="contact-eyebrow">Get in touch</span>
+        <h1>Contact Us</h1>
+        <p>Questions about an order, our produce or deliveries? We&apos;re happy to help.</p>
+      </Reveal>
 
       <div className="contact-cards">
+        <Reveal delay={0} className="contact-card-wrap">
         <div
           className="contact-card location"
           onClick={handleLocationClick}
+          onKeyDown={onCardKey(handleLocationClick)}
           role="button"
           tabIndex={0}
         >
@@ -45,10 +59,13 @@ const Contact = () => {
             road,Bangalore-560035
           </p>
         </div>
+        </Reveal>
 
+        <Reveal delay={0.08} className="contact-card-wrap">
         <div
           className="contact-card phone"
           onClick={handlePhoneClick}
+          onKeyDown={onCardKey(handlePhoneClick)}
           role="button"
           tabIndex={0}
         >
@@ -60,10 +77,13 @@ const Contact = () => {
             <p>+91 9900088164</p>
           </div>
         </div>
+        </Reveal>
 
+        <Reveal delay={0.16} className="contact-card-wrap">
         <div
           className="contact-card email"
           onClick={handleEmailClick}
+          onKeyDown={onCardKey(handleEmailClick)}
           role="button"
           tabIndex={0}
         >
@@ -75,12 +95,13 @@ const Contact = () => {
             <p>chanvifarms9@gmail.com</p>
           </div>
         </div>
+        </Reveal>
       </div>
 
-      <div className="map-container">
+      <Reveal className="map-container" delay={0.1}>
         <iframe
           src={mapUrl}
-          width="110%"
+          width="100%"
           height="400"
           style={{ border: 0 }}
           allowFullScreen=""
@@ -88,7 +109,7 @@ const Contact = () => {
           referrerPolicy="no-referrer-when-downgrade"
           title="Chanvi Farms Location"
         ></iframe>
-      </div>
+      </Reveal>
     </div>
   );
 };

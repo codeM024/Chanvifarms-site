@@ -6,7 +6,7 @@
 // List of critical assets to preload
 const criticalAssets = [
   '/Chanvifarm_lcon.svg',
-  '/header_img.png',
+  '/header_img.webp',
   // Add other critical images/assets here
 ];
 
