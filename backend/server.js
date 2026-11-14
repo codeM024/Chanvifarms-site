@@ -8,6 +8,7 @@ import userRouter from "./routes/userRoute.js";
 import cartRouter from "./routes/cartRoute.js";
 import orderRouter from "./routes/orderRoute.js";
 import boxRouter from "./routes/boxRoute.js";
+import adminRouter from "./routes/adminRoute.js";
 import Razorpay from 'razorpay';
 import crypto from 'crypto';
 import Order from './models/orderModel.js';
@@ -39,6 +40,10 @@ const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
 if (missingEnvVars.length > 0) {
     console.error('Error: Missing required environment variables:', missingEnvVars.join(', '));
     process.exit(1);
+}
+
+if (!process.env.ADMIN_ACCOUNTS) {
+    console.warn('Warning: ADMIN_ACCOUNTS is not set. Admin login is disabled until it is configured.');
 }
 
 if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
@@ -225,6 +230,7 @@ app.use('/api/user', userRouter)
 app.use("/api/cart", cartRouter)
 app.use("/api/order", orderRouter)
 app.use('/api/box', boxRouter)
+app.use('/api/admin', adminRouter)
 
 // Error handling middleware
 app.use((err, req, res, next) => {

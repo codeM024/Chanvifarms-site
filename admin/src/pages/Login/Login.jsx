@@ -1,16 +1,11 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { assets } from '../../assets/assets';
 import loginBg from '../../assets/adminloginBG.webp';
+import { loginAdmin } from '../../auth';
 import './Login.css';
-
-const validCredentials = [
-  { email: 'lovelyboyarun91@gmail.com', password: 'vali@18024' },
-  { email: 'manisake28@gmail.com', password: 'mani@18024' },
-  { email: 'chanvifarms9@gmail.com', password: 'Chanvifarms@99' },
-];
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -18,22 +13,25 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
-  const handleLogin = (e) => {
+  useEffect(() => {
+    if (searchParams.get('expired')) {
+      toast.info('Your session has expired. Please log in again.');
+    }
+  }, [searchParams]);
+
+  // Credentials are checked by the backend (POST /api/admin/login); nothing secret lives in this bundle
+  const handleLogin = async (e) => {
     e.preventDefault();
     setSubmitting(true);
 
-    const isValidUser = validCredentials.some(
-      cred => cred.email === email && cred.password === password
-    );
-
-    if (isValidUser) {
-      // Store auth state
-      localStorage.setItem('adminAuth', JSON.stringify({ email, isAuthenticated: true }));
+    try {
+      await loginAdmin(email.trim(), password);
       toast.success('Login successful!');
-      navigate('/list');
-    } else {
-      toast.error('Invalid credentials!');
+      navigate('/list', { replace: true });
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Unable to log in. Please try again.');
       setSubmitting(false);
     }
   };

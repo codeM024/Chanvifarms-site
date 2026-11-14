@@ -6,6 +6,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import { RouteLoader } from './components/Feedback/Feedback'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { getAdminAuth } from './auth';
 
 // Route-level code splitting: each page is downloaded only when first visited.
 const Add = lazy(() => import('./pages/Add/Add'))
@@ -36,7 +37,7 @@ const AuthenticatedLayout = () => {
 };
 
 const App = () => {
-  const auth = JSON.parse(localStorage.getItem('adminAuth'));
+  const auth = getAdminAuth();
 
   return (
     <div>

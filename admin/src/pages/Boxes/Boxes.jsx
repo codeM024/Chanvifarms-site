@@ -133,10 +133,8 @@ const Boxes = () => {
 
     setLoading(true)
     try {
-      const admin = JSON.parse(localStorage.getItem('adminAuth'))
-      const adminEmail = admin?.email
       const payload = { name, items, price: Number(price), marketPrice: marketPrice ? Number(marketPrice) : undefined }
-      const res = await axios.post(url + '/api/box/add', payload, { headers: { 'admin-email': adminEmail } })
+      const res = await axios.post(url + '/api/box/add', payload)
       if (res.data?.success) {
         toast.success('Box created successfully')
         setName(''); setItems([]); setPrice(''); setMarketPrice('')
@@ -158,14 +156,12 @@ const Boxes = () => {
   const handleUpdateBox = async (boxId, newPrice, newMarketPrice) => {
     setLoading(true)
     try {
-      const admin = JSON.parse(localStorage.getItem('adminAuth'))
-      const adminEmail = admin?.email
       const payload = { 
         boxId, 
         price: Number(newPrice),
         marketPrice: newMarketPrice ? Number(newMarketPrice) : undefined 
       }
-      const res = await axios.put(url + '/api/box/update', payload, { headers: { 'admin-email': adminEmail } })
+      const res = await axios.put(url + '/api/box/update', payload)
       if (res.data?.success) {
         toast.success('Box updated successfully')
         setEditBox(null)
@@ -190,9 +186,7 @@ const Boxes = () => {
 
     setLoading(true);
     try {
-      const admin = JSON.parse(localStorage.getItem('adminAuth'))
-      const adminEmail = admin?.email
-      const res = await axios.delete(`${url}/api/box/delete/${boxId}`, { headers: { 'admin-email': adminEmail } })
+      const res = await axios.delete(`${url}/api/box/delete/${boxId}`)
       if (res.data?.success) {
         toast.success('Box deleted successfully')
         // Refresh boxes list

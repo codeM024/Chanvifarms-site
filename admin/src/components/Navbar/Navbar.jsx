@@ -4,13 +4,14 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { useEffect } from 'react'
 import { FaSignOutAlt } from 'react-icons/fa'
+import { getAdminAuth, clearAdminAuth } from '../../auth';
 
 const Navbar = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
     // Check authentication status on mount and changes
-    const auth = localStorage.getItem('adminAuth');
+    const auth = getAdminAuth();
     if (!auth) {
       navigate('/login');
     }
@@ -19,7 +20,7 @@ const Navbar = () => {
   const handleLogout = () => {
     try {
       // Clear all auth-related data
-      localStorage.clear();
+      clearAdminAuth();
       sessionStorage.clear();
 
       // Show success message
@@ -36,7 +37,7 @@ const Navbar = () => {
     }
   };
 
-  const auth = JSON.parse(localStorage.getItem('adminAuth'));
+  const auth = getAdminAuth();
   const initial = auth?.email ? auth.email.charAt(0).toUpperCase() : 'A';
 
   return (

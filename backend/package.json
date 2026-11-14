@@ -5,7 +5,8 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "server": "nodemon server.js"
+    "server": "nodemon server.js",
+    "hash-admin-password": "node scripts/hash-admin-password.js"
   },
   "author": "",
   "license": "ISC",
