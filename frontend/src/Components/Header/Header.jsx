@@ -28,7 +28,7 @@ const Header = () => {
           Farm-Fresh Organic Vegetables & Fruits Delivered to Your Doorstep
         </motion.h2>
         <motion.p variants={item}>
-          Order online and enjoy the freshest organic vegetables and fruits, sourced directly from trusted local farmers. Experience quality, taste, and nutrition delivered right to your home.
+          Order online and enjoy the freshest organic vegetables and tiffins, sourced directly from trusted local farmers. Experience quality, taste, and nutrition delivered right to your home.
         </motion.p>
         <motion.div variants={item}>
           <Link to="/shop" className="header-cta">
