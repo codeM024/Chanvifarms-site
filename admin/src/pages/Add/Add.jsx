@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import './Add.css';
-import upload_area from '../../assets/upload_area.png';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
@@ -215,82 +214,112 @@ const Add = () => {
 
   return (
     <div className="add-product">
-      <div className="addproduct-itemfield">
-        <p>Product Image <span className="required">*</span></p>
-        <label 
-          htmlFor="file-input" 
-          className={`image-upload ${dragOver ? 'drag-over' : ''} ${imageError ? 'error' : ''}`}
-          onDragOver={(e) => {
-            e.preventDefault();
-            setDragOver(true);
-          }}
-          onDragLeave={(e) => {
-            e.preventDefault();
-            setDragOver(false);
-          }}
-          onDrop={handleImageDrop}
-        >
-          <img 
-            src={image ? URL.createObjectURL(image) : upload_area} 
-            className="addproduct-thumbnail-img" 
-            alt={image ? "Product preview" : "Upload area"} 
-          />
-          {!image && (
-            <div className="upload-overlay">
-              <i className="fas fa-cloud-upload-alt"></i>
-              <p>Drag and drop an image here or click to browse</p>
-              <small>Maximum file size: 5MB</small>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Add Product</h1>
+          <p className="page-subtitle">Create a new item for the Chanvi Farms store.</p>
+        </div>
+      </div>
+
+      <div className="add-grid">
+        <section className="card card-pad add-media">
+          <div className="addproduct-itemfield">
+            <p className="label">Product Image <span className="required">*</span></p>
+            <label
+              htmlFor="file-input"
+              className={`image-upload ${dragOver ? 'drag-over' : ''} ${imageError ? 'error' : ''} ${image ? 'has-image' : ''}`}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setDragOver(true);
+              }}
+              onDragLeave={(e) => {
+                e.preventDefault();
+                setDragOver(false);
+              }}
+              onDrop={handleImageDrop}
+            >
+              {image ? (
+                <img
+                  src={URL.createObjectURL(image)}
+                  className="addproduct-thumbnail-img"
+                  alt="Product preview"
+                />
+              ) : (
+                <div className="upload-overlay">
+                  <span className="upload-icon"><i className="fas fa-cloud-upload-alt"></i></span>
+                  <p><strong>Click to upload</strong> or drag and drop</p>
+                  <small>PNG, JPG or WEBP &middot; max 5MB</small>
+                </div>
+              )}
+              {image && <span className="upload-change">Change image</span>}
+              {imageError && <div className="error-message">{imageError}</div>}
+            </label>
+            <input
+              onChange={imageHandler}
+              type="file"
+              name="image"
+              id="file-input"
+              accept="image/*"
+              hidden
+            />
+          </div>
+        </section>
+
+        <section className="card card-pad add-details">
+          <div className="addproduct-itemfield">
+            <label className="label" htmlFor="add-name">Product Name <span className="required">*</span></label>
+            <input
+              id="add-name"
+              className="input"
+              value={data.name}
+              onChange={inputHandler}
+              type="text"
+              name="name"
+              placeholder="e.g. Organic Tomatoes"
+            />
+          </div>
+
+          <div className="addproduct-itemfield">
+            <label className="label" htmlFor="add-description">Description <span className="required">*</span></label>
+            <textarea
+              id="add-description"
+              className="textarea"
+              value={data.description}
+              onChange={inputHandler}
+              name="description"
+              placeholder="Short description shown to customers"
+              rows="4"
+            />
+          </div>
+
+          <div className="add-two-col">
+            <div className="addproduct-itemfield">
+              <label className="label" htmlFor="add-category">Product Category <span className="required">*</span></label>
+              <select id="add-category" className="select" value={data.category} onChange={inputHandler} name="category">
+                <option value="">Select Category</option>
+                <option value="Vegetables">Organic Vegetables</option>
+                <option value="Fruits">Organic Fruits</option>
+                <option value="Exotic Vegetables">Exotic Organic Vegetables</option>
+                <option value="Exotic Fruits">Exotic Organic Fruits</option>
+                <option value="Meat">Meat</option>
+                <option value="Groceries">Organic Groceries</option>
+              </select>
             </div>
-          )}
-          {imageError && <div className="error-message">{imageError}</div>}
-        </label>
-        <input
-          onChange={imageHandler}
-          type="file"
-          name="image"
-          id="file-input"
-          accept="image/*"
-          hidden
-        />
+
+            <div className="addproduct-itemfield">
+              <label className="label" htmlFor="add-status">Status</label>
+              <select id="add-status" className="select" value={data.status} onChange={inputHandler} name="status">
+                <option value="in-stock">In Stock</option>
+                <option value="out-of-stock">Out of Stock</option>
+                <option value="coming-soon">Coming Soon</option>
+              </select>
+            </div>
+          </div>
+        </section>
       </div>
 
-      <div className="addproduct-itemfield">
-        <p>Product Name <span className="required">*</span></p>
-        <input
-          value={data.name}
-          onChange={inputHandler}
-          type="text"
-          name="name"
-          placeholder="Enter product name"
-        />
-      </div>
-
-      <div className="addproduct-itemfield">
-        <p>Description <span className="required">*</span></p>
-        <textarea
-          value={data.description}
-          onChange={inputHandler}
-          name="description"
-          placeholder="Enter product description"
-          rows="4"
-        />
-      </div>
-
-      <div className="addproduct-itemfield">
-        <p>Product Category <span className="required">*</span></p>
-        <select value={data.category} onChange={inputHandler} name="category">
-          <option value="">Select Category</option>
-          <option value="Vegetables">Organic Vegetables</option>
-          <option value="Fruits">Organic Fruits</option>
-          <option value="Exotic Vegetables">Exotic Organic Vegetables</option>
-          <option value="Exotic Fruits">Exotic Organic Fruits</option>
-          <option value="Meat">Meat</option>
-          <option value="Groceries">Organic Groceries</option>
-        </select>
-      </div>
-
-      <div className="quantity-options">
-        <p>Available Quantities & Prices <span className="required">*</span></p>
+      <section className="card card-pad quantity-options">
+        <p className="section-title">Available Quantities & Prices <span className="required">*</span></p>
         <div className="quantity-price-grid">
           <div className="quantity-row header">
             <span>Quantity</span>
@@ -308,46 +337,53 @@ const Add = () => {
             { key: 'g500', label: '500 gm' },
             { key: 'kg1', label: '1 kg' }
           ].map(({ key, label }) => (
-            <div key={key} className="quantity-row">
-              <span>{label}</span>
+            <div key={key} className={`quantity-row ${data.quantityOptions[key] ? 'enabled' : ''}`}>
+              <span className="quantity-label">{label}</span>
+              <label className="switch" aria-label={`Enable ${label}`}>
+                <input
+                  type="checkbox"
+                  checked={data.quantityOptions[key]}
+                  onChange={() => {
+                    const newEnabled = !data.quantityOptions[key];
+                    setData(prev => ({
+                      ...prev,
+                      quantityOptions: {
+                        ...prev.quantityOptions,
+                        [key]: newEnabled
+                      },
+                      prices: {
+                        ...prev.prices,
+                        [key]: newEnabled ? prev.prices[key] : ""
+                      },
+                      marketPrices: {
+                        ...prev.marketPrices,
+                        [key]: newEnabled ? prev.marketPrices[key] : ""
+                      }
+                    }));
+                  }}
+                />
+                <span className="switch-track" aria-hidden="true" />
+              </label>
               <input
-                type="checkbox"
-                checked={data.quantityOptions[key]}
-                onChange={() => {
-                  const newEnabled = !data.quantityOptions[key];
-                  setData(prev => ({
-                    ...prev,
-                    quantityOptions: {
-                      ...prev.quantityOptions,
-                      [key]: newEnabled
-                    },
-                    prices: {
-                      ...prev.prices,
-                      [key]: newEnabled ? prev.prices[key] : ""
-                    },
-                    marketPrices: {
-                      ...prev.marketPrices,
-                      [key]: newEnabled ? prev.marketPrices[key] : ""
-                    }
-                  }));
-                }}
-              />
-              <input
+                className="input"
                 type="number"
                 name={`price_${key}`}
                 value={data.prices[key]}
                 onChange={inputHandler}
-                placeholder="Enter price"
+                placeholder="Price"
+                aria-label={`Price for ${label}`}
                 disabled={!data.quantityOptions[key]}
                 min="0"
                 step="0.01"
               />
               <input
+                className="input"
                 type="number"
                 name={`marketPrice_${key}`}
                 value={data.marketPrices[key]}
                 onChange={inputHandler}
                 placeholder="Optional"
+                aria-label={`Market price for ${label}`}
                 disabled={!data.quantityOptions[key]}
                 min="0"
                 step="0.01"
@@ -355,30 +391,26 @@ const Add = () => {
             </div>
           ))}
         </div>
-      </div>
+      </section>
 
-      <div className="addproduct-itemfield">
-        <p>Status</p>
-        <select value={data.status} onChange={inputHandler} name="status">
-          <option value="in-stock">In Stock</option>
-          <option value="out-of-stock">Out of Stock</option>
-          <option value="coming-soon">Coming Soon</option>
-        </select>
+      <div className="add-actions">
+        <button
+          className="btn btn-primary btn-lg addproduct-btn"
+          onClick={addProduct}
+          disabled={loading}
+          aria-busy={loading}
+        >
+          {loading ? (
+            <>
+              <span className="spinner" aria-hidden="true" /> Adding product...
+            </>
+          ) : (
+            <>
+              <i className="fas fa-plus" aria-hidden="true"></i> Add Product
+            </>
+          )}
+        </button>
       </div>
-
-      <button 
-        className="addproduct-btn" 
-        onClick={addProduct}
-        disabled={loading}
-      >
-        {loading ? (
-          <>
-            <i className="fas fa-spinner fa-spin"></i> ADDING PRODUCT...
-          </>
-        ) : (
-          'ADD PRODUCT'
-        )}
-      </button>
     </div>
   );
 };

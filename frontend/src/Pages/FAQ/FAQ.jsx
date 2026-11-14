@@ -1,4 +1,6 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import Reveal from '../../Components/Motion/Reveal'
 import './FAQ.css'
 
 const FAQ = () => {
@@ -81,28 +83,52 @@ const FAQ = () => {
 
   return (
     <div className="faq-container">
-      <h1>Frequently Asked Questions</h1>
+      <Reveal className="faq-hero">
+        <span className="faq-eyebrow">Help Center</span>
+        <h1>Frequently Asked Questions</h1>
+        <p>Everything you need to know about ordering fresh, organic produce from Chanvi Farms.</p>
+      </Reveal>
       <div className="faq-list">
-        {faqData.map((faq, index) => (
-          <div 
-            key={index} 
-            className={`faq-item ${activeIndex === index ? 'active' : ''}`}
-            style={{ animationDelay: `${index * 0.1}s` }}
-          >
-            <div 
-              className={`faq-question ${activeIndex === index ? 'active' : ''}`}
-              onClick={() => toggleAccordion(index)}
+        {faqData.map((faq, index) => {
+          const isOpen = activeIndex === index
+          return (
+            <Reveal
+              key={index}
+              className={`faq-item ${isOpen ? 'active' : ''}`}
+              delay={Math.min(index, 6) * 0.04}
+              y={16}
             >
-              {faq.question}
-              <span className="faq-icon">
-                {activeIndex === index ? '−' : '+'}
-              </span>
-            </div>
-            <div className={`faq-answer ${activeIndex === index ? 'active' : ''}`}>
-              {faq.answer}
-            </div>
-          </div>
-        ))}
+              <button
+                type="button"
+                id={`faq-q-${index}`}
+                className={`faq-question ${isOpen ? 'active' : ''}`}
+                onClick={() => toggleAccordion(index)}
+                aria-expanded={isOpen}
+                aria-controls={`faq-a-${index}`}
+              >
+                <span>{faq.question}</span>
+                <span className="faq-icon" aria-hidden="true"></span>
+              </button>
+              <AnimatePresence initial={false}>
+                {isOpen && (
+                  <motion.div
+                    key="answer"
+                    id={`faq-a-${index}`}
+                    role="region"
+                    aria-labelledby={`faq-q-${index}`}
+                    className="faq-answer active"
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                  >
+                    <div className="faq-answer-inner">{faq.answer}</div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </Reveal>
+          )
+        })}
       </div>
     </div>
   )

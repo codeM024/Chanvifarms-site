@@ -1,12 +1,14 @@
 import 'dotenv/config.js'
 import express from "express";
 import cors from "cors";
+import compression from "compression";
 import { connectDB } from "./config/db.js";
 import foodRouter from "./routes/foodRoute.js";
 import userRouter from "./routes/userRoute.js";
 import cartRouter from "./routes/cartRoute.js";
 import orderRouter from "./routes/orderRoute.js";
 import boxRouter from "./routes/boxRoute.js";
+import adminRouter from "./routes/adminRoute.js";
 import Razorpay from 'razorpay';
 import crypto from 'crypto';
 import Order from './models/orderModel.js';
@@ -40,6 +42,10 @@ if (missingEnvVars.length > 0) {
     process.exit(1);
 }
 
+if (!process.env.ADMIN_ACCOUNTS) {
+    console.warn('Warning: ADMIN_ACCOUNTS is not set. Admin login is disabled until it is configured.');
+}
+
 if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
     console.warn('Warning: Razorpay credentials are missing. Payment endpoints will be disabled in this environment.');
 }
@@ -48,8 +54,12 @@ if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
 const app = express()
 const port = process.env.PORT || 4000
 
-// Serve static files from uploads directory
-app.use('/images', express.static('uploads'))
+// gzip API responses (product/box lists shrink ~70-80%)
+app.use(compression())
+
+// Serve uploaded product images with browser caching (filenames are timestamped, so they never change)
+const imageCache = express.static('uploads', { maxAge: '30d', immutable: true })
+app.use('/images', imageCache)
 
 // middleware 
 app.use(express.json())
@@ -216,11 +226,11 @@ app.post('/api/order/verify-payment', async (req, res) => {
 
 //api endpoints
 app.use('/api/food', foodRouter)
-app.use('/images', express.static('uploads'))
 app.use('/api/user', userRouter)
 app.use("/api/cart", cartRouter)
 app.use("/api/order", orderRouter)
 app.use('/api/box', boxRouter)
+app.use('/api/admin', adminRouter)
 
 // Error handling middleware
 app.use((err, req, res, next) => {

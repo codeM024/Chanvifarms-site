@@ -49,7 +49,7 @@ export const listBoxes = async (req, res) => {
     const boxes = await Box.find().populate({
       path: 'items.itemId',
       select: 'name image prices marketPrices quantityOptions category status'
-    })
+    }).lean()
     res.json({ success: true, data: boxes })
   } catch (error) {
     console.error('listBoxes error', error)

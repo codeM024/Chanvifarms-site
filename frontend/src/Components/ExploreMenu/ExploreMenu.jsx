@@ -1,11 +1,11 @@
 import './ExploreMenu.css'
 import ImageLoader from './ImageLoader'
-import exoticveggi from '../../assets/exoticveggicard.jpg'
-import veggicard from '../../assets/veggicard.jpg'
-import mixfruits from '../../assets/mixfru.jpg'
-import emixfruits from '../../assets/mix-fruits.jpg'
-import rawmeat from '../../assets/rawmeat.jpg'
-import groceries from '../../assets/grocriess.jpeg'
+import Reveal from '../Motion/Reveal'
+import exoticveggi from '../../assets/exoticveggicard.webp'
+import veggicard from '../../assets/veggicard.webp'
+import mixfruits from '../../assets/mixfru.webp'
+import emixfruits from '../../assets/mix-fruits.webp'
+import groceries from '../../assets/grocriess.webp'
 
 const ExploreMenu = () => {
   const categories = [
@@ -37,30 +37,36 @@ const ExploreMenu = () => {
   ]
 
   return (
-    <div className="explore-menu" id="explore-menu">
-      <div className="explore-menu-header">
-        <h1>Categories</h1>
-        <p>See What We <strong>Provide</strong></p>
-      </div>
+    <section className="explore-menu" id="explore-menu">
+      <Reveal className="explore-menu-header">
+        <span className="explore-eyebrow">Categories</span>
+        <h1>See What We <strong>Provide</strong></h1>
+      </Reveal>
 
       <div className="categories-grid">
         {categories.map((item, index) => (
-          <div key={index} className="category-card">
-            <div className="category-image">
-              <ImageLoader
-                src={item.image}
-                alt={item.title}
-                className="category-image-content"
-              />
+          <Reveal
+            key={item.title}
+            className="category-card-wrap"
+            delay={Math.min(index * 0.06, 0.3)}
+          >
+            <div className="category-card">
+              <div className="category-image">
+                <ImageLoader
+                  src={item.image}
+                  alt={item.title}
+                  className="category-image-content"
+                />
+              </div>
+              <div className="category-content">
+                <h2>{item.title}</h2>
+                <p>{item.description}</p>
+              </div>
             </div>
-            <div className="category-content">
-              <h2>{item.title}</h2>
-              <p>{item.description}</p>
-            </div>
-          </div>
+          </Reveal>
         ))}
       </div>
-    </div>
+    </section>
   )
 }
 

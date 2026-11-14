@@ -1,7 +1,7 @@
 import basket_icon from './basket_icon.png'
-import logo from './logo.png'
-import Chanvifarmlogo from './Chanvifarm_logo1.png'
-import header_img from './header_img.png'
+import logo from './logo.webp'
+import Chanvifarmlogo from './Chanvifarm_logo1.webp'
+import header_img from './header_img.webp'
 import search_icon from './search_icon.png'
 import menu_1 from './menu_1.png'
 import menu_2 from './menu_2.png'
@@ -22,8 +22,8 @@ import profile_icon from './profile_icon.png'
 import bag_icon from './bag_icon.png'
 import logout_icon from './logout_icon.png'
 import parcel_icon from './parcel_icon.png'
-import deliveryboy from './delivery.jpg'
-import rawmeat from './rawmeat.jpg'
+import deliveryboy from './delivery.webp'
+import rawmeat from './rawmeat.webp'
 
 export const assets = {
     logo,

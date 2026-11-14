@@ -1,12 +1,13 @@
 import { createContext, useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import PropTypes from 'prop-types';
-import Loading from '../Components/Loading/Loading';
 
 export const StoreContext = createContext(null);
 
 const StoreContextProvider = (props) => {
-    const [cartItems, setCartItems] = useState({});
+    const [cartItems, setCartItems] = useState(() => {
+        try { return JSON.parse(localStorage.getItem('cartItems')) || {}; } catch { return {}; }
+    });
   const url = import.meta.env.VITE_BACKEND_URL;
     const [token, setToken] = useState(() => localStorage.getItem('token') || "")
     const [food_list, setFoodList] = useState([]);
@@ -49,6 +50,10 @@ const StoreContextProvider = (props) => {
             if (response.data.success && response.data.cartData) {
                 const validCartItems = {};
                 Object.entries(response.data.cartData).forEach(([key, quantity]) => {
+                    if (key.startsWith('box_')) {
+                        validCartItems[key] = typeof quantity === 'object' ? quantity : { quantity, type: 'box', boxData: cartItems[key]?.boxData };
+                        return;
+                    }
                     const [itemId] = key.split('_');
                     const item = food_list.find(item => item._id === itemId);
                     if (item && item.status === 'in-stock' && !item.outOfStock) {
@@ -72,7 +77,8 @@ const StoreContextProvider = (props) => {
                 setCartItems(JSON.parse(localCart));
             }
         }
-    }, [url, food_list]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [url, food_list, handleTokenExpiration]);
 
     const addToCart = useCallback(async (itemId, selectedQuantity = 'g250', boxData = null) => {
         // Handle box items
@@ -228,14 +234,6 @@ const StoreContextProvider = (props) => {
                 console.error('Error adding box to cart', err);
             }
         }
-
-        try {
-            await axios.post(url + '/api/cart/box/add', { boxId, quantity }, { headers: { token } })
-            // reload cart from server
-            await loadCartData(token)
-        } catch (err) {
-            console.error('Error adding box to cart', err)
-        }
     }, [box_list, cartItems, loadCartData, token, url])
 
     const getTotalCartAmount = useCallback(() => {
@@ -301,6 +299,7 @@ const StoreContextProvider = (props) => {
                     status: item.status || 'in-stock'
                 }));
                 setFoodList(processedList);
+                return processedList;
             } else {
                 setError(response.data.message || "Failed to fetch products");
                 setFoodList([]);
@@ -309,18 +308,19 @@ const StoreContextProvider = (props) => {
             setError(error.message || "Error loading products");
             setFoodList([]);
         }
+        return [];
     }, [url]);
 
-    const loadBoxList = useCallback(async () => {
+    const loadBoxList = useCallback(async (foods = [], prefetched = null) => {
         try {
-            const res = await axios.get(url + '/api/box/list')
+            const res = prefetched ? await prefetched : await axios.get(url + '/api/box/list')
             if (res.data.success) {
                 // normalize boxes: ensure each item's itemId is the full product object and has prices/marketPrices/quantityOptions
                 const normalized = res.data.data.map(box => ({
                     ...box,
                     items: (box.items || []).map(it => {
                         // if backend populated itemId, use it; otherwise try to find in food_list
-                        let product = it.itemId && typeof it.itemId === 'object' ? it.itemId : food_list.find(f => f._id === it.itemId)
+                        let product = it.itemId && typeof it.itemId === 'object' ? it.itemId : foods.find(f => f._id === it.itemId)
                         if (!product) product = { _id: it.itemId, name: 'Unknown', image: '', prices: {}, marketPrices: {}, quantityOptions: {} }
                         const prices = product.prices || { g250: product.price }
                         const marketPrices = product.marketPrices || { g250: product.marketPrice || product.price }
@@ -333,13 +333,14 @@ const StoreContextProvider = (props) => {
         } catch (err) {
             console.error('Error loading boxes', err)
         }
-    }, [url, food_list])
+    }, [url])
 
     // Update cart when food list changes to remove any invalid items
     useEffect(() => {
         if (food_list.length > 0 && Object.keys(cartItems).length > 0) {
             const validCartItems = {};
             Object.entries(cartItems).forEach(([key, value]) => {
+                if (key.startsWith('box_')) { validCartItems[key] = value; return; }
                 const [itemId] = key.split('_');
                 const item = food_list.find(item => item._id === itemId);
                 if (item && item.status === 'in-stock' && !item.outOfStock) {
@@ -351,28 +352,32 @@ const StoreContextProvider = (props) => {
         }
     }, [food_list]);
 
+    // Load data in the background - the UI renders immediately and shows skeletons
     useEffect(() => {
+        if (isInitialized) return;
+        let cancelled = false;
         const initializeData = async () => {
             setLoading(true);
             try {
-                await loadFoodList();
-                await loadBoxList();
+                // Products and boxes are independent requests: fetch in parallel
+                const boxesRequest = axios.get(url + '/api/box/list');
+                boxesRequest.catch(() => {}); // handled inside loadBoxList
+                const foods = await loadFoodList();
+                if (cancelled) return;
+                await loadBoxList(foods, boxesRequest);
+                setLoading(false);
                 await loadCartData(token);
             } finally {
-                setLoading(false);
-                setIsInitialized(true);
+                if (!cancelled) {
+                    setLoading(false);
+                    setIsInitialized(true);
+                }
             }
         };
-
-        if (!isInitialized) {
-            initializeData();
-        }
-    }, [loadFoodList, loadCartData, token, isInitialized]);
-
-    // Don't show loading screen after initial load
-    if (loading && !isInitialized) {
-        return <Loading />;
-    }
+        initializeData();
+        return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isInitialized]);
 
     const contextValue = {
         food_list,

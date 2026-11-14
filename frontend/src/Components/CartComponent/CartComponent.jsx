@@ -2,14 +2,45 @@ import React from 'react'
 import { StoreContext } from '../../Context/StoreContext'
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
+import PropTypes from 'prop-types'
 import './CartComponent.css'
+
+const EASE_OUT = [0.22, 1, 0.36, 1];
+
+// Small rolling-number animation for quantity changes
+const QtyValue = ({ value }) => (
+  <span className="cart-qty-value" aria-live="polite">
+    <AnimatePresence mode="popLayout" initial={false}>
+      <motion.span
+        key={value}
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 8 }}
+        transition={{ duration: 0.15 }}
+      >
+        {value}
+      </motion.span>
+    </AnimatePresence>
+  </span>
+);
+
+QtyValue.propTypes = { value: PropTypes.number };
+
+const rowMotion = {
+  layout: true,
+  initial: { opacity: 0, y: 12 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, x: -32, transition: { duration: 0.2, ease: [0.4, 0, 1, 1] } },
+  transition: { duration: 0.3, ease: EASE_OUT },
+};
 
 const CartComponent = () => {
   const { cartItems, food_list, removeFromCart, getTotalCartAmount, getTotalCartSavings, addToCart, url, loading } = React.useContext(StoreContext);
   const [promoCode, setPromoCode] = React.useState('');
   const [appliedPromo, setAppliedPromo] = React.useState(null);
   const [copiedCode, setCopiedCode] = React.useState(null);
-  const [availableOffers, setAvailableOffers] = React.useState([
+  const [availableOffers] = React.useState([
     {
       code: 'ABOVE250',
       title: '2% Discount',
@@ -103,8 +134,6 @@ const CartComponent = () => {
   case 'g400': return '400 gm';
   case 'g500': return '500 gm';
   case 'kg1': return '1 kg';
-      case 'g500': return '500 gm';
-      case 'kg1': return '1 kg';
       default: return size;
     }
   };
@@ -211,7 +240,6 @@ const CartComponent = () => {
     const subtotal = getTotalCartAmount();
     const deliveryFee = getDeliveryFee();
     const promoDiscount = getDiscountAmount();
-    const cartSavings = getTotalCartSavings();
     return subtotal + deliveryFee - promoDiscount;
   };
 
@@ -219,248 +247,301 @@ const CartComponent = () => {
 
   const hasItems = Object.values(cartItems).some(item => item.quantity > 0);
 
+  // Build the list of renderable cart rows (same visibility rules as before)
+  const cartRows = Object.entries(cartItems).map(([cartKey, cartItem]) => {
+    if (cartKey.startsWith('box_')) {
+      return { cartKey, cartItem, isBox: true };
+    }
+    const [itemId, size] = cartKey.split('_');
+    const item = food_list.find(food => food._id === itemId);
+    if (item && cartItem.quantity > 0 && !item.outOfStock && item.status === 'in-stock') {
+      return { cartKey, cartItem, isBox: false, item, itemId, size };
+    }
+    return null;
+  }).filter(Boolean);
+
+  const itemCount = cartRows.reduce((sum, row) => sum + (row.cartItem.quantity || 0), 0);
+  const deliveryFee = getDeliveryFee();
+  const subtotal = getTotalCartAmount();
+
   return (
     <div className="cart">
       {hasItems ? (
         <>
-          <div className="cart-items">
-            <div className="cart-items-title">
-              <p>Items</p>
-              <p>Title</p>
-              <p>Size</p>
-              <p>Market Price</p>
-              <p>Our Price</p>
-              <p>Quantity</p>
-              <p>Total</p>
-              <p>Remove</p>
-            </div>
-            <br />
-            <hr />
-            {Object.entries(cartItems).map(([cartKey, cartItem]) => {
-              if (cartKey.startsWith('box_')) {
-                // Handle box items
-                const boxData = cartItem.boxData;
-                return (
-                  <div key={cartKey} className="cart-box-item">
-                    <div className="cart-items-title cart-items-item">
-                      <div className="box-image">
-                        <i className="fas fa-box"></i>
-                      </div>
-                      <div className="box-details">
-                        <h3>{boxData.name}</h3>
-                        <div className="box-items-list">
-                          {boxData.items.map((item, idx) => (
-                            <div key={idx} className="box-item-detail">
-                              <span>{item.itemId.name} - {getQuantityLabel(item.size)}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                      <p>Box Package</p>
-                      <p className="market-price">₹{boxData.marketPrice || boxData.price}</p>
-                      <p>₹{boxData.price}</p>
-                      <div className="cart-quantity-controls">
-                        <button onClick={() => removeFromCart(boxData._id, 'box')} className="quantity-btn">
-                          <i className="fas fa-minus"></i>
-                        </button>
-                        <span>{cartItem.quantity}</span>
-                        <button onClick={() => addToCart(boxData._id, 'box')} className="quantity-btn">
-                          <i className="fas fa-plus"></i>
-                        </button>
-                      </div>
-                      <p>₹{boxData.price * cartItem.quantity}</p>
-                      <button onClick={() => removeFromCart(boxData._id, 'box', true)} className="remove-btn">
-                        <i className="fas fa-trash"></i>
-                      </button>
-                    </div>
-                  </div>
-                );
-              }
-              
-              // Handle regular items
-              const [itemId, size] = cartKey.split('_');
-              const item = food_list.find(food => food._id === itemId);
-              
-              if (item && cartItem.quantity > 0 && !item.outOfStock && item.status === 'in-stock') {
-                const price = item.prices?.[size] || item.price;
-                const marketPrice = item.marketPrices?.[size] || item.marketPrice || price;
-                
-                return (
-                  <div key={cartKey}>
-                    <div className="cart-items-title cart-items-item">
-                      <img src={`${url}/images/${item.image}`} alt={item.name} />
-                      <p>{item.name}</p>
-                      <p>{getQuantityLabel(size)}</p>
-                      <p className="market-price">₹{marketPrice}</p>
-                      <p>₹{price}</p>
-                      <div className="cart-quantity-controls">
-                        <button onClick={() => removeFromCart(itemId, size)}>
-                          <i className="fas fa-minus"></i>
-                        </button>
-                        <span>{cartItem.quantity}</span>
-                        <button onClick={() => addToCart(itemId, size)}>
-                          <i className="fas fa-plus"></i>
-                        </button>
-                      </div>
-                      <p>₹{price * cartItem.quantity}</p>
-                      <p onClick={() => {
-                        for (let i = 0; i < cartItem.quantity; i++) {
-                          removeFromCart(itemId, size);
-                        }
-                      }} className="cross">×</p>
-                    </div>
-                    <hr />
-                  </div>
-                );
-              }
-              return null;
-            })}
-          </div>
-          <div className="cart-bottom">
-            <div className="cart-total">
-              <h2>Cart Totals</h2>
-              <div>
-                <div className="cart-total-details">
-                  <p>Subtotal</p>
-                  <p>₹{getTotalCartAmount().toFixed(2)}</p>
-                </div>
-                <hr />
-                <div className="cart-total-details">
-                  <p>Delivery Fee</p>
-                  <p>₹{getDeliveryFee().toFixed(2)}</p>
-                </div>
-                <hr />
-                <div className="cart-total-details savings">
-                  <p>Total Savings</p>
-                  <p className="savings-amount">₹{getTotalCartSavings().toFixed(2)}</p>
-                </div>
-                {appliedPromo && getDiscountAmount() > 0 && (
-                  <>
-                    <hr />
-                    <div className="cart-total-details promo-discount">
-                      <p>
-                        {appliedPromo.type === 'combo' ? (
-                          <>
-                            Promo Discount ({appliedPromo.code})<br />
-                            <small>{appliedPromo.benefits.find(b => b.type === 'percentage')?.value}% OFF + Free Delivery</small>
-                          </>
-                        ) : (
-                          <>
-                            Promo Discount ({appliedPromo.code})<br />
-                            <small>{appliedPromo.value}% OFF</small>
-                          </>
-                        )}
-                      </p>
-                      <p className="discount-amount">-₹{getDiscountAmount()}</p>
-                    </div>
-                  </>
-                )}
-                <hr />
-                <div className="cart-total-details">
-                  <b>Total</b>
-                  <b>₹{calculateFinalAmount().toFixed(2)}</b>
-                </div>
-              </div>
-              <button onClick={handleCheckout}>Proceed to Checkout</button>
-            </div>
-            <div className='cart-promocode'>
-              <div className="promocode-container">
-                <div className="offers-header">
-                  <h3>
-                    <i className="fas fa-gift"></i>
-                    Available Offers
-                  </h3>
-                  <span className="offers-subtitle">Save more with these exclusive deals!</span>
-                </div>
-                
-                <div className="promo-offers">
-                  {availableOffers.map((offer) => (
-                    <div key={offer.code} className="promo-offer-item">
-                      <div className="offer-tag">
-                        {offer.type === 'percentage' ? (
-                          <i className="fas fa-percent"></i>
-                        ) : offer.type === 'free_delivery' ? (
-                          <i className="fas fa-truck"></i>
-                        ) : (
-                          <i className="fas fa-tag"></i>
-                        )}
-                      </div>
-                      <div className="offer-content">
-                        <div className="promo-code-container">
-                          <span className="code">{offer.code}</span>
-                          <div className="offer-details">
-                            <span className="offer-title">{offer.title}</span> <br />
-                            <span className="offer-validity">Valid till: {new Date(offer.validUntil).toLocaleDateString()}</span>
+          <header className="cart-header">
+            <h1>Your Cart</h1>
+            <span className="cart-count-pill">{itemCount} {itemCount === 1 ? 'item' : 'items'}</span>
+          </header>
+
+          <div className="cart-layout">
+            <section className="cart-items" aria-label="Cart items">
+              <motion.ul className="cart-list" layout>
+                <AnimatePresence initial={false}>
+                  {cartRows.map((row) => {
+                    const { cartKey, cartItem } = row;
+
+                    if (row.isBox) {
+                      const boxData = cartItem.boxData;
+                      return (
+                        <motion.li key={cartKey} className="cart-row cart-box-item" {...rowMotion}>
+                          <div className="cart-row-media box-image" aria-hidden="true">
+                            <i className="fas fa-box-open"></i>
                           </div>
-                          <button 
-                            className="copy-button"
-                            onClick={() => copyPromoCode(offer.code)}
-                          >
-                            {copiedCode === offer.code ? (
-                              <>
-                                <i className="fas fa-check"></i>
-                                <span>Copied!</span>
-                              </>
-                            ) : (
-                              <>
-                                <i className="far fa-copy"></i>
-                                <span>Copy</span>
-                              </>
-                            )}
+                          <div className="cart-row-info box-details">
+                            <h3>{boxData.name}</h3>
+                            <span className="cart-chip">Box Package</span>
+                            <ul className="box-items-list">
+                              {boxData.items.map((item, idx) => (
+                                <li key={idx} className="box-item-detail">
+                                  {item.itemId.name} · {getQuantityLabel(item.size)}
+                                </li>
+                              ))}
+                            </ul>
+                            <div className="cart-row-prices">
+                              <span className="our-price">₹{boxData.price}</span>
+                              <span className="market-price">₹{boxData.marketPrice || boxData.price}</span>
+                            </div>
+                          </div>
+                          <div className="cart-quantity-controls" role="group" aria-label={`Quantity for ${boxData.name}`}>
+                            <button type="button" onClick={() => removeFromCart(boxData._id, 'box')} className="quantity-btn" aria-label="Decrease quantity">
+                              <i className="fas fa-minus"></i>
+                            </button>
+                            <QtyValue value={cartItem.quantity} />
+                            <button type="button" onClick={() => addToCart(boxData._id, 'box')} className="quantity-btn" aria-label="Increase quantity">
+                              <i className="fas fa-plus"></i>
+                            </button>
+                          </div>
+                          <p className="cart-row-total">₹{boxData.price * cartItem.quantity}</p>
+                          <button type="button" onClick={() => removeFromCart(boxData._id, 'box', true)} className="remove-btn" aria-label={`Remove ${boxData.name}`}>
+                            <i className="fas fa-trash-alt"></i>
+                          </button>
+                        </motion.li>
+                      );
+                    }
+
+                    const { item, itemId, size } = row;
+                    const price = item.prices?.[size] || item.price;
+                    const marketPrice = item.marketPrices?.[size] || item.marketPrice || price;
+
+                    return (
+                      <motion.li key={cartKey} className="cart-row" {...rowMotion}>
+                        <div className="cart-row-media">
+                          <img src={`${url}/images/${item.image}`} alt={item.name} loading="lazy" decoding="async" />
+                        </div>
+                        <div className="cart-row-info">
+                          <h3>{item.name}</h3>
+                          <span className="cart-chip">{getQuantityLabel(size)}</span>
+                          <div className="cart-row-prices">
+                            <span className="our-price">₹{price}</span>
+                            <span className="market-price">₹{marketPrice}</span>
+                          </div>
+                        </div>
+                        <div className="cart-quantity-controls" role="group" aria-label={`Quantity for ${item.name}`}>
+                          <button type="button" className="quantity-btn" onClick={() => removeFromCart(itemId, size)} aria-label="Decrease quantity">
+                            <i className="fas fa-minus"></i>
+                          </button>
+                          <QtyValue value={cartItem.quantity} />
+                          <button type="button" className="quantity-btn" onClick={() => addToCart(itemId, size)} aria-label="Increase quantity">
+                            <i className="fas fa-plus"></i>
                           </button>
                         </div>
-                        {offer.terms && (
-                          <div className="offer-terms">
-                            <i className="fas fa-info-circle"></i>
-                            <span>{offer.terms}</span>
+                        <p className="cart-row-total">₹{price * cartItem.quantity}</p>
+                        <button
+                          type="button"
+                          className="remove-btn"
+                          aria-label={`Remove ${item.name}`}
+                          onClick={() => {
+                            for (let i = 0; i < cartItem.quantity; i++) {
+                              removeFromCart(itemId, size);
+                            }
+                          }}
+                        >
+                          <i className="fas fa-trash-alt"></i>
+                        </button>
+                      </motion.li>
+                    );
+                  })}
+                </AnimatePresence>
+              </motion.ul>
+
+              <button type="button" className="cart-continue-link" onClick={handleContinueShopping}>
+                <i className="fas fa-arrow-left"></i> Continue shopping
+              </button>
+
+              <div className='cart-promocode'>
+                <div className="promocode-container">
+                  <div className="offers-header">
+                    <h3>
+                      <i className="fas fa-gift"></i>
+                      Available Offers
+                    </h3>
+                    <span className="offers-subtitle">Save more with these exclusive deals!</span>
+                  </div>
+
+                  <div className="promo-offers">
+                    {availableOffers.map((offer) => (
+                      <div
+                        key={offer.code}
+                        className={`promo-offer-item${subtotal >= offer.minAmount ? ' is-unlocked' : ''}${appliedPromo?.code === offer.code ? ' is-applied' : ''}`}
+                      >
+                        <div className="offer-tag" aria-hidden="true">
+                          {offer.type === 'percentage' ? (
+                            <i className="fas fa-percent"></i>
+                          ) : offer.type === 'free_delivery' ? (
+                            <i className="fas fa-truck"></i>
+                          ) : (
+                            <i className="fas fa-tag"></i>
+                          )}
+                        </div>
+                        <div className="offer-content">
+                          <div className="promo-code-container">
+                            <div className="offer-details">
+                              <span className="code">{offer.code}</span>
+                              <span className="offer-title">{offer.title}</span>
+                              <span className="offer-validity">Valid till {new Date(offer.validUntil).toLocaleDateString()}</span>
+                            </div>
+                            <button
+                              type="button"
+                              className={`copy-button${copiedCode === offer.code ? ' is-copied' : ''}`}
+                              onClick={() => copyPromoCode(offer.code)}
+                            >
+                              {copiedCode === offer.code ? (
+                                <>
+                                  <i className="fas fa-check"></i>
+                                  <span>Copied!</span>
+                                </>
+                              ) : (
+                                <>
+                                  <i className="far fa-copy"></i>
+                                  <span>Copy</span>
+                                </>
+                              )}
+                            </button>
                           </div>
-                        )}
+                          {offer.terms && (
+                            <div className="offer-terms">
+                              <i className="fas fa-info-circle"></i>
+                              <span>{offer.terms}</span>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <aside className="cart-summary" aria-label="Order summary">
+              <div className="cart-total">
+                <h2>Order Summary</h2>
+                <div className="cart-total-rows">
+                  <div className="cart-total-details">
+                    <p>Subtotal</p>
+                    <p>₹{subtotal.toFixed(2)}</p>
+                  </div>
+                  <div className="cart-total-details">
+                    <p>Delivery Fee</p>
+                    <p>{deliveryFee === 0 ? <span className="free-tag">FREE</span> : `₹${deliveryFee.toFixed(2)}`}</p>
+                  </div>
+                  <div className="cart-total-details savings">
+                    <p>Total Savings</p>
+                    <p className="savings-amount">₹{getTotalCartSavings().toFixed(2)}</p>
+                  </div>
+                  <AnimatePresence initial={false}>
+                    {appliedPromo && getDiscountAmount() > 0 && (
+                      <motion.div
+                        key="promo"
+                        className="cart-total-details promo-discount"
+                        initial={{ opacity: 0, y: -6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -6 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <p>
+                          Promo Discount ({appliedPromo.code})<br />
+                          <small>
+                            {appliedPromo.type === 'combo'
+                              ? `${appliedPromo.benefits.find(b => b.type === 'percentage')?.value}% OFF + Free Delivery`
+                              : `${appliedPromo.value}% OFF`}
+                          </small>
+                        </p>
+                        <p className="discount-amount">-₹{getDiscountAmount()}</p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                  <div className="cart-total-details cart-grand-total">
+                    <b>Total</b>
+                    <b>₹{calculateFinalAmount().toFixed(2)}</b>
+                  </div>
                 </div>
 
                 <div className="promocode-input-section">
-                  <p className="promocode-title">Have a Promocode?</p>
+                  <label className="promocode-title" htmlFor="cart-promo-input">Have a promo code?</label>
                   <div className="cart-promocode-input">
                     <div className="input-wrapper">
-                      <i className="fas fa-tag input-icon"></i>
-                      <input 
-                        type="text" 
-                        placeholder='Enter your promocode' 
+                      <i className="fas fa-tag input-icon" aria-hidden="true"></i>
+                      <input
+                        id="cart-promo-input"
+                        type="text"
+                        placeholder='Enter code'
                         value={promoCode}
                         onChange={(e) => setPromoCode(e.target.value)}
-                        onKeyPress={(e) => {
+                        onKeyDown={(e) => {
                           if (e.key === 'Enter') {
                             handlePromoCode();
                           }
                         }}
                       />
                     </div>
-                    <button onClick={handlePromoCode} className="apply-button">
-                      <span>Apply</span>
-                      <i className="fas fa-arrow-right"></i>
+                    <button type="button" onClick={handlePromoCode} className="apply-button">
+                      Apply
                     </button>
                   </div>
+                  <AnimatePresence>
+                    {appliedPromo && (
+                      <motion.p
+                        className="applied-promo"
+                        initial={{ opacity: 0, y: -4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <i className="fas fa-check-circle"></i>
+                        {appliedPromo.type === 'free_delivery'
+                          ? 'Free delivery applied!'
+                          : appliedPromo.type === 'combo'
+                            ? `${appliedPromo.benefits.find(b => b.type === 'percentage')?.value}% OFF + Free Delivery applied!`
+                            : `${appliedPromo.value}% discount applied!`}
+                      </motion.p>
+                    )}
+                  </AnimatePresence>
                 </div>
-                {appliedPromo && (
-                  <p className="applied-promo">
-                    {appliedPromo.type === 'free_delivery' 
-                      ? '🎉 Free delivery applied!' 
-                      : `🎉 ${appliedPromo.value}% discount applied!`}
-                  </p>
-                )}
+
+                <button type="button" className="checkout-btn" onClick={handleCheckout}>
+                  Proceed to Checkout <i className="fas fa-arrow-right"></i>
+                </button>
+                <p className="cart-secure-note"><i className="fas fa-lock"></i> Safe &amp; secure checkout</p>
               </div>
-            </div>
+            </aside>
           </div>
         </>
       ) : (
-        <div className="empty-cart">
-          <i className="fas fa-shopping-cart"></i>
-          <h2>Your Cart is Empty</h2>
-          <p>Add items to your cart to proceed with checkout</p>
-          <button onClick={handleContinueShopping}>Continue Shopping</button>
-        </div>
+        <motion.div
+          className="empty-cart"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: EASE_OUT }}
+        >
+          <div className="empty-cart-icon" aria-hidden="true">
+            <i className="fas fa-shopping-basket"></i>
+          </div>
+          <h2>Your cart is empty</h2>
+          <p>Fresh, organic produce is just a few clicks away. Add items to your cart to get started.</p>
+          <button type="button" className="btn-primary" onClick={handleContinueShopping}>
+            <i className="fas fa-leaf"></i> Start Shopping
+          </button>
+        </motion.div>
       )}
     </div>
   );

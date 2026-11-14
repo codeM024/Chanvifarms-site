@@ -1,6 +1,6 @@
 import { memo, useEffect, useState, useRef } from 'react'
 import './Loading.css'
-import Chanvifarm_logo1 from '../../assets/Chanvifarm_logo1.png' // Update path as per your project structure
+import Chanvifarm_logo1 from '../../assets/Chanvifarm_logo1.webp' // Update path as per your project structure
 import { preloadCriticalAssets, trackLoadingProgress } from './LoadingOptimizer'
 
 const Loading = () => {

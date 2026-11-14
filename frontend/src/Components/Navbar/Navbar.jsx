@@ -6,6 +6,14 @@ import { StoreContext } from "../../Context/StoreContext";
 import { NavContext } from "../../Context/NavContext";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
+import { motion } from "framer-motion";
+
+const NAV_LINKS = [
+  { key: "home", to: "/", label: "Home" },
+  { key: "about", to: "/about", label: "About Us" },
+  { key: "shop", to: "/shop", label: "Organic Products" },
+  { key: "contact", to: "/contact", label: "Contact Us" },
+];
 
 const Navbar = ({ setShowLogin }) => {
   const navigate = useNavigate();
@@ -16,6 +24,7 @@ const Navbar = ({ setShowLogin }) => {
   const [showAnnouncement, setShowAnnouncement] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   // Scroll to top when route changes
   useEffect(() => {
@@ -43,6 +52,8 @@ const Navbar = ({ setShowLogin }) => {
           );
           // Show announcement bar only at the top
           setShowAnnouncement(currentScrollPos === 0);
+          // Add shadow / denser background once the page is scrolled
+          setScrolled(currentScrollPos > 8);
           // Update scroll position for threshold checks
           lastScrollPosition = currentScrollPos;
           ticking = false;
@@ -123,52 +134,36 @@ const Navbar = ({ setShowLogin }) => {
           </p>
         </div>
       </div>
-      <div className={`navbar ${visible ? "navbar-visible" : "hidden"}`}>
+      <div
+        className={`navbar ${visible ? "navbar-visible" : "hidden"} ${
+          scrolled ? "navbar-scrolled" : ""
+        }`}
+      >
         <a href="/" onClick={handleLogoClick} className="navbar-logo">
           <img src={assets.Chanvifarmlogo} alt="Chanvi Farms Logo" className="logo" />
         </a>
 
         <ul className={`navbar-menu ${mobileMenuOpen ? "active" : ""}`}>
-          <Link
-            to="/"
-            onClick={() => {
-              setActiveNav("home");
-              setMobileMenuOpen(false);
-            }}
-            className={activeNav === "home" ? "active" : ""}
-          >
-            Home
-          </Link>
-          <Link
-            to="/about"
-            onClick={() => {
-              setActiveNav("about");
-              setMobileMenuOpen(false);
-            }}
-            className={activeNav === "about" ? "active" : ""}
-          >
-            About Us
-          </Link>
-          <Link
-            to="/shop"
-            onClick={() => {
-              setActiveNav("shop");
-              setMobileMenuOpen(false);
-            }}
-            className={activeNav === "shop" ? "active" : ""}
-          >
-            Organic Products
-          </Link>
-          <Link
-            to="/contact"
-            onClick={() => {
-              setActiveNav("contact");
-              setMobileMenuOpen(false);
-            }}
-            className={activeNav === "contact" ? "active" : ""}
-          >
-            Contact Us
-          </Link>
+          {NAV_LINKS.map(({ key, to, label }) => (
+            <Link
+              key={key}
+              to={to}
+              onClick={() => {
+                setActiveNav(key);
+                setMobileMenuOpen(false);
+              }}
+              className={activeNav === key ? "active" : ""}
+            >
+              {label}
+              {activeNav === key && (
+                <motion.span
+                  layoutId="nav-underline"
+                  className="nav-underline"
+                  transition={{ type: "spring", stiffness: 500, damping: 38 }}
+                />
+              )}
+            </Link>
+          ))}
         </ul>
 
         <div className="navbar-right">
@@ -223,6 +218,7 @@ const Navbar = ({ setShowLogin }) => {
           className={`mobile-menu-button ${mobileMenuOpen ? "active" : ""}`}
           onClick={toggleMobileMenu}
           aria-label="Toggle menu"
+          aria-expanded={mobileMenuOpen}
         >
           <span></span>
           <span></span>

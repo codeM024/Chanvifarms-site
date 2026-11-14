@@ -11,7 +11,10 @@ import {
   FaSortAmountDown,
   FaSortAmountUp,
   FaTrash,
+  FaInbox,
+  FaExclamationTriangle,
 } from "react-icons/fa";
+import { CardSkeleton, EmptyState } from "../../components/Feedback/Feedback";
 
 const Orders = () => {
   const url = import.meta.env.VITE_BACKEND_URL;
@@ -23,6 +26,9 @@ const Orders = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("all");
   const [sortOrder, setSortOrder] = useState("newest");
+  // UI-only flags: initial fetch + dialog submit spinners (do not change requests)
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [dialogBusy, setDialogBusy] = useState(false);
 
   const fetchAllOrders = async () => {
     const response = await axios.get(url + "/api/order/list");
@@ -38,7 +44,7 @@ const Orders = () => {
   const [selectedOrderForCancel, setSelectedOrderForCancel] = useState(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [selectedOrderForDelete, setSelectedOrderForDelete] = useState(null);
-  
+
   const handleCancelSubmit = async () => {
     if (!cancelReason.trim()) {
       toast.error("Please provide a cancellation reason");
@@ -47,7 +53,7 @@ const Orders = () => {
 
     try {
       const loadingToast = toast.loading("Cancelling order...");
-      
+
       // Update order status
       const response = await axios.post(url + "/api/order/status", {
         orderId: selectedOrderForCancel.orderId,
@@ -95,13 +101,13 @@ const Orders = () => {
 
     try {
       const loadingToast = toast.loading("Deleting order...");
-      
+
       const response = await axios.delete(`${url}/api/order/delete/${selectedOrderForDelete._id}`, {
         headers: {
           'Content-Type': 'application/json'
         }
       });
-      
+
       if (response.data.success) {
         toast.update(loadingToast, {
           render: "Order deleted successfully",
@@ -130,7 +136,7 @@ const Orders = () => {
   const statusHandler = async (event, orderId, currentOrder) => {
     const newStatus = event.target.value;
     const currentStatus = currentOrder.status;
-    
+
     try {
       // Validate status transition from pending
       if (currentStatus === 'pending' && !['confirmed', 'cancelled'].includes(newStatus)) {
@@ -203,10 +209,10 @@ const Orders = () => {
   };
 
   const handleWhatsAppClick = (order) => {
-    const orderDetails = order.items.map(item => 
+    const orderDetails = order.items.map(item =>
       `${item.name} (${item.size}) × ${item.quantity}`
     ).join(", ");
-    
+
     const message = `Order Details:
 Order ID: ${order._id}
 Customer: ${order.userId.name}
@@ -336,18 +342,31 @@ ${mapLink}`;
   ];
 
   useEffect(() => {
-    fetchAllOrders();
+    fetchAllOrders().finally(() => setInitialLoading(false));
   }, []);
+
+  const runDialogAction = async (action) => {
+    setDialogBusy(true);
+    try {
+      await action();
+    } finally {
+      setDialogBusy(false);
+    }
+  };
+
+  const visibleOrders = filteredOrders();
 
   return (
     <div className="orders-container">
       <div className="orders-header">
         <div className="header-main">
           <div className="header-left">
-            <h2>Order List</h2>
+            <h1 className="page-title">Orders</h1>
             <div className="search-bar">
-              <FaSearch className="search-icon" />
+              <FaSearch className="search-icon" aria-hidden="true" />
               <input
+                className="input"
+                aria-label="Search orders"
                 type="text"
                 placeholder="Search orders by name, ID or items..."
                 value={searchQuery}
@@ -359,7 +378,7 @@ ${mapLink}`;
             <div className="total-orders">
               <span className="order-count-label">Total Orders</span>
               <span className="order-count-number">
-                {filteredOrders().length}
+                {visibleOrders.length}
               </span>
               <span className="order-count-total">/ {orders.length}</span>
             </div>
@@ -386,6 +405,8 @@ ${mapLink}`;
             <div className="filters-right">
               <div className="date-filter">
                 <input
+                  className="input"
+                  aria-label="Start date"
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
@@ -393,6 +414,8 @@ ${mapLink}`;
                 />
                 <span>to</span>
                 <input
+                  className="input"
+                  aria-label="End date"
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
@@ -403,7 +426,8 @@ ${mapLink}`;
                 <select
                   value={selectedPaymentMethod}
                   onChange={(e) => setSelectedPaymentMethod(e.target.value)}
-                  className="payment-select"
+                  className="select payment-select"
+                  aria-label="Filter by payment method"
                 >
                   <option value="all">All Payments</option>
                   <option value="cod">COD</option>
@@ -415,7 +439,8 @@ ${mapLink}`;
                 <select
                   value={selectedStatus}
                   onChange={(e) => setSelectedStatus(e.target.value)}
-                  className="status-select"
+                  className="select status-select"
+                  aria-label="Filter by status"
                 >
                   <option value="all">All Status</option>
                   <option value="pending">Pending</option>
@@ -429,7 +454,7 @@ ${mapLink}`;
               </div>
               <div className="sort-filter">
                 <button
-                  className="sort-button"
+                  className="btn btn-secondary sort-button"
                   onClick={toggleSortOrder}
                   title={sortOrder === "newest" ? "Newest first" : "Oldest first"}
                 >
@@ -450,14 +475,27 @@ ${mapLink}`;
       </div>
 
       <div className="orders-list-container">
+        {initialLoading ? (
+          <CardSkeleton count={4} minWidth={420} />
+        ) : visibleOrders.length === 0 ? (
+          <div className="card">
+            <EmptyState
+              icon={orders.length === 0 ? <FaInbox /> : <FaSearch />}
+              title={orders.length === 0 ? "No orders yet" : "No orders match your filters"}
+              text={orders.length === 0
+                ? "New customer orders will appear here."
+                : "Try another search term, status, payment method or date range."}
+            />
+          </div>
+        ) : (
         <div className="orders-list">
-          {filteredOrders().map((order, index) => (
+          {visibleOrders.map((order, index) => (
             <div key={index} className="order-card" data-status={order.status}>
               <div className="order-status-section">
                 <div className="order-id-section">
                   <div className="order-id">Order #{order._id.slice(-6)}</div>
                   <div className="order-actions">
-                    <button 
+                    <button
                       className="whatsapp-button"
                       onClick={() => handleWhatsAppClick(order)}
                       title="Send to WhatsApp"
@@ -465,7 +503,7 @@ ${mapLink}`;
                       <FaWhatsapp />
                     </button>
                     {(order.status === 'delivered' || order.status === 'cancelled') && (
-                      <button 
+                      <button
                         className="delete-button"
                         onClick={() => {
                           setSelectedOrderForDelete(order);
@@ -515,6 +553,7 @@ ${mapLink}`;
                           <img
                             src={`${url}/images/${item.image}`}
                             alt={item.name}
+                            loading="lazy"
                             className="product-image"
                           />
                           <div className="item-quantity">×{item.quantity}</div>
@@ -615,16 +654,18 @@ ${mapLink}`;
             </div>
           ))}
         </div>
+        )}
       </div>
 
       {/* Cancel Order Dialog */}
       {showCancelDialog && selectedOrderForCancel && (
-        <div className="cancel-dialog-overlay">
-          <div className="cancel-dialog">
+        <div className="modal-overlay cancel-dialog-overlay">
+          <div className="modal cancel-dialog" role="dialog" aria-modal="true">
             <div className="cancel-dialog-header">
               <h3>Cancel Order #{selectedOrderForCancel.order._id.slice(-6)}</h3>
-              <button 
-                className="close-button"
+              <button
+                className="icon-btn close-button"
+                aria-label="Close"
                 onClick={() => {
                   setShowCancelDialog(false);
                   setCancelReason('');
@@ -642,7 +683,7 @@ ${mapLink}`;
                 </p>
                 <p className="customer-phone">{selectedOrderForCancel.order.address.phone}</p>
               </div>
-              
+
               <div className="order-items">
                 <h4>Order Items:</h4>
                 <div className="items-list">
@@ -659,10 +700,10 @@ ${mapLink}`;
                 </div>
               </div>
             </div>
-            
+
             <div className="cancel-form">
               <label>
-                <span className="required">*</span> 
+                <span className="required">*</span>
                 Reason for Cancellation:
               </label>
               <textarea
@@ -670,22 +711,23 @@ ${mapLink}`;
                 onChange={(e) => setCancelReason(e.target.value)}
                 placeholder="Please provide a detailed reason for cancellation..."
                 rows="4"
-                className={!cancelReason.trim() ? 'error' : ''}
+                className={`textarea ${!cancelReason.trim() ? 'error' : ''}`}
               />
               {!cancelReason.trim() && (
                 <span className="error-message">Cancellation reason is required</span>
               )}
-              
+
               <div className="cancel-note">
                 <p>
                   <FaWhatsapp className="whatsapp-icon" />
                   A cancellation message will be sent to the customer via WhatsApp
                 </p>
               </div>
-              
+
               <div className="cancel-actions">
-                <button 
-                  className="btn-cancel"
+                <button
+                  className="btn btn-secondary btn-cancel"
+                  disabled={dialogBusy}
                   onClick={() => {
                     setShowCancelDialog(false);
                     setCancelReason('');
@@ -694,12 +736,13 @@ ${mapLink}`;
                 >
                   Back
                 </button>
-                <button 
-                  className="btn-confirm"
-                  onClick={handleCancelSubmit}
-                  disabled={!cancelReason.trim()}
+                <button
+                  className="btn btn-danger btn-confirm"
+                  onClick={() => runDialogAction(handleCancelSubmit)}
+                  disabled={!cancelReason.trim() || dialogBusy}
                 >
-                  Confirm & Send WhatsApp
+                  {dialogBusy ? <span className="spinner" aria-hidden="true" /> : <FaWhatsapp aria-hidden="true" />}
+                  {dialogBusy ? "Cancelling..." : "Confirm & Send WhatsApp"}
                 </button>
               </div>
             </div>
@@ -709,12 +752,13 @@ ${mapLink}`;
 
       {/* Delete Order Confirmation Dialog */}
       {showDeleteDialog && selectedOrderForDelete && (
-        <div className="delete-dialog-overlay">
-          <div className="delete-dialog">
+        <div className="modal-overlay delete-dialog-overlay">
+          <div className="modal delete-dialog" role="dialog" aria-modal="true">
             <div className="delete-dialog-header">
               <h3>Delete Order</h3>
-              <button 
-                className="close-button"
+              <button
+                className="icon-btn close-button"
+                aria-label="Close"
                 onClick={() => {
                   setShowDeleteDialog(false);
                   setSelectedOrderForDelete(null);
@@ -723,9 +767,9 @@ ${mapLink}`;
                 ×
               </button>
             </div>
-            
+
             <div className="delete-dialog-content">
-              <div className="warning-icon">⚠️</div>
+              <div className="modal-icon danger warning-icon"><FaExclamationTriangle /></div>
               <p>Are you sure you want to delete this order?</p>
               <div className="order-info">
                 <p><strong>Order ID:</strong> #{selectedOrderForDelete._id.slice(-6)}</p>
@@ -736,8 +780,9 @@ ${mapLink}`;
             </div>
 
             <div className="delete-dialog-actions">
-              <button 
-                className="btn-cancel"
+              <button
+                className="btn btn-secondary btn-cancel"
+                disabled={dialogBusy}
                 onClick={() => {
                   setShowDeleteDialog(false);
                   setSelectedOrderForDelete(null);
@@ -745,11 +790,13 @@ ${mapLink}`;
               >
                 Cancel
               </button>
-              <button 
-                className="btn-delete"
-                onClick={handleDeleteOrder}
+              <button
+                className="btn btn-danger btn-delete"
+                onClick={() => runDialogAction(handleDeleteOrder)}
+                disabled={dialogBusy}
               >
-                Delete Order
+                {dialogBusy && <span className="spinner" aria-hidden="true" />}
+                {dialogBusy ? "Deleting..." : "Delete Order"}
               </button>
             </div>
           </div>

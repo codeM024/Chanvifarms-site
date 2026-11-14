@@ -1,89 +1,149 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import PropTypes from "prop-types";
 import "./About.css";
-import animeboyVision from "../../assets/animeboyVision.jpg";
-import aboutboy from "../../assets/aboutboy.jpg";
-import animeGirlVision from "../../assets/animeGirlWithBasket.jpg";
+import Reveal from "../../Components/Motion/Reveal";
+import animeboyVision from "../../assets/animeboyVision.webp";
+import aboutboy from "../../assets/aboutboy.webp";
+import animeGirlVision from "../../assets/animeGirlWithBasket.webp";
+
+const STAT_TARGETS = { products: 100, team: 50, locations: 10 };
+
+const whyChooseUs = [
+  { icon: "fa-leaf", title: "Farm-Fresh Quality", text: "Direct from farms to your doorstep, ensuring maximum freshness" },
+  { icon: "fa-clock", title: "Pre-order a Day Before", text: "Plan ahead and secure your fresh produce" },
+  { icon: "fa-truck", title: "Doorstep Delivery", text: "Convenient home delivery at your preferred time" },
+  { icon: "fa-boxes", title: "Wide Variety", text: "Extensive selection of fresh produce to choose from" },
+  { icon: "fa-tag", title: "Affordable Pricing", text: "Competitive prices without compromising quality" },
+  { icon: "fa-gift", title: "Above 500 order", text: "Get an 5% discount on order total" },
+];
+
+const reviews = [
+  {
+    name: "Mohan",
+    stars: 5,
+    text: "The freshness of Organic vegetables from Chanvi Farms is unmatched! I've been ordering for 3 months now and have never been disappointed. Their customer service is excellent too!",
+  },
+  {
+    name: "Kiran Kumar",
+    stars: 4.5,
+    text: "What I love most about Chanvi Farms is their commitment to quality. The fruits are always fresh and perfectly ripe. Their pre-order system makes planning meals so much easier!",
+  },
+  {
+    name: "Manikanta",
+    stars: 5,
+    text: "Chanvi Farms takes the stress out of grocery shopping. As someone always on the go, I truly appreciate their timely service and fresh fruits and veggies.",
+  },
+  {
+    name: "Sai Navya",
+    stars: 4.5,
+    text: "Being a working professional, Chanvi Farms has made my life easier. Their produce is always fresh, and the doorstep delivery is super convenient. Highly recommended!",
+  },
+  {
+    name: "Purna Chandra",
+    stars: 5,
+    text: "Balancing work and life isn’t easy, but Chanvi Farms makes eating healthy effortless with their top-notch produce and seamless delivery.",
+  },
+];
+
+const Stars = ({ value }) => (
+  <div className="rating" aria-label={`${value} out of 5 stars`}>
+    {[1, 2, 3, 4, 5].map((n) => (
+      <i
+        key={n}
+        className={
+          value >= n ? "fas fa-star" : value >= n - 0.5 ? "fas fa-star-half-alt" : "far fa-star"
+        }
+        aria-hidden="true"
+      ></i>
+    ))}
+  </div>
+);
+
+const LazyImg = ({ src, alt }) => {
+  const [loaded, setLoaded] = useState(false);
+  const imgRef = useRef(null);
+  // Cached images can finish before React attaches onLoad
+  useEffect(() => {
+    if (imgRef.current?.complete) setLoaded(true);
+  }, []);
+  return (
+    <img
+      ref={imgRef}
+      src={src}
+      alt={alt}
+      loading="lazy"
+      decoding="async"
+      className={`img-fade ${loaded ? "is-loaded" : ""}`}
+      onLoad={() => setLoaded(true)}
+    />
+  );
+};
+
+Stars.propTypes = { value: PropTypes.number };
+LazyImg.propTypes = { src: PropTypes.string, alt: PropTypes.string };
 
 const About = () => {
-  const [counts, setCounts] = useState({
-    products: 0,
-    team: 0,
-    locations: 0,
-  });
+  const [counts, setCounts] = useState({ products: 0, team: 0, locations: 0 });
+  const statsRef = useRef(null);
+  const hasAnimated = useRef(false);
 
-  const [hasAnimated, setHasAnimated] = useState(false);
-
+  // Count-up animation, started once when the stats band scrolls into view
   useEffect(() => {
-    // Animation for counting numbers
+    const node = statsRef.current;
+    if (!node) return undefined;
+    let frame;
+
     const animateCounts = () => {
-      const duration = 4000;
-      const steps = 100;
-      const interval = duration / steps;
-
-      let currentStep = 0;
-
-      const timer = setInterval(() => {
-        currentStep++;
-
+      const duration = 1600;
+      const start = performance.now();
+      const tick = (now) => {
+        const t = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - t, 3);
         setCounts({
-          products: Math.min(Math.floor((100 * currentStep) / steps), 100),
-          team: Math.min(Math.floor((50 * currentStep) / steps), 50),
-          locations: Math.min(Math.floor((10 * currentStep) / steps), 10),
+          products: Math.round(STAT_TARGETS.products * eased),
+          team: Math.round(STAT_TARGETS.team * eased),
+          locations: Math.round(STAT_TARGETS.locations * eased),
         });
-
-        if (currentStep >= steps) {
-          clearInterval(timer);
-        }
-      }, interval);
+        if (t < 1) frame = requestAnimationFrame(tick);
+      };
+      frame = requestAnimationFrame(tick);
     };
 
-    // Animation for elements when they come into view
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("animate-in");
-
-            // Start counting animation when stats section comes into view
-            if (
-              entry.target.classList.contains("stats-section") &&
-              !hasAnimated
-            ) {
-              setHasAnimated(true);
-              animateCounts();
-            }
+          if (entry.isIntersecting && !hasAnimated.current) {
+            hasAnimated.current = true;
+            animateCounts();
+            observer.disconnect();
           }
         });
       },
-      { threshold: 0.2 }
-    ); // Increased threshold for better timing
-
-    // Observe all animated elements
-    document
-      .querySelectorAll(
-        ".card-section, .team-member, .instagram-card, .feature-circle, .stats-section"
-      )
-      .forEach((element) => {
-        observer.observe(element);
-      });
+      { threshold: 0.3 }
+    );
+    observer.observe(node);
 
     return () => {
       observer.disconnect();
+      if (frame) cancelAnimationFrame(frame);
     };
-  }, [hasAnimated]); // Added hasAnimated to dependencies
+  }, []);
 
   return (
     <div className="about-container">
       {/* Hero Section */}
-      <section className="hero-section">
-        <div className="hero-content">
+      <section className="about-hero">
+        <div className="about-hero-content">
+          <span className="about-eyebrow">Our story</span>
           <h1>About Us</h1>
+          <p>Farm-fresh, organic goodness delivered from local growers to your doorstep.</p>
         </div>
       </section>
+
       {/* Specialty Section */}
-      <div className="card-section specialty-card">
+      <Reveal className="card-section specialty-card">
         <div className="card-image">
-          <img src={animeboyVision} alt="Anime girl with vegetable basket" />
+          <LazyImg src={animeboyVision} alt="Anime girl with vegetable basket" />
         </div>
         <div className="card-content">
           <h2>Our Specialty</h2>
@@ -99,9 +159,10 @@ const About = () => {
             to meet your highest expectations.
           </p>
         </div>
-      </div>
+      </Reveal>
+
       {/* About Section */}
-      <div className="card-section about-card">
+      <Reveal className="card-section about-card reverse">
         <div className="card-content">
           <h2>About Chanvi Farms</h2>
           <h3>Fresh Organic Vegetables, Organic Fruits And Exotic</h3>
@@ -131,70 +192,39 @@ const About = () => {
             </div>
           </div>
 
-          <a href="tel:+919900088164" className="call-now-btn">
+          <a href="tel:+919900088164" className="call-now-btn btn-primary">
             <i className="fas fa-phone"></i>
             Call Now
           </a>
         </div>
         <div className="card-image">
-          <img src={aboutboy} alt="Fresh produce" />
+          <LazyImg src={aboutboy} alt="Fresh produce" />
         </div>
-      </div>
+      </Reveal>
+
       {/* Why Choose Us Section */}
-      <div className="why-choose-section">
-        <h2>Why Choose Us</h2>
-        <h3>What Sets Us Apart</h3>
+      <section className="why-choose-section">
+        <Reveal className="section-head">
+          <h2>Why Choose Us</h2>
+          <h3>What Sets Us Apart</h3>
+        </Reveal>
         <div className="features-grid">
-          <div className="feature-circle">
-            <div className="circle-icon">
-              <i className="fas fa-leaf"></i>
-            </div>
-            <h4>Farm-Fresh Quality</h4>
-            <p>
-              Direct from farms to your doorstep, ensuring maximum freshness
-            </p>
-          </div>
-          <div className="feature-circle">
-            <div className="circle-icon">
-              <i className="fas fa-clock"></i>
-            </div>
-            <h4>Pre-order a Day Before</h4>
-            <p>Plan ahead and secure your fresh produce</p>
-          </div>
-          <div className="feature-circle">
-            <div className="circle-icon">
-              <i className="fas fa-truck"></i>
-            </div>
-            <h4>Doorstep Delivery</h4>
-            <p>Convenient home delivery at your preferred time</p>
-          </div>
-          <div className="feature-circle">
-            <div className="circle-icon">
-              <i className="fas fa-boxes"></i>
-            </div>
-            <h4>Wide Variety</h4>
-            <p>Extensive selection of fresh produce to choose from</p>
-          </div>
-          <div className="feature-circle">
-            <div className="circle-icon">
-              <i className="fas fa-tag"></i>
-            </div>
-            <h4>Affordable Pricing</h4>
-            <p>Competitive prices without compromising quality</p>
-          </div>
-          <div className="feature-circle">
-            <div className="circle-icon">
-              <i className="fas fa-gift"></i>
-            </div>
-            <h4>Above 500 order</h4>
-            <p>Get an 5% discount on order total</p>
-          </div>
+          {whyChooseUs.map((f, i) => (
+            <Reveal key={f.title} className="feature-circle" delay={(i % 3) * 0.08}>
+              <div className="circle-icon">
+                <i className={`fas ${f.icon}`}></i>
+              </div>
+              <h4>{f.title}</h4>
+              <p>{f.text}</p>
+            </Reveal>
+          ))}
         </div>
-      </div>
+      </section>
+
       {/* Vision Section */}
-      <div className="card-section vision-card">
+      <Reveal className="card-section vision-card">
         <div className="card-image">
-          <img src={animeGirlVision} alt="Anime girl with vision" />
+          <LazyImg src={animeGirlVision} alt="Anime girl with vision" />
         </div>
         <div className="card-content">
           <h2>Our Vision</h2>
@@ -212,171 +242,104 @@ const About = () => {
             and joyful part of everyday life — together.
           </p>
         </div>
-      </div>
+      </Reveal>
+
       {/* Stats Section */}
-      <div className="stats-section">
-        <div className="stat-item">
-          <div className="stat-icon">
-            <i className="fas fa-carrot"></i>
+      <Reveal className="stats-section">
+        <div className="stats-inner" ref={statsRef}>
+          <div className="stat-item">
+            <div className="stat-icon">
+              <i className="fas fa-carrot"></i>
+            </div>
+            <span className="stat-number">{counts.products}+</span>
+            <span className="stat-label">Product Varieties</span>
           </div>
-          <span className="stat-number">{counts.products}+</span>
-          <span className="stat-label">Product Varieties</span>
-        </div>
-        <div className="stat-item">
-          <div className="stat-icon">
-            <i className="fas fa-users"></i>
+          <div className="stat-item">
+            <div className="stat-icon">
+              <i className="fas fa-users"></i>
+            </div>
+            <span className="stat-number">{counts.team}+</span>
+            <span className="stat-label">Team Members</span>
           </div>
-          <span className="stat-number">{counts.team}+</span>
-          <span className="stat-label">Team Members</span>
-        </div>
-        <div className="stat-item">
-          <div className="stat-icon">
-            <i className="fas fa-map-marker-alt"></i>
+          <div className="stat-item">
+            <div className="stat-icon">
+              <i className="fas fa-map-marker-alt"></i>
+            </div>
+            <span className="stat-number">{counts.locations}+</span>
+            <span className="stat-label">Delivery Locations</span>
           </div>
-          <span className="stat-number">{counts.locations}+</span>
-          <span className="stat-label">Delivery Locations</span>
         </div>
-      </div>
-      {/* Team Section */}{" "}
-      <div className="team-section">
-        <h2>Our Team</h2>
-        <h3>Meet the People Behind Chanvi Farm</h3>
+      </Reveal>
+
+      {/* Team Section */}
+      <section className="team-section">
+        <Reveal className="section-head">
+          <h2>Our Team</h2>
+          <h3>Meet the People Behind Chanvi Farm</h3>
+        </Reveal>
         <div className="team-members">
-          <div className="team-member">
+          <Reveal className="team-member">
             <div className="member-image">
               <i className="fas fa-user-tie"></i>
             </div>
             <h4>Raghunandana G</h4>
             <p>Founder</p>
-          </div>
+          </Reveal>
 
-          <div className="team-member">
+          <Reveal className="team-member" delay={0.08}>
             <div className="member-image">
               <i className="fas fa-user-astronaut"></i>
             </div>
             <h4>Massthan vali G</h4>
             <p>Web Developer</p>
-          </div>
+          </Reveal>
         </div>
-      </div>
+      </section>
+
       {/* Instagram Card */}
-      <div
-        className="instagram-card"
-        onClick={() =>
-          window.open("https://www.instagram.com/chanvifarms9/", "_blank")
-        }
-      >
-        <div className="instagram-content">
-          <h3>
-            Follow us on <strong>Instagram</strong>
-          </h3>
-          <p>Get fresh updates and behind-the-scenes content</p>
-        </div>
-        <div className="instagram-icon">
-          <i className="fab fa-instagram"></i>
-          <i className="fas fa-arrow-right"></i>
-        </div>
-      </div>
+      <Reveal>
+        <a
+          className="instagram-card"
+          href="https://www.instagram.com/chanvifarms9/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <div className="instagram-content">
+            <h3>
+              Follow us on <strong>Instagram</strong>
+            </h3>
+            <p>Get fresh updates and behind-the-scenes content</p>
+          </div>
+          <div className="instagram-icon">
+            <i className="fab fa-instagram"></i>
+            <i className="fas fa-arrow-right"></i>
+          </div>
+        </a>
+      </Reveal>
+
       {/* Reviews Section */}
-      <div className="reviews-section">
-        <h2>What Our Customers Say</h2>
-        <h3>Customer Reviews</h3>
+      <section className="reviews-section">
+        <Reveal className="section-head">
+          <h2>What Our Customers Say</h2>
+          <h3>Customer Reviews</h3>
+        </Reveal>
         <div className="reviews-grid">
-          <div className="review-card">
-            <div className="reviewer-info">
-              <i className="fas fa-user-circle"></i>
-              <h4>Mohan</h4>
-            </div>
-            <div className="rating">
-              <i className="fas fa-star"></i>
-              <i className="fas fa-star"></i>
-              <i className="fas fa-star"></i>
-              <i className="fas fa-star"></i>
-              <i className="fas fa-star"></i>
-            </div>
-            <p>
-              &ldquo;The freshness of Organic vegetables from Chanvi Farms is unmatched!
-              I&apos;ve been ordering for 3 months now and have never been
-              disappointed. Their customer service is excellent too!&rdquo;
-            </p>
-          </div>
-
-          <div className="review-card">
-            <div className="reviewer-info">
-              <i className="fas fa-user-circle"></i>
-              <h4>Kiran Kumar</h4>
-            </div>
-            <div className="rating">
-              <i className="fas fa-star"></i>
-              <i className="fas fa-star"></i>
-              <i className="fas fa-star"></i>
-              <i className="fas fa-star"></i>
-              <i className="fas fa-star-half-alt"></i>
-            </div>
-            <p>
-              &ldquo;What I love most about Chanvi Farms is their commitment to
-              quality. The fruits are always fresh and perfectly ripe. Their
-              pre-order system makes planning meals so much easier!&rdquo;
-            </p>
-          </div>
-
-          <div className="review-card">
-            <div className="reviewer-info">
-              <i className="fas fa-user-circle"></i>
-              <h4>Manikanta</h4>
-            </div>
-            <div className="rating">
-              <i className="fas fa-star"></i>
-              <i className="fas fa-star"></i>
-              <i className="fas fa-star"></i>
-              <i className="fas fa-star"></i>
-              <i className="fas fa-star"></i>
-            </div>
-            <p>
-              &rdquo;Chanvi Farms takes the stress out of grocery shopping. As
-              someone always on the go, I truly appreciate their timely service
-              and fresh fruits and veggies.&rdquo;
-            </p>
-          </div>
-
-          <div className="review-card">
-            <div className="reviewer-info">
-              <i className="fas fa-user-circle"></i>
-              <h4>Sai Navya</h4>
-            </div>
-            <div className="rating">
-              <i className="fas fa-star"></i>
-              <i className="fas fa-star"></i>
-              <i className="fas fa-star"></i>
-              <i className="fas fa-star"></i>
-              <i className="fas fa-star-half-alt"></i>
-            </div>
-            <p>
-              &ldquo;Being a working professional, Chanvi Farms has made my life
-              easier. Their produce is always fresh, and the doorstep delivery
-              is super convenient. Highly recommended!&rdquo;
-            </p>
-          </div>
-          <div className="review-card">
-            <div className="reviewer-info">
-              <i className="fas fa-user-circle"></i>
-              <h4>Purna Chandra</h4>
-            </div>
-            <div className="rating">
-              <i className="fas fa-star"></i>
-              <i className="fas fa-star"></i>
-              <i className="fas fa-star"></i>
-              <i className="fas fa-star"></i>
-              <i className="fas fa-star"></i>
-            </div>
-            <p>
-              &ldquo;Balancing work and life isn’t easy, but Chanvi Farms makes
-              eating healthy effortless with their top-notch produce and
-              seamless delivery.&rdquo;
-            </p>
-          </div>
+          {reviews.map((r, i) => (
+            <Reveal key={r.name} className="review-card" delay={(i % 3) * 0.08}>
+              <div className="reviewer-info">
+                <span className="reviewer-avatar" aria-hidden="true">
+                  {r.name.charAt(0)}
+                </span>
+                <div>
+                  <h4>{r.name}</h4>
+                  <Stars value={r.stars} />
+                </div>
+              </div>
+              <p>&ldquo;{r.text}&rdquo;</p>
+            </Reveal>
+          ))}
         </div>
-      </div>
+      </section>
     </div>
   );
 };

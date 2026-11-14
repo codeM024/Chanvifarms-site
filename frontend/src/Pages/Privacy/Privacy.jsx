@@ -1,24 +1,26 @@
+import Reveal from '../../Components/Motion/Reveal'
 import './Privacy.css'
 
 const Privacy = () => {
   return (
     <div className="privacy-container">
-      <div className="privacy-header">
+      <Reveal className="privacy-header legal-header">
+        <span className="legal-eyebrow">Legal</span>
         <h1>Privacy Policy</h1>
         <p className="last-updated">Last updated: July 22, 2025</p>
-      </div>
+      </Reveal>
       
-      <div className="privacy-content">
-        <div className="privacy-intro">
+      <div className="privacy-content legal-content">
+        <Reveal className="privacy-intro legal-intro" y={16}>
           <p>
             Chanvi Farms operates this store and website, including all related information, content, features, tools, products and services, in order to provide you, the customer, with a curated shopping experience (the "Services"). Chanvi Farms is powered by Shopify, which enables us to provide the Services to you. This Privacy Policy describes how we collect, use, and disclose your personal information when you visit, use, or make a purchase or other transaction using the Services or otherwise communicate with us.
           </p>
           <p>
             Please read this Privacy Policy carefully. By using and accessing any of the Services, you acknowledge that you have read this Privacy Policy and understand the collection, use, and disclosure of your information as described in this Privacy Policy.
           </p>
-        </div>
+        </Reveal>
 
-        <section>
+        <Reveal as="section" className="legal-section" y={16}>
           <h2>1. Personal Information We Collect</h2>
           <p>When we use the term "personal information," we are referring to information that identifies or can reasonably be linked to you or another person. We may collect or process the following categories of personal information:</p>
           <ul>
@@ -30,9 +32,9 @@ const Privacy = () => {
             <li><strong>Device information:</strong> including information about your device, browser, or network connection, your IP address, and other unique identifiers</li>
             <li><strong>Usage information:</strong> including information regarding your interaction with the Services, including how and when you interact with or navigate the Services</li>
           </ul>
-        </section>
+        </Reveal>
 
-        <section>
+        <Reveal as="section" className="legal-section" y={16}>
           <h2>2. Personal Information Sources</h2>
           <p>We may collect personal information from the following sources:</p>
           <ul>
@@ -41,9 +43,9 @@ const Privacy = () => {
             <li><strong>From our service providers:</strong> including when we engage them to enable certain technology and when they collect or process your personal information on our behalf</li>
             <li><strong>From our partners or other third parties</strong></li>
           </ul>
-        </section>
+        </Reveal>
 
-        <section>
+        <Reveal as="section" className="legal-section" y={16}>
           <h2>3. How We Use Your Personal Information</h2>
           <p>Depending on how you interact with us or which of the Services you use, we may use personal information for the following purposes:</p>
           <ul>
@@ -53,9 +55,9 @@ const Privacy = () => {
             <li><strong>Communicating with You:</strong> We use your personal information to provide you with customer support, to be responsive to you, to provide effective services to you and to maintain our business relationship with you</li>
             <li><strong>Legal Reasons:</strong> We use your personal information to comply with applicable law or respond to valid legal process, including requests from law enforcement or government agencies</li>
           </ul>
-        </section>
+        </Reveal>
 
-        <section>
+        <Reveal as="section" className="legal-section" y={16}>
           <h2>4. How We Disclose Personal Information</h2>
           <p>In certain circumstances, we may disclose your personal information to third parties for legitimate purposes subject to this Privacy Policy. Such circumstances may include:</p>
           <ul>
@@ -65,9 +67,9 @@ const Privacy = () => {
             <li>With our affiliates or otherwise within our corporate group</li>
             <li>In connection with a business transaction such as a merger or bankruptcy, to comply with any applicable legal obligations, to enforce any applicable terms of service or policies, and to protect or defend the Services, our rights, and the rights of our users or others</li>
           </ul>
-        </section>
+        </Reveal>
 
-        <section>
+        <Reveal as="section" className="legal-section" y={16}>
           <h2>5. Relationship with Shopify</h2>
           <p>
             The Services are hosted by Shopify, which collects and processes personal information about your access to and use of the Services in order to provide and improve the Services for you. Information you submit to the Services will be transmitted to and shared with Shopify as well as third parties that may be located in countries other than where you reside, in order to provide and improve the Services for you.
@@ -75,23 +77,23 @@ const Privacy = () => {
           <p>
             To learn more about how Shopify uses your personal information and any rights you may have, you can visit the <a href="https://privacy.shopify.com/en" target="_blank" rel="noopener noreferrer">Shopify Consumer Privacy Policy</a>.
           </p>
-        </section>
+        </Reveal>
 
-        <section>
+        <Reveal as="section" className="legal-section" y={16}>
           <h2>6. Third Party Websites and Links</h2>
           <p>
             The Services may provide links to websites or other online platforms operated by third parties. If you follow links to sites not affiliated or controlled by us, you should review their privacy and security policies and other terms and conditions. We do not guarantee and are not responsible for the privacy or security of such sites, including the accuracy, completeness, or reliability of information found on these sites.
           </p>
-        </section>
+        </Reveal>
 
-        <section>
+        <Reveal as="section" className="legal-section" y={16}>
           <h2>7. Children's Data</h2>
           <p>
             The Services are not intended to be used by children, and we do not knowingly collect any personal information about children under the age of majority in your jurisdiction. If you are the parent or guardian of a child who has provided us with their personal information, you may contact us using the contact details set out below to request that it be deleted.
           </p>
-        </section>
+        </Reveal>
 
-        <section>
+        <Reveal as="section" className="legal-section" y={16}>
           <h2>8. Security and Retention of Your Information</h2>
           <p>
             Please be aware that no security measures are perfect or impenetrable, and we cannot guarantee "perfect security." In addition, any information you send to us may not be secure while in transit. We recommend that you do not use unsecure channels to communicate sensitive or confidential information to us.
@@ -99,9 +101,9 @@ const Privacy = () => {
           <p>
             How long we retain your personal information depends on different factors, such as whether we need the information to maintain your account, to provide you with Services, comply with legal obligations, resolve disputes or enforce other applicable contracts and policies.
           </p>
-        </section>
+        </Reveal>
 
-        <section>
+        <Reveal as="section" className="legal-section" y={16}>
           <h2>9. Your Rights and Choices</h2>
           <p>Depending on where you live, you may have some or all of the rights listed below in relation to your personal information:</p>
           <ul>
@@ -114,37 +116,37 @@ const Privacy = () => {
           <p>
             You may exercise any of these rights where indicated on the Services or by contacting us using the contact details provided below. We will not discriminate against you for exercising any of these rights.
           </p>
-        </section>
+        </Reveal>
 
-        <section>
+        <Reveal as="section" className="legal-section" y={16}>
           <h2>10. Complaints</h2>
           <p>
             If you have complaints about how we process your personal information, please contact us using the contact details provided below. Depending on where you live, you may have the right to appeal our decision by contacting us using the contact details set out below, or lodge your complaint with your local data protection authority.
           </p>
-        </section>
+        </Reveal>
 
-        <section>
+        <Reveal as="section" className="legal-section" y={16}>
           <h2>11. International Transfers</h2>
           <p>
             Please note that we may transfer, store and process your personal information outside the country you live in. If we transfer your personal information out of the European Economic Area or the United Kingdom, we will rely on recognized transfer mechanisms like the European Commission's Standard Contractual Clauses, or any equivalent contracts issued by the relevant competent authority of the UK, as relevant, unless the data transfer is to a country that has been determined to provide an adequate level of protection.
           </p>
-        </section>
+        </Reveal>
 
-        <section>
+        <Reveal as="section" className="legal-section" y={16}>
           <h2>12. Changes to This Privacy Policy</h2>
           <p>
             We may update this Privacy Policy from time to time, including to reflect changes to our practices or for other operational, legal, or regulatory reasons. We will post the revised Privacy Policy on this website, update the "Last updated" date and provide notice as required by applicable law.
           </p>
-        </section>
+        </Reveal>
 
-        <div className="privacy-footer">
+        <Reveal className="privacy-footer legal-footer" y={16}>
           <h2>Contact Information</h2>
           <p>Should you have any questions about our privacy practices or this Privacy Policy, or if you would like to exercise any of the rights available to you, please contact us at:</p>
           <div className="contact-details">
             <p><strong>Email:</strong> chanvifarms9@gmail.com</p>
             <p><strong>Address:</strong> 001, Shivam, Ground floor, Mudalliyar layout, Kasavanahalli, Sarjapur road, Bangalore, KA, 560035, IN</p>
           </div>
-        </div>
+        </Reveal>
       </div>
     </div>
   )
