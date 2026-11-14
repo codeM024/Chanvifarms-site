@@ -153,7 +153,7 @@ const OrderCard = ({ order }) => {
       <div className="to-foot">
         <div className="to-meta">
           <h3>Payment</h3>
-          <p>{PAYMENT_LABEL[order.payment?.method] || order.payment?.method || '—'}</p>
+          <p>{order.payment?.method === 'COD' ? (order.fulfilment === 'pickup' ? 'Pay at pickup' : 'Cash on delivery') : (PAYMENT_LABEL[order.payment?.method] || order.payment?.method || '—')}</p>
           <p className="to-muted">{PAYMENT_STATUS[order.payment?.status] || order.payment?.status || ''}</p>
         </div>
         <div className="to-meta">

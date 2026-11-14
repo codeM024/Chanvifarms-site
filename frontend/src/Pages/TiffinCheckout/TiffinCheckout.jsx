@@ -175,10 +175,14 @@ const TiffinCheckout = ({ setShowLogin }) => {
     (data) => {
       clear()
       setSuccess(data)
-      window.scrollTo({ top: 0, behavior: 'smooth' })
     },
     [clear]
   )
+
+  // Show the confirmation from the top once it has rendered (the page gets much shorter)
+  useEffect(() => {
+    if (success) window.scrollTo({ top: 0, behavior: 'instant' })
+  }, [success])
 
   const openRazorpay = async (data, contactInfo) => {
     const ok = await loadRazorpayScript()

@@ -65,7 +65,7 @@ const TiffinOrderCard = ({ order, busy, isNew, showDate, onStatus, onCancel, onP
       </div>
 
       <div className="to-payment">
-        <span className="to-pay-method">{PAYMENT_METHOD_LABELS[order.payment?.method] || order.payment?.method}</span>
+        <span className="to-pay-method">{order.payment?.method === 'COD' && order.fulfilment === 'pickup' ? 'Pay at pickup' : (PAYMENT_METHOD_LABELS[order.payment?.method] || order.payment?.method)}</span>
         <span className={`pill pill-${pay.tone}`}>{pay.label}</span>
       </div>
 
