@@ -1,0 +1,616 @@
+/* ================= Tiffin checkout ================= */
+
+.tf-checkout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  grid-template-areas:
+    'heading heading'
+    'banner banner'
+    'left right';
+  gap: 20px 28px;
+  align-items: start;
+  max-width: 1200px;
+  margin: 24px auto 60px;
+  min-width: 0;
+}
+
+.tf-checkout-center {
+  display: flex;
+  justify-content: center;
+  padding: 24px 0;
+}
+
+.tf-checkout-center .tf-state {
+  max-width: 520px;
+  width: 100%;
+}
+
+.tf-co-heading {
+  grid-area: heading;
+}
+
+.tf-co-heading h1 {
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  color: var(--tf-ink);
+}
+
+.tf-co-heading p {
+  color: var(--text-muted);
+}
+
+.tf-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--brand-600);
+}
+
+.tf-back:hover {
+  color: var(--brand-800);
+}
+
+.tf-co-banner {
+  grid-area: banner;
+  min-width: 0;
+}
+
+.tf-co-left {
+  grid-area: left;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.tf-co-right {
+  grid-area: right;
+  position: sticky;
+  top: 110px;
+  min-width: 0;
+}
+
+.tf-co-card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 24px;
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  min-width: 0;
+}
+
+.tf-co-card-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.tf-co-card-head h2 {
+  font-size: 1.2rem;
+  color: var(--text);
+}
+
+.tf-co-card-head p {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.tf-step-badge {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--brand-500), var(--brand-600));
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 700;
+  box-shadow: 0 4px 10px rgba(31, 111, 67, 0.25);
+}
+
+/* ---------- Choice tiles (fulfilment + payment) ---------- */
+.tf-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.tf-pay-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tf-choice {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: var(--radius-lg);
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  min-width: 0;
+  transition: border-color var(--dur) var(--ease-out), background-color var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out);
+}
+
+.tf-choice:hover {
+  border-color: var(--brand-300);
+}
+
+.tf-choice input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.tf-choice:focus-within {
+  box-shadow: var(--ring);
+}
+
+.tf-choice.is-selected {
+  border-color: var(--brand-500);
+  background: var(--brand-50);
+}
+
+.tf-choice-icon {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  color: var(--brand-600);
+  font-size: 1.15rem;
+  transition: background-color var(--dur) var(--ease-out), color var(--dur) var(--ease-out);
+}
+
+.tf-choice.is-selected .tf-choice-icon {
+  background: var(--brand-600);
+  color: #fff;
+}
+
+.tf-choice-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.tf-choice-text strong {
+  color: var(--text);
+}
+
+.tf-choice-text small {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+
+.tf-co-sub {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.tf-co-sub h3 {
+  font-size: 1rem;
+  color: var(--text);
+}
+
+/* ---------- Addresses ---------- */
+.tf-addr-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.tf-addr-sk {
+  height: 110px;
+  border-radius: var(--radius-lg) !important;
+}
+
+.tf-addr {
+  position: relative;
+  display: flex;
+  padding: 14px 16px;
+  border-radius: var(--radius-lg);
+  border: 1.5px solid var(--border);
+  cursor: pointer;
+  min-width: 0;
+  transition: border-color var(--dur) var(--ease-out), background-color var(--dur) var(--ease-out);
+}
+
+.tf-addr:hover {
+  border-color: var(--brand-300);
+}
+
+.tf-addr.is-selected {
+  border-color: var(--brand-500);
+  background: var(--brand-50);
+}
+
+.tf-addr:focus-within {
+  box-shadow: var(--ring);
+}
+
+.tf-addr input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.tf-addr-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding-right: 22px;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+
+.tf-addr-body strong {
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.tf-addr-phone i {
+  font-size: 0.75rem;
+  margin-right: 4px;
+}
+
+.tf-addr-check {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  color: var(--brand-500);
+  animation: tfPop 0.25s var(--ease-spring);
+}
+
+.tf-add-addr {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border-radius: var(--radius-full);
+  border: 1.5px dashed var(--brand-300);
+  color: var(--brand-600);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.tf-add-addr:hover,
+.tf-add-addr.is-open {
+  background: var(--brand-50);
+  border-style: solid;
+}
+
+.tf-addr-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border-radius: var(--radius-lg);
+  background: var(--surface-2);
+}
+
+.tf-addr-form .btn-primary {
+  align-self: flex-start;
+}
+
+/* ---------- Fields ---------- */
+.tf-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.tf-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.tf-field label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.tf-field input,
+.tf-field textarea {
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.tf-field textarea {
+  resize: vertical;
+  min-height: 64px;
+}
+
+.tf-field input:focus,
+.tf-field textarea:focus {
+  border-color: var(--brand-400);
+  box-shadow: var(--ring);
+}
+
+.tf-field.has-error input {
+  border-color: var(--danger-500);
+}
+
+.tf-field-error {
+  font-size: 0.8rem;
+  color: var(--danger-500);
+  font-weight: 600;
+}
+
+.tf-pickup-at {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 14px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, var(--tf-cream), #fff);
+  border: 1px solid #f1e7c3;
+}
+
+.tf-pickup-at i {
+  margin-top: 4px;
+  color: var(--brand-600);
+}
+
+.tf-pickup-at p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+
+/* ---------- Summary ---------- */
+.tf-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px;
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+}
+
+.tf-summary-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.15rem;
+  color: var(--tf-ink);
+}
+
+.tf-sum-sk {
+  height: 56px;
+  margin-bottom: 8px;
+}
+
+.tf-sum-lines {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 360px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.tf-sum-line {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: start;
+}
+
+.tf-sum-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: var(--brand-50);
+  color: var(--brand-400);
+}
+
+.tf-sum-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tf-sum-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 0;
+}
+
+.tf-sum-info strong {
+  font-size: 0.92rem;
+  overflow-wrap: anywhere;
+}
+
+.tf-sum-info small {
+  font-size: 0.78rem;
+  color: var(--brand-600);
+  margin-top: -4px;
+}
+
+.tf-sum-price {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.tf-sum-totals {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border);
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+
+.tf-sum-totals div,
+.tf-sum-total {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.tf-sum-total {
+  align-items: baseline;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  font-weight: 700;
+}
+
+.tf-sum-total strong {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  color: var(--tf-ink);
+}
+
+.tf-place-btn {
+  min-height: 50px;
+  font-size: 1.02rem;
+}
+
+.tf-spinner {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  animation: tfSpin 0.7s linear infinite;
+}
+
+@keyframes tfSpin {
+  to { transform: rotate(360deg); }
+}
+
+.tf-secure {
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--text-subtle);
+}
+
+/* ---------- Success ---------- */
+.tf-success {
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 36px 24px;
+  text-align: center;
+  border-radius: var(--radius-xl);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 210, 74, 0.25), transparent 50%),
+    var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+}
+
+.tf-success h1 {
+  font-size: 1.8rem;
+  color: var(--tf-ink);
+}
+
+.tf-success p {
+  color: var(--text-muted);
+}
+
+.tf-success-icon {
+  width: 76px;
+  height: 76px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--brand-500), var(--brand-700));
+  color: #fff;
+  font-size: 2rem;
+  box-shadow: 0 12px 28px rgba(31, 111, 67, 0.35);
+}
+
+.tf-success-num strong {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  color: var(--brand-700);
+  letter-spacing: 0.02em;
+}
+
+.tf-wa-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 20px;
+  border-radius: var(--radius-full);
+  background: #25d366;
+  color: #fff;
+  font-weight: 700;
+}
+
+.tf-wa-btn:hover {
+  background: #1fb857;
+}
+
+.tf-success-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+@media (max-width: 960px) {
+  .tf-checkout {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'heading' 'banner' 'left' 'right';
+  }
+  .tf-co-right {
+    position: static;
+  }
+}
+
+@media (max-width: 560px) {
+  .tf-checkout {
+    margin-top: 12px;
+    gap: 16px;
+  }
+  .tf-co-card,
+  .tf-summary {
+    padding: 16px;
+  }
+  .tf-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .tf-choice-grid,
+  .tf-addr-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

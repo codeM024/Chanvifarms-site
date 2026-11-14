@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { motion } from 'framer-motion'
 import './BoxItem.css'
 import { StoreContext } from '../../Context/StoreContext'
+import { imageUrl } from '../../utils/imageUrl'
 
 const BoxThumb = ({ product }) => {
   const [loaded, setLoaded] = useState(false)
@@ -12,7 +13,7 @@ const BoxThumb = ({ product }) => {
   return (
     <div className={`box-thumb ${loaded ? '' : 'skeleton'}`}>
       <img
-        src={`${import.meta.env.VITE_BACKEND_URL}/images/${product.image}`}
+        src={imageUrl(product.image)}
         alt={product.name || 'product'}
         loading="lazy"
         decoding="async"

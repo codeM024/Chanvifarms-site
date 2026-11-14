@@ -305,6 +305,17 @@
   opacity: 1;
 }
 
+.nav-profile-dropdown .nav-dd-icon {
+  width: 18px;
+  text-align: center;
+  font-size: 0.95rem;
+  opacity: 0.75;
+}
+
+.nav-profile-dropdown li:hover .nav-dd-icon {
+  opacity: 1;
+}
+
 .nav-profile-dropdown p {
   margin: 0;
   font-size: 0.95rem;
@@ -369,6 +380,7 @@ body {
   }
   .navbar-menu a {
     padding: 8px 10px;
+    white-space: nowrap;
   }
   .nav-underline {
     left: 10px;

@@ -1,0 +1,810 @@
+/* ================= Tiffin shared components ================= */
+/* Everything is prefixed tf- so it never collides with the grocery shop styles. */
+
+:root {
+  --tf-cream: #fff8e3;
+  --tf-cream-2: #fdf1c9;
+  --tf-leaf-green: #eaf5df;
+  --tf-ink: var(--brand-800);
+  --tf-yellow: #ffd24a;
+  --tf-amber-bg: #fff6e0;
+  --tf-amber-border: #f6d58b;
+  --tf-amber-text: #8a5300;
+  --tf-script: 'Caveat', 'Segoe Script', 'Brush Script MT', cursive;
+}
+
+/* ---------- Menu card ---------- */
+.tf-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  border: 1px solid #efe6c4;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out);
+}
+
+@media (hover: hover) {
+  .tf-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+  }
+  .tf-card:hover .tf-dish img.is-loaded {
+    transform: scale(1.05) rotate(-2deg);
+  }
+}
+
+.tf-card.is-in-cart {
+  border-color: var(--brand-300);
+  box-shadow: 0 0 0 2px rgba(46, 139, 69, 0.18), var(--shadow-sm);
+}
+
+.tf-card-visual {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 18px 14px 30px;
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  background:
+    radial-gradient(circle at 85% 10%, rgba(255, 210, 74, 0.28), transparent 45%),
+    linear-gradient(165deg, var(--tf-cream) 0%, var(--tf-cream-2) 55%, var(--tf-leaf-green) 100%);
+}
+
+.tf-card-name {
+  font-family: var(--font-display);
+  font-size: 1.12rem;
+  font-weight: 800;
+  color: var(--tf-ink);
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.tf-card-sub {
+  margin-top: 2px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--brand-600);
+  overflow-wrap: anywhere;
+}
+
+.tf-plate {
+  position: relative;
+  width: min(78%, 200px);
+  aspect-ratio: 1;
+  margin-top: 12px;
+  display: grid;
+  place-items: center;
+}
+
+/* Banana leaf drawn in CSS behind the dish */
+.tf-leaf {
+  position: absolute;
+  inset: 2% -12%;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  transform: rotate(-24deg);
+  background:
+    linear-gradient(90deg, transparent 49.2%, rgba(255, 255, 255, 0.45) 49.5%, rgba(255, 255, 255, 0.45) 50.5%, transparent 50.8%),
+    repeating-linear-gradient(20deg, transparent 0 9px, rgba(255, 255, 255, 0.08) 9px 10px),
+    linear-gradient(135deg, #5fae4f 0%, #2f8a3c 55%, #1f6f2f 100%);
+  box-shadow: inset 0 -6px 12px rgba(0, 0, 0, 0.12), 0 6px 14px rgba(19, 69, 43, 0.18);
+}
+
+.tf-dish {
+  position: relative;
+  width: 82%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #fff;
+  border: 4px solid #fff;
+  box-shadow: 0 10px 22px rgba(19, 69, 43, 0.28);
+}
+
+.tf-dish.skeleton {
+  border-radius: 50%;
+}
+
+.tf-dish img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tf-dish-fallback {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  color: var(--brand-400);
+  font-size: 2rem;
+  background: var(--brand-50);
+}
+
+.tf-in-cart-badge {
+  position: absolute;
+  top: 2%;
+  right: 2%;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 7px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-full);
+  background: var(--accent-500);
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.85rem;
+  border: 2px solid #fff;
+  box-shadow: var(--shadow-sm);
+  animation: tfPop 0.3s var(--ease-spring);
+}
+
+@keyframes tfPop {
+  from { transform: scale(0.4); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.tf-price-pill {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translate(-50%, 50%);
+  z-index: 1;
+  padding: 6px 18px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--brand-700), var(--brand-800));
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.05rem;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  border: 3px solid #fff;
+  box-shadow: 0 6px 14px rgba(19, 69, 43, 0.3);
+}
+
+.tf-card-foot {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 26px 14px 14px;
+}
+
+.tf-card-desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: center;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ---------- Skeleton card ---------- */
+.tf-card-skeleton .tf-sk-line {
+  height: 16px;
+  border-radius: var(--radius-sm);
+  margin: 2px auto 6px;
+}
+.tf-sk-w60 { width: 60%; }
+.tf-sk-w40 { width: 40%; }
+.tf-sk-thin { height: 12px !important; }
+.tf-sk-dish {
+  width: 82%;
+  aspect-ratio: 1;
+  border-radius: 50% !important;
+}
+.tf-sk-btn {
+  height: 42px;
+  border-radius: var(--radius-full) !important;
+}
+
+/* ---------- Add button / stepper ---------- */
+.tf-stepper-wrap {
+  display: flex;
+  justify-content: center;
+  min-height: 42px;
+}
+
+.tf-add-btn {
+  width: 100%;
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 16px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--brand-500), var(--brand-600));
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 6px 14px rgba(31, 111, 67, 0.22);
+}
+
+.tf-add-btn:hover:not(:disabled) {
+  box-shadow: 0 8px 18px rgba(31, 111, 67, 0.32);
+}
+
+.tf-add-btn:disabled {
+  cursor: not-allowed;
+  background: var(--surface-2);
+  color: var(--text-subtle);
+  box-shadow: none;
+  border: 1px dashed var(--border);
+}
+
+.tf-stepper {
+  width: 100%;
+  min-height: 42px;
+  display: grid;
+  grid-template-columns: 42px 1fr 42px;
+  align-items: center;
+  border-radius: var(--radius-full);
+  background: var(--brand-50);
+  border: 1px solid var(--brand-200);
+  overflow: hidden;
+}
+
+.tf-step-btn {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--brand-700);
+  font-size: 0.85rem;
+}
+
+.tf-step-btn:hover:not(:disabled) {
+  background: var(--brand-100);
+}
+
+.tf-step-btn:disabled {
+  color: var(--text-subtle);
+  cursor: not-allowed;
+}
+
+.tf-step-qty {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  height: 42px;
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--tf-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.tf-stepper-sm,
+.tf-stepper-sm .tf-stepper {
+  min-height: 34px;
+}
+.tf-stepper-sm .tf-stepper {
+  grid-template-columns: 34px 30px 34px;
+  width: auto;
+}
+.tf-stepper-sm .tf-step-btn,
+.tf-stepper-sm .tf-step-qty {
+  width: 34px;
+  height: 34px;
+  font-size: 0.8rem;
+}
+.tf-stepper-sm .tf-step-qty {
+  width: 30px;
+  font-size: 0.95rem;
+}
+
+/* ---------- Ordering banner ---------- */
+.tf-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 18px;
+  padding: 12px 16px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.tf-banner-open {
+  background: linear-gradient(90deg, var(--brand-50), #fff);
+  border-color: var(--brand-200);
+  color: var(--brand-700);
+}
+
+.tf-banner-closed {
+  background: linear-gradient(90deg, var(--tf-amber-bg), #fff);
+  border-color: var(--tf-amber-border);
+  color: var(--tf-amber-text);
+}
+
+.tf-banner-loading {
+  color: var(--text-muted);
+}
+
+.tf-banner-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  min-width: 0;
+}
+
+.tf-banner-dot {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.85;
+}
+
+.tf-banner-open .tf-banner-dot {
+  background: var(--brand-500);
+  box-shadow: 0 0 0 0 rgba(46, 139, 69, 0.5);
+  animation: tfPulse 1.8s ease-out infinite;
+}
+
+.tf-banner-closed .tf-banner-dot {
+  background: var(--accent-500);
+}
+
+@keyframes tfPulse {
+  0% { box-shadow: 0 0 0 0 rgba(46, 139, 69, 0.45); }
+  100% { box-shadow: 0 0 0 10px rgba(46, 139, 69, 0); }
+}
+
+.tf-windows {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+}
+
+.tf-windows li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.tf-windows li strong {
+  color: var(--text);
+}
+
+.tf-windows li.is-current {
+  border-color: var(--brand-400);
+  background: var(--brand-50);
+  color: var(--brand-700);
+}
+
+.tf-windows li .fa-sun { color: var(--accent-500); }
+.tf-windows li .fa-moon { color: var(--brand-600); }
+
+/* ---------- Generic bits ---------- */
+.tf-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 40px 20px;
+  text-align: center;
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  border: 1px dashed var(--border);
+}
+
+.tf-state h3 {
+  font-size: 1.25rem;
+  color: var(--text);
+}
+
+.tf-state p {
+  max-width: 460px;
+  color: var(--text-muted);
+}
+
+
+.tf-warn {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background: #fdecec;
+  color: #a1282c;
+  font-size: 0.88rem;
+}
+.tf-warn i { margin-top: 3px; }
+
+.tf-warn-amber {
+  background: var(--tf-amber-bg);
+  color: var(--tf-amber-text);
+}
+
+.tf-empty-icon {
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--brand-50);
+  color: var(--brand-500);
+  font-size: 1.6rem;
+}
+
+.tf-empty-icon-warn {
+  background: var(--tf-amber-bg);
+  color: var(--accent-500);
+}
+
+.tf-icon-btn {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--text-muted);
+}
+.tf-icon-btn:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.tf-link-btn {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--brand-600);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 3px;
+}
+.tf-link-btn:hover {
+  text-decoration-color: currentColor;
+}
+
+.tf-block-btn {
+  width: 100%;
+}
+
+.btn-primary:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ---------- Sticky cart bar ---------- */
+.tf-cartbar {
+  position: fixed;
+  left: 50%;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  z-index: 990;
+  width: min(720px, calc(100vw - 24px));
+  margin-left: calc(min(720px, calc(100vw - 24px)) / -2);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--brand-700), var(--brand-800));
+  color: #fff;
+  box-shadow: 0 16px 40px rgba(19, 69, 43, 0.35);
+}
+
+.tf-cartbar-summary {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 8px;
+  border-radius: var(--radius-full);
+  text-align: left;
+  color: #fff;
+}
+
+.tf-cartbar-summary:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.tf-cartbar-icon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--tf-yellow);
+}
+
+.tf-cartbar-text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.tf-cartbar-text strong {
+  display: inline-block;
+  font-size: 1rem;
+  transform-origin: left center;
+}
+
+.tf-cartbar-text small {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.75);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tf-cartbar-cta {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: var(--radius-full);
+  background: var(--tf-yellow);
+  color: var(--brand-800);
+  font-weight: 800;
+}
+
+.tf-cartbar-cta:hover:not(:disabled) {
+  background: #ffdc6e;
+}
+
+.tf-cartbar-cta:disabled {
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* ---------- Drawer ---------- */
+.tf-drawer-root {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+}
+
+.tf-drawer-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(13, 30, 20, 0.45);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+}
+
+.tf-drawer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(420px, 100vw);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  box-shadow: var(--shadow-lg);
+}
+
+.tf-drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 18px 14px;
+  background: linear-gradient(135deg, var(--tf-cream), var(--tf-leaf-green));
+  border-bottom: 1px solid var(--border);
+}
+
+.tf-drawer-head h2 {
+  font-size: 1.2rem;
+  color: var(--tf-ink);
+}
+
+.tf-drawer-head p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.tf-drawer-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 24px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.tf-drawer-lines {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  list-style: none;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tf-line {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  grid-template-areas: 'thumb info' 'thumb actions';
+  gap: 6px 12px;
+  padding: 12px;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.tf-line-thumb {
+  grid-area: thumb;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: var(--brand-50);
+  color: var(--brand-400);
+  border: 2px solid var(--tf-cream-2);
+}
+
+.tf-line-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tf-line-info {
+  grid-area: info;
+  min-width: 0;
+}
+
+.tf-line-name {
+  font-weight: 700;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.tf-line-sub {
+  font-size: 0.8rem;
+  color: var(--brand-600);
+}
+
+.tf-line-price {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.tf-line-price strong {
+  color: var(--text);
+}
+
+.tf-line-actions {
+  grid-area: actions;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.tf-drawer-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 18px max(18px, env(safe-area-inset-bottom));
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+
+.tf-drawer-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 1.05rem;
+}
+
+.tf-drawer-total strong {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  color: var(--tf-ink);
+}
+
+.tf-drawer-note {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.tf-drawer-links {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* ---------- Status pills (orders) ---------- */
+.tf-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+  background: var(--surface-2);
+  color: var(--text-muted);
+}
+
+@media (max-width: 480px) {
+  .tf-card-visual {
+    padding: 14px 8px 26px;
+  }
+  .tf-card-name {
+    font-size: 0.98rem;
+  }
+  .tf-card-sub {
+    font-size: 0.78rem;
+  }
+  .tf-plate {
+    width: 84%;
+    margin-top: 8px;
+  }
+  .tf-leaf {
+    inset: 4% -6%;
+  }
+  .tf-price-pill {
+    font-size: 0.92rem;
+    padding: 4px 12px;
+  }
+  .tf-card-foot {
+    padding: 22px 8px 10px;
+  }
+  .tf-card-desc {
+    display: none;
+  }
+  .tf-add-btn {
+    padding: 0 10px;
+    font-size: 0.92rem;
+  }
+  .tf-stepper {
+    grid-template-columns: 36px 1fr 36px;
+  }
+  .tf-step-btn {
+    width: 36px;
+  }
+  .tf-banner {
+    padding: 10px 12px;
+  }
+  .tf-banner-main {
+    font-size: 0.92rem;
+  }
+  .tf-windows li {
+    font-size: 0.78rem;
+    padding: 5px 10px;
+  }
+  .tf-cartbar-cta {
+    padding: 11px 14px;
+  }
+  .tf-cartbar-icon {
+    display: none;
+  }
+}

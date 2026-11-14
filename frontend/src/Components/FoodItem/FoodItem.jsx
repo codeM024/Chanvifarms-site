@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { motion, AnimatePresence } from 'framer-motion'
 import "./FoodItem.css"
 import { StoreContext } from '../../Context/StoreContext'
+import { imageUrl } from '../../utils/imageUrl'
 
 const FoodItemComponent = ({
   id, 
@@ -85,7 +86,7 @@ const FoodItemComponent = ({
       <div className={`food-item-img-container ${imgLoaded ? '' : 'skeleton'}`}>
         <img
           className={`food-item-image img-fade ${imgLoaded ? 'is-loaded' : ''} ${status !== 'in-stock' ? 'grayscale' : ''}`}
-          src={`${url}/images/${image}`}
+          src={imageUrl(image, url)}
           alt={name}
           loading="lazy"
           decoding="async"
