@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "server": "nodemon server.js",
-    "hash-admin-password": "node scripts/hash-admin-password.js"
+    "hash-admin-password": "node scripts/hash-admin-password.js",
+    "seed-tiffins": "node scripts/seed-tiffins.js"
   },
   "author": "",
   "license": "ISC",
@@ -15,6 +16,7 @@
     "@stripe/stripe-js": "^4.1.0",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
+    "cloudinary": "^2.5.1",
     "compression": "^1.7.5",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",

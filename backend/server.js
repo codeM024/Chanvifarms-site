@@ -9,6 +9,9 @@ import cartRouter from "./routes/cartRoute.js";
 import orderRouter from "./routes/orderRoute.js";
 import boxRouter from "./routes/boxRoute.js";
 import adminRouter from "./routes/adminRoute.js";
+import tiffinRouter from "./routes/tiffinRoute.js";
+import tiffinOrderRouter from "./routes/tiffinOrderRoute.js";
+import { isCloudinaryConfigured } from "./utils/cloudinary.js";
 import Razorpay from 'razorpay';
 import crypto from 'crypto';
 import Order from './models/orderModel.js';
@@ -40,6 +43,10 @@ const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
 if (missingEnvVars.length > 0) {
     console.error('Error: Missing required environment variables:', missingEnvVars.join(', '));
     process.exit(1);
+}
+
+if (!isCloudinaryConfigured()) {
+    console.warn('Warning: CLOUDINARY_* is not set. Tiffin image uploads are disabled and product images fall back to local disk.');
 }
 
 if (!process.env.ADMIN_ACCOUNTS) {
@@ -231,6 +238,8 @@ app.use("/api/cart", cartRouter)
 app.use("/api/order", orderRouter)
 app.use('/api/box', boxRouter)
 app.use('/api/admin', adminRouter)
+app.use('/api/tiffin', tiffinRouter)
+app.use('/api/tiffin-order', tiffinOrderRouter)
 
 // Error handling middleware
 app.use((err, req, res, next) => {
