@@ -14,6 +14,9 @@ const List = lazy(() => import('./pages/List/List'))
 const Boxes = lazy(() => import('./pages/Boxes/Boxes'))
 const Orders = lazy(() => import('./pages/Orders/Orders'))
 const Login = lazy(() => import('./pages/Login/Login'))
+const Tiffins = lazy(() => import('./pages/Tiffins/Tiffins'))
+const TiffinSettings = lazy(() => import('./pages/Tiffins/TiffinSettings'))
+const TiffinOrders = lazy(() => import('./pages/TiffinOrders/TiffinOrders'))
 
 // Shared shell for every authenticated page. Rendered once as a layout route so the
 // navbar/sidebar persist between pages and only the content area transitions.
@@ -61,6 +64,9 @@ const App = () => {
           <Route path="/list" element={<List />} />
           <Route path="/boxes" element={<Boxes />} />
           <Route path="/orders" element={<Orders />} />
+          <Route path="/tiffins" element={<Tiffins />} />
+          <Route path="/tiffin-settings" element={<TiffinSettings />} />
+          <Route path="/tiffin-orders" element={<TiffinOrders />} />
         </Route>
       </Routes>
     </div>

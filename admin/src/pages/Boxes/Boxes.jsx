@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import axios from 'axios'
+import { imageUrl } from '../../utils/imageUrl'
 import { toast } from 'react-toastify'
 import { CardSkeleton, EmptyState } from '../../components/Feedback/Feedback'
 import './Boxes.css'
@@ -265,7 +266,7 @@ const Boxes = () => {
                       setShowDropdown(false)
                     }}
                   >
-                    <img src={`${url}/images/${it.image}`} alt={it.name} className="dropdown-item-image" loading="lazy" />
+                    <img src={imageUrl(it.image)} alt={it.name} className="dropdown-item-image" loading="lazy" />
                     <span>{it.name}</span>
                     {items.some(i => i.itemId === it._id) && <i className="fas fa-check dropdown-check" aria-hidden="true" />}
                   </div>
@@ -284,7 +285,7 @@ const Boxes = () => {
             const availableSizes = product?.quantityOptions ? Object.keys(product.quantityOptions).filter(k => product.quantityOptions[k]) : ['g250']
             return (
               <div key={idx} className="selected-item">
-                <img src={`${url}/images/${product?.image}`} alt={product?.name} />
+                <img src={imageUrl(product?.image)} alt={product?.name} />
                 <div className="selected-meta">
                   <div className="selected-name">{product?.name || it.itemId}</div>
                   <select className="select" value={it.size} onChange={e => handleSizeChange(idx, e.target.value)} aria-label={`Size for ${product?.name || 'item'}`}>
@@ -361,7 +362,7 @@ const Boxes = () => {
                 const product = item.itemId
                 return (
                   <div key={idx} className="box-product">
-                    <img src={`${url}/images/${product?.image}`} alt={product?.name} loading="lazy" />
+                    <img src={imageUrl(product?.image)} alt={product?.name} loading="lazy" />
                     <div className="box-product-meta">
                       <div className="box-product-name">{product?.name}</div>
                       <div className="box-product-size">{sizeLabel(item.size)}</div>

@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { toast } from 'react-toastify';
 import Reveal from '../../Components/Motion/Reveal';
+import { imageUrl } from '../../utils/imageUrl';
 
 const MyOrders = () => {
     const [orders, setOrders] = useState([]);
@@ -181,7 +182,7 @@ const MyOrders = () => {
                                 {order.items.map((item, index) => (
                                     <div key={index} className="order-item">
                                         <div className="item-image">
-                                            <img src={`${url}/images/${item.image}`} alt={item.name} loading="lazy" decoding="async" />
+                                            <img src={imageUrl(item.image, url)} alt={item.name} loading="lazy" decoding="async" />
                                         </div>
                                         <div className="item-details">
                                             <h4>{item.name}</h4>

@@ -1,0 +1,506 @@
+/* ================= Tiffins page (poster-style menu) ================= */
+
+.tiffins-page {
+  max-width: 1200px;
+  margin: 24px auto 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  min-width: 0;
+  /* the CSS banana leaves poke out of the cards a little; never let that scroll the page */
+  overflow-x: clip;
+  padding-inline: 4px;
+}
+
+.tiffins-page.has-cartbar {
+  padding-bottom: 88px;
+}
+
+/* ---------- Hero ---------- */
+.tf-hero {
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  padding: 36px 20px 26px;
+  border-radius: var(--radius-xl);
+  background:
+    radial-gradient(circle at 10% 0%, rgba(255, 210, 74, 0.35), transparent 40%),
+    radial-gradient(circle at 95% 100%, rgba(87, 168, 97, 0.25), transparent 45%),
+    linear-gradient(180deg, var(--tf-cream), #fffdf5);
+  border: 1px solid #f1e7c3;
+  box-shadow: var(--shadow-sm);
+}
+
+.tf-hero-leaf {
+  position: absolute;
+  width: 140px;
+  height: 64px;
+  border-radius: 0 100% 0 100%;
+  background: linear-gradient(135deg, var(--brand-400), var(--brand-600));
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+.tf-hero-leaf::after {
+  content: '';
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 50%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.5);
+  transform: rotate(-24deg);
+}
+
+.tf-hero-leaf-l {
+  top: -14px;
+  left: -34px;
+  transform: rotate(18deg);
+}
+
+.tf-hero-leaf-r {
+  bottom: -18px;
+  right: -36px;
+  transform: rotate(-160deg);
+  background: linear-gradient(135deg, var(--brand-300), var(--brand-500));
+}
+
+.tf-hero-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--brand-100);
+  color: var(--brand-600);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.tf-hero-title {
+  margin-top: 10px;
+  font-size: clamp(2.2rem, 6vw, 3.8rem);
+  font-weight: 800;
+  color: var(--tf-ink);
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+.tf-hero-tag {
+  font-family: var(--tf-script);
+  font-size: clamp(1.6rem, 4vw, 2.3rem);
+  font-weight: 700;
+  color: var(--brand-500);
+  line-height: 1.1;
+}
+
+.tf-badges {
+  list-style: none;
+  margin: 22px auto 0;
+  max-width: 900px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.tf-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 8px;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid var(--brand-100);
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--brand-700);
+  line-height: 1.25;
+}
+
+.tf-badge-icon {
+  position: relative;
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--brand-500), var(--brand-700));
+  color: #fff;
+  font-size: 1.1rem;
+  box-shadow: 0 6px 14px rgba(31, 111, 67, 0.25);
+}
+
+.tf-badge-icon.is-strike::after {
+  content: '';
+  position: absolute;
+  width: 60%;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--tf-yellow);
+  transform: rotate(-45deg);
+}
+
+/* ---------- Ribbon ---------- */
+.tf-ribbon-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 0 12px;
+}
+
+.tf-ribbon {
+  position: relative;
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: baseline;
+  gap: 4px 12px;
+  padding: 12px 56px;
+  max-width: 100%;
+  color: #fff;
+  font-size: clamp(1.25rem, 3.2vw, 1.9rem);
+  font-weight: 800;
+  text-align: center;
+  background: linear-gradient(135deg, var(--brand-700), var(--brand-800));
+  clip-path: polygon(0 0, 100% 0, calc(100% - 22px) 50%, 100% 100%, 0 100%, 22px 50%);
+  filter: drop-shadow(0 8px 14px rgba(19, 69, 43, 0.25));
+}
+
+.tf-ribbon em {
+  font-style: normal;
+  font-family: var(--tf-script);
+  font-size: 1.35em;
+  font-weight: 700;
+  color: var(--tf-yellow);
+  letter-spacing: 0;
+}
+
+.tf-closed-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: -8px;
+  font-size: 0.88rem;
+  color: var(--tf-amber-text);
+}
+
+/* ---------- Grid ---------- */
+.tf-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 26px 18px;
+}
+
+.tf-grid-cell {
+  min-width: 0;
+}
+
+/* ---------- Groceries / produce ---------- */
+.tf-promos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.tf-promo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 100%;
+  padding: 18px 20px;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out);
+}
+
+.tf-promo:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.tf-promo-grocery {
+  background: linear-gradient(135deg, var(--tf-cream), #fff);
+}
+
+.tf-promo-veg {
+  background: linear-gradient(135deg, var(--tf-leaf-green), #fff);
+}
+
+.tf-promo-icon {
+  flex-shrink: 0;
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--brand-700);
+  color: var(--tf-yellow);
+  font-size: 1.3rem;
+}
+
+.tf-promo-veg .tf-promo-icon {
+  color: #ffb07a;
+}
+
+.tf-promo-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.tf-promo-body strong {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  color: var(--tf-ink);
+}
+
+.tf-promo-body span {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.tf-promo-arrow {
+  color: var(--brand-500);
+  transition: transform var(--dur) var(--ease-out);
+}
+
+.tf-promo:hover .tf-promo-arrow {
+  transform: translateX(4px);
+}
+
+/* ---------- Info boxes ---------- */
+.tf-info {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.tf-info-box {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px;
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  border: 2px solid var(--brand-100);
+  min-width: 0;
+}
+
+.tf-info-box h3 {
+  font-size: 1rem;
+  color: var(--tf-ink);
+}
+
+.tf-info-box p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.tf-info-icon {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-md);
+  background: var(--brand-50);
+  color: var(--brand-600);
+  font-size: 1.2rem;
+}
+
+.tf-review {
+  background: linear-gradient(135deg, var(--tf-cream), #fff);
+  border-color: #f1e1a6;
+}
+
+.tf-qr {
+  flex-shrink: 0;
+  width: 92px;
+  height: 92px;
+  border-radius: var(--radius-md);
+  background: #fff;
+  border: 1px solid var(--border);
+  padding: 4px;
+}
+
+.tf-qr-icon {
+  display: grid;
+  place-items: center;
+  color: var(--brand-700);
+  font-size: 2.4rem;
+}
+
+.tf-review-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--brand-600);
+}
+
+.tf-review-link:hover {
+  color: var(--brand-800);
+}
+
+.tf-thanks {
+  font-family: var(--tf-script);
+  font-size: 1.35rem !important;
+  color: var(--brand-600) !important;
+  line-height: 1.1;
+}
+
+/* ---------- Address strip ---------- */
+.tf-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 20px;
+  padding: 14px 20px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(90deg, var(--brand-800), var(--brand-700));
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.92rem;
+}
+
+.tf-strip p {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.tf-strip p i {
+  margin-top: 4px;
+  color: var(--tf-yellow);
+}
+
+.tf-strip a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.tf-strip a:hover {
+  background: var(--tf-yellow);
+  color: var(--brand-800);
+}
+
+.tf-page-links {
+  display: flex;
+  justify-content: center;
+}
+
+.tf-page-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: var(--brand-600);
+}
+
+.tf-page-links a:hover {
+  color: var(--brand-800);
+}
+
+/* ---------- Photo credits ---------- */
+.tf-credits {
+  font-size: 0.8rem;
+  color: var(--text-subtle);
+}
+
+.tf-credits summary {
+  cursor: pointer;
+  width: fit-content;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.tf-credits ul {
+  margin-top: 8px;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-wrap: anywhere;
+}
+
+.tf-credits a {
+  color: var(--brand-600);
+  text-decoration: underline;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1024px) {
+  .tf-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .tf-info {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .tf-review {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 720px) {
+  .tf-badges {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .tf-promos,
+  .tf-info {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .tf-strip {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .tiffins-page {
+    margin-top: 12px;
+    gap: 18px;
+  }
+  .tf-hero {
+    padding: 26px 12px 18px;
+  }
+  .tf-hero-leaf {
+    width: 96px;
+    height: 44px;
+  }
+  .tf-badge {
+    font-size: 0.8rem;
+    padding: 10px 6px;
+  }
+  .tf-ribbon {
+    padding: 10px 34px;
+    clip-path: polygon(0 0, 100% 0, calc(100% - 14px) 50%, 100% 100%, 0 100%, 14px 50%);
+  }
+  .tf-grid {
+    gap: 22px 10px;
+  }
+  .tf-promo {
+    padding: 14px;
+  }
+}
+
+@media (max-width: 340px) {
+  .tf-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

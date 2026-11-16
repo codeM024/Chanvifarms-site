@@ -4,13 +4,16 @@ import './index.css'
 import {BrowserRouter} from 'react-router-dom'
 import StoreContextProvider from './Context/StoreContext.jsx'
 import NavContextProvider from './Context/NavContext.jsx'
+import TiffinProvider from './Context/TiffinContext.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>
     <StoreContextProvider>
-      <NavContextProvider>
-        <App />
-      </NavContextProvider>
+      <TiffinProvider>
+        <NavContextProvider>
+          <App />
+        </NavContextProvider>
+      </TiffinProvider>
     </StoreContextProvider>
   </BrowserRouter>,
 )

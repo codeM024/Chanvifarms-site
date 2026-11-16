@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import PropTypes from 'prop-types'
 import './CartComponent.css'
+import { imageUrl } from '../../utils/imageUrl'
 
 const EASE_OUT = [0.22, 1, 0.36, 1];
 
@@ -326,7 +327,7 @@ const CartComponent = () => {
                     return (
                       <motion.li key={cartKey} className="cart-row" {...rowMotion}>
                         <div className="cart-row-media">
-                          <img src={`${url}/images/${item.image}`} alt={item.name} loading="lazy" decoding="async" />
+                          <img src={imageUrl(item.image, url)} alt={item.name} loading="lazy" decoding="async" />
                         </div>
                         <div className="cart-row-info">
                           <h3>{item.name}</h3>

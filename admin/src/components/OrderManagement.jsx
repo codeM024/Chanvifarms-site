@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { imageUrl } from '../utils/imageUrl';
 import { toast } from 'react-toastify';
 import { format } from 'date-fns';
 import { CardSkeleton, EmptyState } from './Feedback/Feedback';
@@ -132,7 +133,7 @@ const OrderManagement = () => {
                                     <div key={index} className="flex justify-between items-center">
                                         <div className="flex items-center">
                                             <img 
-                                                src={item.image} 
+                                                src={imageUrl(item.image)}
                                                 alt={item.name}
                                                 className="w-16 h-16 object-cover rounded"
                                             />

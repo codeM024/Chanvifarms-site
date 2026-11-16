@@ -1,4 +1,5 @@
 import { useState, useEffect, lazy, Suspense } from 'react'
+import PropTypes from 'prop-types'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion, MotionConfig } from 'framer-motion'
 import Navbar from './Components/Navbar/Navbar'
@@ -20,6 +21,9 @@ const MyOrders = lazy(() => import('./Pages/MyOrders/MyOrders'))
 const Terms = lazy(() => import('./Pages/Terms/Terms'))
 const Privacy = lazy(() => import('./Pages/Privacy/Privacy'))
 const LoginPopup = lazy(() => import('./Components/LoginPopup/LoginPopup'))
+const Tiffins = lazy(() => import('./Pages/Tiffins/Tiffins'))
+const TiffinCheckout = lazy(() => import('./Pages/TiffinCheckout/TiffinCheckout'))
+const TiffinOrders = lazy(() => import('./Pages/TiffinOrders/TiffinOrders'))
 
 // Warm up the most visited pages once the browser is idle
 const prefetchRoutes = () => {
@@ -40,6 +44,8 @@ const Page = ({ children }) => (
   </motion.div>
 )
 
+Page.propTypes = { children: PropTypes.node }
+
 const App = () => {
   const [showLogin, setShowLogin] = useState(false)
   const location = useLocation()
@@ -57,6 +63,9 @@ const App = () => {
     ['/', Home], ['/about', About], ['/shop', Shop], ['/contact', Contact],
     ['/cart', Cart], ['/order', PlaceOrder], ['/verify', Verify],
     ['/myorders', MyOrders], ['/terms', Terms], ['/privacy', Privacy],
+    ['/tiffins', Tiffins],
+    // Pages that can open the login popup themselves
+    ['/tiffins/checkout', TiffinCheckout, true], ['/tiffins/orders', TiffinOrders, true],
   ]
 
   return (
@@ -73,8 +82,12 @@ const App = () => {
         <Suspense fallback={<PageLoader />}>
           <AnimatePresence mode="wait" initial={false}>
             <Routes location={location} key={location.pathname}>
-              {routes.map(([path, Component]) => (
-                <Route key={path} path={path} element={<Page><Component /></Page>} />
+              {routes.map(([path, Component, needsLogin]) => (
+                <Route
+                  key={path}
+                  path={path}
+                  element={<Page>{needsLogin ? <Component setShowLogin={setShowLogin} /> : <Component />}</Page>}
+                />
               ))}
             </Routes>
           </AnimatePresence>

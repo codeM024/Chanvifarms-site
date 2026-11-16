@@ -12,6 +12,7 @@ const NAV_LINKS = [
   { key: "home", to: "/", label: "Home" },
   { key: "about", to: "/about", label: "About Us" },
   { key: "shop", to: "/shop", label: "Organic Products" },
+  { key: "tiffins", to: "/tiffins", label: "Tiffins" },
   { key: "contact", to: "/contact", label: "Contact Us" },
 ];
 
@@ -33,7 +34,8 @@ const Navbar = ({ setShowLogin }) => {
 
   // Update active nav based on location
   useEffect(() => {
-    const path = location.pathname.substring(1) || "home";
+    // "/tiffins/checkout" keeps the "tiffins" link active
+    const path = location.pathname.split("/")[1] || "home";
     setActiveNav(path);
   }, [location, setActiveNav]);
 
@@ -196,8 +198,18 @@ const Navbar = ({ setShowLogin }) => {
                     setIsProfileOpen(false);
                   }}
                 >
-                  <img src={assets.bag_icon} alt="Orders" />
+                  <img src={assets.bag_icon} alt="" />
                   <p>My Orders</p>
+                </li>
+                <li
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate("/tiffins/orders");
+                    setIsProfileOpen(false);
+                  }}
+                >
+                  <i className="fas fa-utensils nav-dd-icon" aria-hidden="true"></i>
+                  <p>Tiffin Orders</p>
                 </li>
                 <li
                   onClick={(e) => {

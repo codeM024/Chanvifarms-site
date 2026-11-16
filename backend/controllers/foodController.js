@@ -3,6 +3,13 @@ import fs from 'fs';
 import path from 'path';
 import mongoose from 'mongoose';
 import Order from '../models/orderModel.js';
+import { uploadImage, deleteImage } from '../utils/cloudinary.js';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Images are either a Cloudinary URL (new) or a filename in /uploads (old)
+const isRemote = (img) => /^https?:\/\//.test(img || '');
 
 // Parse JSON fields from form data
 const addFood = async (req, res) => {
@@ -62,6 +69,14 @@ const addFood = async (req, res) => {
             });
         }
 
+        let image = req.file.filename;
+        let imagePublicId = '';
+        if (req.file.buffer) {
+            const uploaded = await uploadImage(req.file.buffer, 'products');
+            image = uploaded.url;
+            imagePublicId = uploaded.publicId;
+        }
+
         const food = new foodModel({
             name,
             description,
@@ -70,7 +85,8 @@ const addFood = async (req, res) => {
             category,
             status,
             quantityOptions,
-            image: req.file.filename
+            image,
+            imagePublicId
         });
 
         await food.save();
@@ -151,10 +167,11 @@ const deleteFood = async (req, res) => {
             });
         }
 
-        // Delete image file
+        // Delete image (Cloudinary or local file)
         try {
-            const imagePath = path.join(__dirname, '../uploads', food.image);
-            if (fs.existsSync(imagePath)) {
+            if (isRemote(food.image)) await deleteImage(food.imagePublicId);
+            const imagePath = isRemote(food.image) ? null : path.join(__dirname, '../uploads', food.image);
+            if (imagePath && fs.existsSync(imagePath)) {
                 fs.unlinkSync(imagePath);
             }
         } catch (error) {
