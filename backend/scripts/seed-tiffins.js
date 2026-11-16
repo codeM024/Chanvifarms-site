@@ -43,7 +43,8 @@ const run = async () => {
 
     let created = 0, imaged = 0, skipped = 0;
     for (const [i, item] of MENU.entries()) {
-        const existing = await tiffinModel.findOne({ name: item.name });
+        // Case-insensitive match so "masala Dosa" added in the admin panel counts as "Masala Dosa"
+        const existing = await tiffinModel.findOne({ name: item.name }).collation({ locale: "en", strength: 2 });
         if (existing && existing.image) { skipped++; continue; }
 
         const buffer = fs.readFileSync(path.join(IMAGES, `${item.file}.webp`));
